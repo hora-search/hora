@@ -117,12 +117,12 @@ fn two_means<E: node::FloatElement, T: node::IdxType>(
         j += 1;
     }
 
-    let mut p = Leaf::copy_leaf(&leaves[i]);
-    let mut q = Leaf::copy_leaf(&leaves[j]);
+    let mut first = Leaf::copy_leaf(&leaves[i]);
+    let mut second = Leaf::copy_leaf(&leaves[j]);
 
     if mt == metrics::Metric::CosineSimilarity {
-        p.normalize();
-        q.normalize();
+        first.normalize();
+        second.normalize();
     }
     // TODO: dot normalize
 
@@ -134,14 +134,16 @@ fn two_means<E: node::FloatElement, T: node::IdxType>(
 
     // produce two mean point.
     for _z in 0..ITERATION_STEPS {
-        let k = random::index(count);
-        let di = ic * metrics::metric(&p.node.vectors(), &leaves[k].node.vectors(), mt).unwrap();
-        let dj = jc * metrics::metric(&q.node.vectors(), &leaves[k].node.vectors(), mt).unwrap();
+        let rand_k = random::index(count);
+        let di = ic
+            * metrics::metric(&first.node.vectors(), &leaves[rand_k].node.vectors(), mt).unwrap();
+        let dj = jc
+            * metrics::metric(&second.node.vectors(), &leaves[rand_k].node.vectors(), mt).unwrap();
 
         //
         let mut norm = one;
         if mt == metrics::Metric::CosineSimilarity {
-            norm = calc::get_norm(&leaves[k].node.vectors()).unwrap();
+            norm = calc::get_norm(&leaves[rand_k].node.vectors()).unwrap();
             match norm.partial_cmp(&zero) {
                 Some(Ordering::Equal) | Some(Ordering::Less) => continue,
                 _ => {}
@@ -150,20 +152,22 @@ fn two_means<E: node::FloatElement, T: node::IdxType>(
 
         // make p more closer to k in space.
         if di < dj {
-            for l in 0..p.node.len() {
-                p.node.mut_vectors()[l] =
-                    (p.node.vectors()[l] * ic + leaves[k].node.vectors()[l] / norm) / (ic + one);
+            for l in 0..first.node.len() {
+                first.node.mut_vectors()[l] = (first.node.vectors()[l] * ic
+                    + leaves[rand_k].node.vectors()[l] / norm)
+                    / (ic + one);
             }
             ic += one;
         } else if dj < di {
-            for l in 0..q.node.len() {
-                q.node.mut_vectors()[l] =
-                    (q.node.vectors()[l] * jc + leaves[k].node.vectors()[l] / norm) / (jc + one);
+            for l in 0..second.node.len() {
+                second.node.mut_vectors()[l] = (second.node.vectors()[l] * jc
+                    + leaves[rand_k].node.vectors()[l] / norm)
+                    / (jc + one);
             }
             jc += one;
         }
     }
-    Ok((p, q))
+    Ok((first, second))
 }
 
 #[derive(Default, Debug, Serialize, Deserialize)]

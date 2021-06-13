@@ -22,7 +22,7 @@ fn make_normal_distribution_clustering(
         let mut base: Vec<f32> = Vec::with_capacity(dimension);
         for _i in 0..dimension {
             let n: f64 = rng.gen::<f64>() * range; // base number
-            base.push((n as f32));
+            base.push(n as f32);
         }
 
         let v_iter: Vec<f64> = rng
@@ -32,7 +32,7 @@ fn make_normal_distribution_clustering(
             .clone();
         for _i in 0..node_n {
             let mut vec_item = Vec::with_capacity(dimension);
-            for i in 0..dimension {
+            for (i, _item) in base.iter().enumerate().take(dimension) {
                 let vv = (v_iter[_i * dimension..(_i + 1) * dimension][i] as f32) + base[i]; // add normal distribution noise
                 vec_item.push(vv);
             }

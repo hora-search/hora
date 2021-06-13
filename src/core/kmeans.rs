@@ -128,7 +128,7 @@ impl<E: node::FloatElement> Kmeans<E> {
     pub fn search_data(
         &mut self,
         batch_size: usize,
-        batch_data: &Vec<Vec<E>>,
+        batch_data: &[Vec<E>],
         assigned_center: &mut Vec<usize>,
     ) {
         let n_center = self._n_center;
@@ -192,7 +192,7 @@ impl<E: node::FloatElement> Kmeans<E> {
         Ok(())
     }
 
-    pub fn train(&mut self, batch_size: usize, batch_data: &Vec<Vec<E>>, n_epoch: usize) {
+    pub fn train(&mut self, batch_size: usize, batch_data: &[Vec<E>], n_epoch: usize) {
         self.init_center(batch_size, batch_data);
         (0..n_epoch).for_each(|epoch| {
             let mut assigned_center: Vec<usize> = Vec::with_capacity(batch_size);
@@ -238,7 +238,7 @@ pub fn general_kmeans<E: node::FloatElement, T: node::IdxType>(
         nodes.par_iter().zip(0..nodes.len()).for_each(|(node, _j)| {
             let mut idx = 0;
             let mut distance = E::max_value();
-            for i in 0..means.len() {
+            for (i, _item) in means.iter().enumerate() {
                 let _distance = node.metric(&means[i], mt).unwrap();
                 if _distance < distance {
                     idx = i;

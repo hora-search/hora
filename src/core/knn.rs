@@ -433,7 +433,7 @@ mod tests {
     use std::collections::HashSet;
 
     use std::iter::FromIterator;
-    use std::time::{Duration, SystemTime, UNIX_EPOCH};
+    use std::time::SystemTime;
     fn make_normal_distribution_clustering(
         clustering_n: usize,
         node_n: usize,
