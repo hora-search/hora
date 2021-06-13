@@ -1,4 +1,4 @@
-use fastann::core::metrics;
+use hora::core::metrics;
 
 use criterion::{black_box, criterion_group, criterion_main, Criterion};
 use rand::distributions::Standard;
