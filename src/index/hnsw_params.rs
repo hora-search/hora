@@ -1,30 +1,16 @@
 #![allow(dead_code)]
-use crate::core::ann_index;
-use crate::core::arguments;
-use crate::core::metrics;
-use crate::core::neighbor::Neighbor;
+
 use crate::core::node;
-use fixedbitset::FixedBitSet;
+
 #[cfg(feature = "without_std")]
 use hashbrown::HashMap;
 #[cfg(feature = "without_std")]
 use hashbrown::HashSet;
-use rand::prelude::*;
-use rayon::{iter::IntoParallelIterator, prelude::*};
-use serde::de::DeserializeOwned;
-use std::collections::BinaryHeap;
 
 use serde::{Deserialize, Serialize};
 
 #[cfg(not(feature = "without_std"))]
-use std::collections::HashMap;
 #[cfg(not(feature = "without_std"))]
-use std::collections::HashSet;
-use std::fs::File;
-use std::io::Write;
-
-use std::sync::RwLock;
-
 #[derive(Debug, Serialize, Deserialize)]
 pub struct HNSWParams<E: node::FloatElement> {
     pub max_item: usize,

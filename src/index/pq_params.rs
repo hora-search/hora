@@ -1,20 +1,8 @@
 #![allow(dead_code)]
-use crate::core::ann_index;
-use crate::core::arguments;
-use crate::core::kmeans;
-use crate::core::metrics;
-use crate::core::neighbor::Neighbor;
+
 use crate::core::node;
 
-use rayon::prelude::*;
-use serde::de::DeserializeOwned;
-use std::collections::BinaryHeap;
-
 use serde::{Deserialize, Serialize};
-
-use std::fs::File;
-
-use std::io::Write;
 
 #[derive(Debug, Serialize, Deserialize)]
 pub struct PQParams<E: node::FloatElement> {

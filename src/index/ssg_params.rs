@@ -1,29 +1,13 @@
 #![allow(dead_code)]
-use crate::core::ann_index;
-use crate::core::arguments;
-use crate::core::metrics;
-use crate::core::neighbor;
+
 use crate::core::node;
-use fixedbitset::FixedBitSet;
+
 #[cfg(feature = "without_std")]
 use hashbrown::HashSet;
-use rand::prelude::*;
-use rayon::prelude::*;
-use serde::de::DeserializeOwned;
+
 use serde::{Deserialize, Serialize};
-use std::cmp::Reverse;
-use std::collections::BinaryHeap;
-use std::collections::LinkedList;
 
-use crate::core::kmeans;
 #[cfg(not(feature = "without_std"))]
-use std::collections::HashSet;
-use std::collections::VecDeque;
-
-use std::fs::File;
-use std::io::Write;
-use std::sync::{Arc, Mutex};
-
 #[derive(Debug, Serialize, Deserialize)]
 pub struct SSGParams<E: node::FloatElement> {
     pub angle: E,

@@ -430,28 +430,19 @@ impl<E: node::FloatElement, T: node::IdxType> SSGIndex<E, T> {
             search_flags.insert(iter.idx());
         }
 
-        let mut cnt = 0;
-
         // greedy BFS search
-        let mut c = Vec::new();
         while !search_queue.is_empty() {
             let id = search_queue.pop_front().unwrap();
 
-            let mut contribute = 0;
-            let mut calc = 0;
-            let mut pass = 0;
             let mut tmp = BinaryHeap::with_capacity(self.graph[id].len());
             for iter in self.graph[id].iter() {
                 if search_flags.contains(*iter) {
-                    pass += 1;
                     continue;
                 }
 
                 let dist = self.nodes[*iter].metric(query, self.mt).unwrap();
                 tmp.push(Reverse(neighbor::Neighbor::new(*iter, dist)));
                 search_flags.insert(*iter);
-                calc += 1;
-                cnt += 1;
             }
             while !tmp.is_empty() {
                 let Reverse(item) = tmp.pop().unwrap();
@@ -462,21 +453,9 @@ impl<E: node::FloatElement, T: node::IdxType> SSGIndex<E, T> {
                 heap.pop();
                 search_queue.push_back(item.idx());
                 heap.push(item);
-                contribute += 1;
             }
-
-            c.push((
-                contribute,
-                calc,
-                self.graph[id].len(),
-                // (contribute as f32) / (calc as f32),
-                // (calc as f32) / (self.graph[*id].len() as f32),
-                // (contribute as f32) / (self.graph[*id].len() as f32),
-                // (pass as f32) / (self.graph[*id].len() as f32),
-            ));
         }
 
-        // println!("stat_here cnt {:?}", cnt);
         let mut result = Vec::with_capacity(heap.len());
 
         while !heap.is_empty() {
