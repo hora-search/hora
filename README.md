@@ -39,7 +39,8 @@ Hora, `ほら` in Japanese, sound like `hōlə`, means `You see!` or `Look at th
   * `Hierarchical Navigable Small World Graph Index(HNSW)` ([reference](https://arxiv.org/abs/1603.09320))
   * `Satellite System Graph (SSG)` ([reference](https://arxiv.org/abs/1907.06146))
   * `Product Quantization Inverted File(PQIVF)` ([reference](https://lear.inrialpes.fr/pubs/2011/JDS11/jegou_searching_with_quantization.pdf))
-  * `Random Projection Tree(RPT)`, `BruteForce`
+  * `Random Projection Tree(RPT)`
+  * `BruteForce`
 
 * **Light** 💡
   * the whole library did not dependent any heavy library, such as `BLAS`
@@ -49,13 +50,13 @@ Hora, `ほら` in Japanese, sound like `hōlə`, means `You see!` or `Look at th
 
 * **Multiple Distances Support** 🧮
   * `Dot Product distance`
-    * <img src="https://latex.codecogs.com/gif.latex?{ D(x,y) = \sum{(x*y)} }" />
+    * ![equation](https://latex.codecogs.com/gif.latex?D%28x%2Cy%29%20%3D%20%5Csum%7B%28x*y%29%7D)
   * `Euclidean distance`
-    * <img src="https://latex.codecogs.com/gif.latex?{ D(x,y) = \sqrt{\sum{(x-y)^2}} }" /> 
+    * ![equation](https://latex.codecogs.com/gif.latex?D%28x%2Cy%29%20%3D%20%5Csqrt%7B%5Csum%7B%28x-y%29%5E2%7D%7D)
   * `Manhattan distance`
-    * <img src="https://latex.codecogs.com/gif.latex?{ D(x,y) = \sum{(x-y)} }" />
+    * ![equation](https://latex.codecogs.com/gif.latex?D%28x%2Cy%29%20%3D%20%5Csum%7B%7C%28x-y%29%7C%7D)
   * `cosine distance`
-    * <img src="https://latex.codecogs.com/gif.latex?{ D(x,y) = \frac{x *y}{||x||*||y||}" />
+    * ![equation](https://latex.codecogs.com/gif.latex?D%28x%2Cy%29%20%3D%20%5Cfrac%7Bx%20*y%7D%7B%7C%7Cx%7C%7C*%7C%7Cy%7C%7C%7D)
 
 * **Productive** ⭐
   * well documented
