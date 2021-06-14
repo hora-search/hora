@@ -1,6 +1,6 @@
 # Hora
 
-approximate nearest neighbor search library in Rust
+a approximate nearest neighbor search library, written in Rust
 
 ## Introduction
 
@@ -13,7 +13,7 @@ Hora, `ほら` in Japanese, sound like `hōlə`, means `You see!` or `Look at th
   * stuble algorithm implementation
   * multiple threads design
 
-* **Multi Language Support** ☄️ 
+* **Multi Language Support** ☄️
   * `Python`
   * `Javascript`
   * `Java`
@@ -22,18 +22,7 @@ Hora, `ほら` in Japanese, sound like `hōlə`, means `You see!` or `Look at th
   * `Swift` (WIP)
   * `R` (WIP)
   * `Julia` (WIP)
-  * and it also can serve as a service
-
-* **Portable** 💼
-  * `no_std` support (WIP)
-  * `Windows`, `Linux` and `OS X` support
-  * `IOS` and `Android` Support (WIP)
-  * thanks for `LLVM`, Hora can be used in `x66` and `ARM` CPUs
-
-* **security** 🔒
-  * thanks for rust strict compiler
-  * all language lib's Hora memory is managed by the Rust
-  * full coverage testing
+  * **also can serve as a service**
 
 * **Multiple Index support** 🚀
   * `Hierarchical Navigable Small World Graph Index(HNSW)` ([reference](https://arxiv.org/abs/1603.09320))
@@ -42,11 +31,16 @@ Hora, `ほら` in Japanese, sound like `hōlə`, means `You see!` or `Look at th
   * `Random Projection Tree(RPT)`
   * `BruteForce`
 
-* **Light** 💡
-  * the whole library did not dependent any heavy library, such as `BLAS`
+* **Portable** 💼
+  * `no_std` support (WIP)
+  * `Windows`, `Linux` and `OS X` support
+  * `IOS` and `Android` Support (WIP)
+  * thanks for `LLVM`, Hora can be used in `x66` and `ARM` CPUs
 
-* **Configurable Compilation** 📕
-  * Hora support some features, such as `SIMD`
+* **Security** 🔒
+  * thanks for rust strict compiler
+  * all language lib's Hora memory is managed by the Rust
+  * full coverage testing
 
 * **Multiple Distances Support** 🧮
   * `Dot Product distance`
@@ -57,6 +51,12 @@ Hora, `ほら` in Japanese, sound like `hōlə`, means `You see!` or `Look at th
     * ![equation](https://latex.codecogs.com/gif.latex?D%28x%2Cy%29%20%3D%20%5Csum%7B%7C%28x-y%29%7C%7D)
   * `cosine distance`
     * ![equation](https://latex.codecogs.com/gif.latex?D%28x%2Cy%29%20%3D%20%5Cfrac%7Bx%20*y%7D%7B%7C%7Cx%7C%7C*%7C%7Cy%7C%7C%7D)
+
+* **Light** 💡
+  * the whole library did not dependent any heavy library, such as `BLAS`
+
+* **Configurable** 📕
+  * Hora support some features, such as `SIMD`, `no_std`
 
 * **Productive** ⭐
   * well documented
@@ -76,15 +76,19 @@ hora = "0.1.0"
 ### Python
 
 ```Bash
-pip install hora
+$ pip install hora
 ```
 
 ### Building from source
 
 ```bash
-git clone https://github.com/hora-search/hora
-cargo build
+$ git clone https://github.com/hora-search/hora
+$ cargo build
 ```
+
+## Benchmark
+
+pic here
 
 ## Interface
 
@@ -214,9 +218,7 @@ pub trait SerializableIndex<
 }
 ```
 
-## Benchmark
 
-pic here
 
 ## Example
 
@@ -231,6 +233,14 @@ Python usage exmaple
 ```Python
 
 ```
+
+## Roadmap
+
+- [ ] Full Coverage Test
+- [ ] implement a [EFANNA](http://arxiv.org/abs/1609.07228) to achieve faster KNN buiding
+- [ ] Swift Support and also IOS/Mac OS deployment example
+- [ ] R Support
+- [ ] mmap file support
 
 ## Related Project and Comparison
 
