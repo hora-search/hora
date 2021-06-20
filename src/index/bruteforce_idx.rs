@@ -23,7 +23,7 @@ pub struct BruteForceIndex<E: node::FloatElement, T: node::IdxType> {
 }
 
 impl<E: node::FloatElement, T: node::IdxType> BruteForceIndex<E, T> {
-    pub fn new(dimension: usize, _params: BruteForceParams) -> BruteForceIndex<E, T> {
+    pub fn new(dimension: usize, _params: &BruteForceParams) -> BruteForceIndex<E, T> {
         BruteForceIndex::<E, T> {
             nodes: Vec::new(),
             mt: metrics::Metric::Unknown,
