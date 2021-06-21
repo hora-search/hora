@@ -1,16 +1,16 @@
 [package]
-name = "hora"
-version = "0.1.0"
-authors = ["salamer <gagasalamer@outlook.com>"]
+authors = ["aljun <gagasalamer@outlook.com>"]
 edition = "2018"
 license = "Apache-2.0"
+name = "hora"
+version = "0.1.0"
 
 description = "Hora Search Everywhere"
 documentation = "https://docs.rs/hora/"
 repository = "https://github.com/hora-search/hora"
 
-keywords = ["approximate nearest neighbor search", "artificial intelligence", "SIMD", "nearest-neighbor-search", "no_std"]
 categories = ["artificial intelligence"]
+keywords = ["approximate nearest neighbor search", "artificial intelligence", "SIMD", "nearest-neighbor-search", "no_std"]
 
 [profile.dev]
 codegen-units = 4 
@@ -35,8 +35,8 @@ panic = 'unwind'
 rpath = false
 
 [features]
-simd = ["packed_simd"]
 no_std = ["hashbrown"]
+simd = ["packed_simd"]
 
 [dependencies]
 bincode = "1.3.2"
@@ -54,5 +54,5 @@ smallvec = {version = "1.6.1", features = ["serde"], optional = true}
 criterion = "0.3.4"
 
 [[bench]]
-name = "bench_metrics"
 harness = false
+name = "bench_metrics"

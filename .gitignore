@@ -19,3 +19,6 @@ Cargo.lock
 examples/Cargo.lock
 examples/target
 examples/target/
+*.so
+.DS_STORE
+build/
