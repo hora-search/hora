@@ -14,8 +14,7 @@ struct StatMetrics {
     TestSize: usize,
 }
 
-const data_path: &str =
-    "lastfm-64-dot.hdf5";
+const data_path: &str = "lastfm-64-dot.hdf5";
 const dimension: usize = 65;
 const K: usize = 10;
 
