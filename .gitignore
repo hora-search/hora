@@ -22,3 +22,4 @@ examples/target/
 *.so
 .DS_STORE
 build/
+examples/src/*.hdf5
