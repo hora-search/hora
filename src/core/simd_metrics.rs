@@ -25,11 +25,11 @@ macro_rules! simd_optimized_impl {
                         .sum::<$simd_type>()
                         .sum();
                     let d: $type_id = a[size..].iter().zip(&b[size..]).map(|(p, q)| p * q).sum();
-                    Ok(c + d)
+                    Ok(-(c + d))
                 }
                 #[cfg(not(feature = $simd_size))]
                 {
-                    Ok(a.iter().zip(b).map(|(p, q)| p * q).sum::<$type_id>())
+                    Ok(-(a.iter().zip(b).map(|(p, q)| p * q).sum::<$type_id>()))
                 }
             }
 
