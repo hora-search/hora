@@ -4,7 +4,7 @@ pub fn get_norm<T>(vec1: &[T]) -> Result<T, &'static str>
 where
     T: FloatElement,
 {
-    match dot(&vec1, &vec1) {
+    match dot(vec1, vec1) {
         Ok(val) => Ok(val.sqrt()),
         Err(err) => Err(err),
     }
@@ -14,7 +14,7 @@ pub fn dot<T>(vec1: &[T], vec2: &[T]) -> Result<T, &'static str>
 where
     T: FloatElement,
 {
-    T::dot_product(&vec1, &vec2)
+    T::dot_product(vec1, vec2)
 }
 
 #[inline(always)]
@@ -47,7 +47,7 @@ mod tests {
     use rand::distributions::Standard;
 
     use rand::Rng;
-    use std::time::{Duration, SystemTime, UNIX_EPOCH};
+    use std::time::SystemTime;
     fn make_normal_distribution_clustering(
         clustering_n: usize,
         node_n: usize,
@@ -135,7 +135,7 @@ mod tests {
             let base_start = SystemTime::now();
             let sumsimd = ns
                 .iter()
-                .map(|nsx| f32::euclidean_distance(&nsx, &nsx).unwrap())
+                .map(|nsx| f32::euclidean_distance(nsx, nsx).unwrap())
                 .sum::<f32>();
             let base_since_the_epoch = SystemTime::now()
                 .duration_since(base_start)

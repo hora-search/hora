@@ -66,7 +66,7 @@ impl<E: node::FloatElement, T: node::IdxType> Leaf<E, T> {
     }
 
     fn normalize(&mut self) {
-        let norm = calc::get_norm(&self.node.vectors()).unwrap();
+        let norm = calc::get_norm(self.node.vectors()).unwrap();
         if norm > E::float_zero() {
             for i in 0..self.node.len() {
                 self.node.mut_vectors()[i] /= norm;
@@ -135,15 +135,15 @@ fn two_means<E: node::FloatElement, T: node::IdxType>(
     // produce two mean point.
     for _z in 0..ITERATION_STEPS {
         let rand_k = random::index(count);
-        let di = ic
-            * metrics::metric(&first.node.vectors(), &leaves[rand_k].node.vectors(), mt).unwrap();
-        let dj = jc
-            * metrics::metric(&second.node.vectors(), &leaves[rand_k].node.vectors(), mt).unwrap();
+        let di =
+            ic * metrics::metric(first.node.vectors(), leaves[rand_k].node.vectors(), mt).unwrap();
+        let dj =
+            jc * metrics::metric(second.node.vectors(), leaves[rand_k].node.vectors(), mt).unwrap();
 
         //
         let mut norm = one;
         if mt == metrics::Metric::CosineSimilarity {
-            norm = calc::get_norm(&leaves[rand_k].node.vectors()).unwrap();
+            norm = calc::get_norm(leaves[rand_k].node.vectors()).unwrap();
             match norm.partial_cmp(&zero) {
                 Some(Ordering::Equal) | Some(Ordering::Less) => continue,
                 _ => {}
@@ -245,7 +245,7 @@ impl<E: node::FloatElement, T: node::IdxType> BPTIndex<E, T> {
     fn get_distance(&self, i: i32, j: i32) -> E {
         let ni = self.get_leaf(i).unwrap();
         let nj = self.get_leaf(j).unwrap();
-        return metrics::metric(&ni.node.vectors(), &nj.node.vectors(), self.mt).unwrap();
+        return metrics::metric(ni.node.vectors(), nj.node.vectors(), self.mt).unwrap();
     }
 
     fn get_tot_items_cnt(&self) -> i32 {
@@ -382,7 +382,7 @@ impl<E: node::FloatElement, T: node::IdxType> BPTIndex<E, T> {
 
             for leaf_idx in indices.iter().skip(1) {
                 let leaf = self.get_leaf(*leaf_idx as i32).unwrap();
-                let side = self.side(&new_parent_leaf, &leaf.node.vectors());
+                let side = self.side(&new_parent_leaf, leaf.node.vectors());
                 children_indices[(side as usize)].push(*leaf_idx);
             }
 
@@ -477,7 +477,7 @@ impl<E: node::FloatElement, T: node::IdxType> BPTIndex<E, T> {
             } else if nd.n_descendants <= self._leaf_max_items {
                 nns.extend_from_slice(&nd.children); // push all of its children
             } else {
-                let margin = self.margin(&nd, vectors)?;
+                let margin = self.margin(nd, vectors)?;
                 // put two children into heap, and use distance to sort the order for poping up.
                 heap.push(neighbor::Neighbor {
                     _distance: self.pq_distance(top_distance, margin, 1),
@@ -502,7 +502,7 @@ impl<E: node::FloatElement, T: node::IdxType> BPTIndex<E, T> {
             if leaf.n_descendants == 1 {
                 nns_vec.push(neighbor::Neighbor::new(
                     *j as usize,
-                    metrics::metric(&v_leaf.node.vectors(), &leaf.node.vectors(), self.mt).unwrap(),
+                    metrics::metric(v_leaf.node.vectors(), leaf.node.vectors(), self.mt).unwrap(),
                 ))
             }
         }
@@ -543,11 +543,11 @@ impl<E: node::FloatElement, T: node::IdxType> BPTIndex<E, T> {
 
     // means same side?
     fn margin(&self, src: &Leaf<E, T>, dst: &[E]) -> Result<E, &'static str> {
-        calc::dot(&src.node.vectors(), &dst)
+        calc::dot(src.node.vectors(), dst)
     }
 
     fn side(&self, src: &Leaf<E, T>, dst: &[E]) -> bool {
-        match self.margin(&src, &dst) {
+        match self.margin(src, dst) {
             Ok(x) => x > E::float_zero(),
             Err(_e) => random::flip(),
         }
@@ -559,7 +559,7 @@ impl<E: node::FloatElement, T: node::IdxType> BPTIndex<E, T> {
         new_mean_leaf: &mut Leaf<E, T>,
         mt: metrics::Metric,
     ) -> Result<(), &'static str> {
-        let (p, q) = two_means(&leaves, mt)?;
+        let (p, q) = two_means(leaves, mt)?;
 
         // TODO: remove
         if new_mean_leaf.node.len() != 0 && new_mean_leaf.node.len() != p.node.len() {

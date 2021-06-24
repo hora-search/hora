@@ -82,7 +82,7 @@ impl<E: node::FloatElement, T: node::IdxType> SSGIndex<E, T> {
                     }
                     heap.push(neighbor::Neighbor::new(
                         i,
-                        item.metric(&node, self.mt).unwrap(),
+                        item.metric(node, self.mt).unwrap(),
                     ));
                     if heap.len() > self.init_k {
                         heap.pop();
@@ -119,7 +119,7 @@ impl<E: node::FloatElement, T: node::IdxType> SSGIndex<E, T> {
                 if *neighbor_id == *nn_id {
                     continue;
                 }
-                if flags.contains(&nn_id) {
+                if flags.contains(nn_id) {
                     continue;
                 }
                 flags.insert(*nn_id);
@@ -544,7 +544,7 @@ impl<E: node::FloatElement, T: node::IdxType> ann_index::ANNIndex<E, T> for SSGI
         k: usize,
         args: &arguments::Args,
     ) -> Vec<(node::Node<E, T>, E)> {
-        self.search(&item, k, &args)
+        self.search(item, k, args)
     }
 
     fn name(&self) -> &'static str {

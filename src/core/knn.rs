@@ -167,7 +167,7 @@ impl<'a, E: FloatElement, T: IdxType> NNDescentHandler<'a, E, T> {
                     let mut ccc: usize = 0;
                     for j in 0..nn_new_neighbors.len() {
                         for k in j..nn_new_neighbors.len() {
-                            if self.update(nn_new_neighbors[j], nn_new_neighbors[k], &my_graph) {
+                            if self.update(nn_new_neighbors[j], nn_new_neighbors[k], my_graph) {
                                 ccc += 1;
                             }
                             flags.insert(nn_new_neighbors[j] * length + nn_new_neighbors[k]);
@@ -177,7 +177,7 @@ impl<'a, E: FloatElement, T: IdxType> NNDescentHandler<'a, E, T> {
 
                     nn_new_neighbors.iter().for_each(|j| {
                         nn_old_neighbors.iter().for_each(|k| {
-                            if self.update(*j, *k, &my_graph) {
+                            if self.update(*j, *k, my_graph) {
                                 ccc += 1;
                             }
                             flags.insert(j * length + k);
@@ -193,7 +193,7 @@ impl<'a, E: FloatElement, T: IdxType> NNDescentHandler<'a, E, T> {
                             if self.update(
                                 reversed_new_neighbors[j],
                                 reversed_new_neighbors[k],
-                                &my_graph,
+                                my_graph,
                             ) {
                                 ccc += 1;
                             }
@@ -207,7 +207,7 @@ impl<'a, E: FloatElement, T: IdxType> NNDescentHandler<'a, E, T> {
                     }
                     reversed_new_neighbors.iter().for_each(|j| {
                         reversed_old_neighbors.iter().for_each(|k| {
-                            if self.update(*j, *k, &my_graph) {
+                            if self.update(*j, *k, my_graph) {
                                 ccc += 1;
                             }
                             flags.insert(j * length + k);
@@ -217,7 +217,7 @@ impl<'a, E: FloatElement, T: IdxType> NNDescentHandler<'a, E, T> {
 
                     nn_new_neighbors.iter().for_each(|j| {
                         reversed_old_neighbors.iter().for_each(|k| {
-                            if self.update(*j, *k, &my_graph) {
+                            if self.update(*j, *k, my_graph) {
                                 ccc += 1;
                             }
                             flags.insert(j * length + k);
@@ -227,7 +227,7 @@ impl<'a, E: FloatElement, T: IdxType> NNDescentHandler<'a, E, T> {
 
                     nn_new_neighbors.iter().for_each(|j| {
                         reversed_new_neighbors.iter().for_each(|k| {
-                            if self.update(*j, *k, &my_graph) {
+                            if self.update(*j, *k, my_graph) {
                                 ccc += 1;
                             }
                             flags.insert(j * length + k);
@@ -237,7 +237,7 @@ impl<'a, E: FloatElement, T: IdxType> NNDescentHandler<'a, E, T> {
 
                     nn_old_neighbors.iter().for_each(|j| {
                         reversed_new_neighbors.iter().for_each(|k| {
-                            if self.update(*j, *k, &my_graph) {
+                            if self.update(*j, *k, my_graph) {
                                 ccc += 1;
                             }
                             flags.insert(j * length + k);
