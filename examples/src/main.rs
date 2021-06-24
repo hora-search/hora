@@ -1,3 +1,5 @@
+mod ann_bench;
+
 fn main() {
-    println!("Hello, world!");
+    ann_bench::ann_bench();
 }
