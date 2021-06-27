@@ -1,6 +1,7 @@
 <div align="center">
   <img src="asset/logo.png" width="60%"/>
 </div>
+
 # Hora
 
 a approximate nearest neighbor search library, written in Rust
