@@ -1,12 +1,10 @@
-<div style="text-align: center; margin: 20px 0;">
-  <img src="asset/logo.png" width="60%"/>
+<div align="center">
+  <img src="asset/logo.svg" width="80%"/>
 </div>
 
 # Hora
 
 a approximate nearest neighbor search library, written in Rust
-
-# Introduction
 
 Hora, `ほら` in Japanese, sound like `[hōlə]`, means `You see!` or `Look at that!`.
 
@@ -65,7 +63,6 @@ Hora, `ほら` in Japanese, sound like `[hōlə]`, means `You see!` or `Look at 
 # Contents
 
 - [Hora](#hora)
-- [Introduction](#introduction)
 - [Key Features](#key-features)
 - [Contents](#contents)
 - [Installation](#installation)
