@@ -1,12 +1,15 @@
+<div align="center">
+  <img src="asset/logo.png" width="60%"/>
+</div>
 # Hora
 
 a approximate nearest neighbor search library, written in Rust
 
-## Introduction
+# Introduction
 
-Hora, `ほら` in Japanese, sound like `hōlə`, means `You see!` or `Look at that!`.
+Hora, `ほら` in Japanese, sound like `[hōlə]`, means `You see!` or `Look at that!`.
 
-## Key Features
+# Key Features
 
 * **Performant** ⚡️
   * SIMD acceleration
@@ -36,6 +39,8 @@ Hora, `ほら` in Japanese, sound like `hōlə`, means `You see!` or `Look at th
   * `Windows`, `Linux` and `OS X` support
   * `IOS` and `Android` Support (WIP)
   * thanks for `LLVM`, Hora can be used in `x66` and `ARM` CPUs
+  * the whole library did not dependent any heavy library, such as `BLAS`
+  * Hora support some features, such as `SIMD`, `no_std`
 
 * **Security** 🔒
   * thanks for rust strict compiler
@@ -52,17 +57,32 @@ Hora, `ほら` in Japanese, sound like `hōlə`, means `You see!` or `Look at th
   * `cosine distance`
     * ![equation](https://latex.codecogs.com/gif.latex?D%28x%2Cy%29%20%3D%20%5Cfrac%7Bx%20*y%7D%7B%7C%7Cx%7C%7C*%7C%7Cy%7C%7C%7D)
 
-* **Light** 💡
-  * the whole library did not dependent any heavy library, such as `BLAS`
-
-* **Configurable** 📕
-  * Hora support some features, such as `SIMD`, `no_std`
-
 * **Productive** ⭐
   * well documented
   * elegant and simple API, which is extremely easy to learn
 
-## Installation
+# Contents
+
+- [Hora](#hora)
+- [Introduction](#introduction)
+- [Key Features](#key-features)
+- [Contents](#contents)
+- [Installation](#installation)
+    - [rust](#rust)
+    - [Python](#python)
+    - [Building from source](#building-from-source)
+- [Benchmark](#benchmark)
+  - [Interface](#interface)
+- [Example](#example)
+- [Roadmap](#roadmap)
+- [Related Project and Comparison](#related-project-and-comparison)
+- [Contribute](#contribute)
+      - [clone the repo](#clone-the-repo)
+      - [build](#build)
+      - [try the changes](#try-the-changes)
+- [License](#license)
+
+# Installation
 
 ### rust
 
@@ -86,9 +106,9 @@ $ git clone https://github.com/hora-search/hora
 $ cargo build
 ```
 
-## Benchmark
+# Benchmark
 
-pic here
+<img src="asset/fashion-mnist-784-euclidean_10_euclidean.png"/>
 
 ## Interface
 
@@ -220,7 +240,7 @@ pub trait SerializableIndex<
 
 
 
-## Example
+# Example
 
 Rust usage example
 
@@ -234,7 +254,7 @@ Python usage exmaple
 
 ```
 
-## Roadmap
+# Roadmap
 
 - [ ] Full Coverage Test
 - [ ] implement a [EFANNA](http://arxiv.org/abs/1609.07228) to achieve faster KNN buiding
@@ -242,14 +262,14 @@ Python usage exmaple
 - [ ] R Support
 - [ ] mmap file support
 
-## Related Project and Comparison
+# Related Project and Comparison
 
 * [Faiss](https://github.com/facebookresearch/faiss): Facebook AI Similarity Search, which is the most popular ANN library currently
   * Diffrences: Faiss more focus on the GPU scene, and Hora is more light than Faiss
 
 * Annoy
 
-### Contribute
+# Contribute
 
 we are pretty gald to have you to participate, any contributions is welcome, including the documentations and tests.
 you can do the  `Pull Requests`, `Issue` on the github, and we will review it as soon as possible.
@@ -277,6 +297,6 @@ cd exmaples
 cargo run
 ```
 
-## License
+# License
 
 The entire repo is under Apache License.
