@@ -6,15 +6,12 @@ use crate::core::neighbor;
 use crate::core::node;
 use crate::index::ssg_params::SSGParams;
 use fixedbitset::FixedBitSet;
-#[cfg(feature = "without_std")]
-use hashbrown::HashSet;
 use rand::prelude::*;
 use rayon::prelude::*;
 use serde::de::DeserializeOwned;
 use serde::{Deserialize, Serialize};
 use std::cmp::Reverse;
 use std::collections::BinaryHeap;
-#[cfg(not(feature = "without_std"))]
 use std::collections::HashSet;
 use std::collections::LinkedList;
 use std::collections::VecDeque;

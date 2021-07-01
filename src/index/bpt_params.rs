@@ -1,11 +1,8 @@
 #![allow(dead_code)]
 
-#[cfg(feature = "without_std")]
-use hashbrown::HashSet;
 
 use serde::{Deserialize, Serialize};
 
-#[cfg(not(feature = "without_std"))]
 #[derive(Debug, Serialize, Deserialize)]
 pub struct BPTParams {
     pub tree_num: i32,

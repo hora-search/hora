@@ -2,12 +2,8 @@
 
 use crate::core::node;
 
-#[cfg(feature = "without_std")]
-use hashbrown::HashSet;
-
 use serde::{Deserialize, Serialize};
 
-#[cfg(not(feature = "without_std"))]
 #[derive(Debug, Serialize, Deserialize)]
 pub struct SSGParams<E: node::FloatElement> {
     pub angle: E,

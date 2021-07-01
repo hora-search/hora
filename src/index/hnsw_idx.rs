@@ -5,19 +5,14 @@ use crate::core::neighbor::Neighbor;
 use crate::core::node;
 use crate::index::hnsw_params::HNSWParams;
 use fixedbitset::FixedBitSet;
-#[cfg(feature = "without_std")]
-use hashbrown::HashMap;
-#[cfg(feature = "without_std")]
-use hashbrown::HashSet;
+
 use rand::prelude::*;
 use rayon::{iter::IntoParallelIterator, prelude::*};
 use serde::de::DeserializeOwned;
 use serde::{Deserialize, Serialize};
 use std::collections::BinaryHeap;
 
-#[cfg(not(feature = "without_std"))]
 use std::collections::HashMap;
-#[cfg(not(feature = "without_std"))]
 use std::collections::HashSet;
 use std::fs::File;
 use std::io::Write;

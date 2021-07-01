@@ -7,13 +7,6 @@ use core::hash::Hash;
 use core::iter::Sum;
 use num::traits::{FromPrimitive, NumAssign};
 use serde::{Deserialize, Serialize};
-#[cfg(feature = "use_smallvec")]
-use smallvec;
-
-#[cfg(feature = "use_smallvec")]
-const SMALLVEC_HOLD_NUM: usize = 64;
-#[cfg(feature = "smallvec_128")]
-const SMALLVEC_HOLD_NUM: usize = 128;
 
 pub trait FloatElement:
     FromPrimitive
@@ -95,25 +88,11 @@ to_idx_type!(u128);
 
 #[derive(Clone, Debug, Default, Serialize, Deserialize)]
 pub struct Node<E: FloatElement, T: IdxType> {
-    #[cfg(any(feature = "use_smallvec", feature = "smallvec_128"))]
-    vectors: smallvec::SmallVec<[E; SMALLVEC_HOLD_NUM]>, // the vectors;
-    #[cfg(not(feature = "use_smallvec"))]
     vectors: Vec<E>,
     idx: Option<T>, // data id, it can be any type;
 }
 
 impl<E: FloatElement, T: IdxType> Node<E, T> {
-    #[cfg(any(feature = "use_smallvec", feature = "smallvec_128"))]
-    pub fn new(vectors: &[E]) -> Node<E, T> {
-        Node::<E, T>::valid_elements(vectors);
-
-        Node {
-            vectors: smallvec::SmallVec::from_slice(vectors),
-            idx: Option::None,
-        }
-    }
-
-    #[cfg(not(feature = "use_smallvec"))]
     pub fn new(vectors: &[E]) -> Node<E, T> {
         Node::<E, T>::valid_elements(vectors);
         Node {
@@ -133,32 +112,14 @@ impl<E: FloatElement, T: IdxType> Node<E, T> {
     }
 
     // const value
-    #[cfg(any(feature = "use_smallvec", feature = "smallvec_128"))]
-    pub fn vectors(&self) -> &smallvec::SmallVec<[E; SMALLVEC_HOLD_NUM]> {
-        &self.vectors
-    }
-
-    #[cfg(not(feature = "use_smallvec"))]
     pub fn vectors(&self) -> &Vec<E> {
         &self.vectors
     }
 
-    #[cfg(any(feature = "use_smallvec", feature = "smallvec_128"))]
-    pub fn mut_vectors(&mut self) -> &mut smallvec::SmallVec<[E; SMALLVEC_HOLD_NUM]> {
-        &mut self.vectors
-    }
-
-    #[cfg(not(feature = "use_smallvec"))]
     pub fn mut_vectors(&mut self) -> &mut Vec<E> {
         &mut self.vectors
     }
 
-    #[cfg(any(feature = "use_smallvec", feature = "smallvec_128"))]
-    pub fn set_vectors(&mut self, v: &[E]) {
-        self.vectors = smallvec::SmallVec::from_slice(v);
-    }
-
-    #[cfg(not(feature = "use_smallvec"))]
     pub fn set_vectors(&mut self, v: &[E]) {
         self.vectors = v.to_vec();
     }
