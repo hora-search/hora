@@ -422,130 +422,129 @@ impl<'a, E: FloatElement, T: IdxType> NNDescentHandler<'a, E, T> {
     }
 }
 
-#[cfg(test)]
-mod tests {
-    use super::*;
+// #[cfg(test)]
+// mod tests {
+//     use super::*;
 
-    use crate::core::node;
-    use rand::distributions::{Distribution, Standard};
-    use rand::Rng;
-    use std::collections::HashMap;
-    use std::collections::HashSet;
+//     use crate::core::node;
+//     use rand::distributions::{Distribution, Standard};
+//     use rand::Rng;
+//     use std::collections::HashMap;
+//     use std::collections::HashSet;
 
-    use std::iter::FromIterator;
-    use std::time::SystemTime;
-    fn make_normal_distribution_clustering(
-        clustering_n: usize,
-        node_n: usize,
-        dimension: usize,
-        range: f64,
-    ) -> (
-        Vec<Vec<f64>>, // center of cluster
-        Vec<Vec<f64>>, // cluster data
-    ) {
-        let mut bases: Vec<Vec<f64>> = Vec::new();
-        let mut ns: Vec<Vec<f64>> = Vec::new();
-        for _i in 0..clustering_n {
-            let mut rng = rand::thread_rng();
-            let mut base: Vec<f64> = Vec::with_capacity(dimension);
-            for _i in 0..dimension {
-                let n: f64 = rng.gen::<f64>() * range; // base number
-                base.push(n);
-            }
+//     use std::iter::FromIterator;
+//     use std::time::SystemTime;
+//     fn make_normal_distribution_clustering(
+//         clustering_n: usize,
+//         node_n: usize,
+//         dimension: usize,
+//         range: f64,
+//     ) -> (
+//         Vec<Vec<f64>>, // center of cluster
+//         Vec<Vec<f64>>, // cluster data
+//     ) {
+//         let mut bases: Vec<Vec<f64>> = Vec::new();
+//         let mut ns: Vec<Vec<f64>> = Vec::new();
+//         for _i in 0..clustering_n {
+//             let mut rng = rand::thread_rng();
+//             let mut base: Vec<f64> = Vec::with_capacity(dimension);
+//             for _i in 0..dimension {
+//                 let n: f64 = rng.gen::<f64>() * range; // base number
+//                 base.push(n);
+//             }
 
-            let v_iter: Vec<f64> = rng
-                .sample_iter(&Standard)
-                .take(dimension * node_n)
-                .collect::<Vec<f64>>()
-                .clone();
-            for _i in 0..node_n {
-                let mut vec_item = Vec::with_capacity(dimension);
-                for i in 0..dimension {
-                    let vv = v_iter[_i * dimension..(_i + 1) * dimension][i] + base[i]; // add normal distribution noise
-                    vec_item.push(vv);
-                }
-                ns.push(vec_item);
-            }
-            bases.push(base);
-        }
+//             let v_iter: Vec<f64> = rng
+//                 .sample_iter(&Standard)
+//                 .take(dimension * node_n)
+//                 .collect::<Vec<f64>>()
+//                 .clone();
+//             for _i in 0..node_n {
+//                 let mut vec_item = Vec::with_capacity(dimension);
+//                 for i in 0..dimension {
+//                     let vv = v_iter[_i * dimension..(_i + 1) * dimension][i] + base[i]; // add normal distribution noise
+//                     vec_item.push(vv);
+//                 }
+//                 ns.push(vec_item);
+//             }
+//             bases.push(base);
+//         }
 
-        (bases, ns)
-    }
+//         (bases, ns)
+//     }
 
-    #[test]
-    fn knn_nn_descent() {
-        let dimension = 2;
-        let nodes_every_cluster = 10;
-        let node_n = 1000;
-        let (_, ns) =
-            make_normal_distribution_clustering(node_n, nodes_every_cluster, dimension, 10000000.0);
-        println!("hello world {:?}", ns.len());
+//     #[test]
+//     fn knn_nn_descent() {
+//         let dimension = 2;
+//         let nodes_every_cluster = 10;
+//         let node_n = 1000;
+//         let (_, ns) =
+//             make_normal_distribution_clustering(node_n, nodes_every_cluster, dimension, 10000000.0);
 
-        let mut data = Vec::new();
-        for i in 0..ns.len() {
-            data.push(Box::new(node::Node::new_with_idx(&ns[i], i)));
-        }
+//         let mut data = Vec::new();
+//         for i in 0..ns.len() {
+//             data.push(Box::new(node::Node::new_with_idx(&ns[i], i)));
+//         }
 
-        let mut graph: Vec<Vec<Neighbor<f64, usize>>> = vec![Vec::new(); data.len()];
-        let base_start = SystemTime::now();
-        naive_build_knn_graph::<f64, usize>(&data, metrics::Metric::Euclidean, 100, &mut graph);
-        let base_since_the_epoch = SystemTime::now()
-            .duration_since(base_start)
-            .expect("Time went backwards");
-        println!(
-            "test for {:?} times, base use {:?} millisecond",
-            ns.len(),
-            base_since_the_epoch.as_millis()
-        );
+//         let mut graph: Vec<Vec<Neighbor<f64, usize>>> = vec![Vec::new(); data.len()];
+//         let base_start = SystemTime::now();
+//         naive_build_knn_graph::<f64, usize>(&data, metrics::Metric::Euclidean, 100, &mut graph);
+//         let base_since_the_epoch = SystemTime::now()
+//             .duration_since(base_start)
+//             .expect("Time went backwards");
+//         println!(
+//             "test for {:?} times, base use {:?} millisecond",
+//             ns.len(),
+//             base_since_the_epoch.as_millis()
+//         );
 
-        let base_start = SystemTime::now();
-        let mut nn_descent_handler =
-            NNDescentHandler::new(&data, metrics::Metric::Euclidean, 100, 0.2);
-        nn_descent_handler.init();
+//         let base_start = SystemTime::now();
+//         let mut nn_descent_handler =
+//             NNDescentHandler::new(&data, metrics::Metric::Euclidean, 100, 0.2);
+//         nn_descent_handler.init();
 
-        let try_times = 8;
-        let mut ground_truth: HashMap<usize, HashSet<usize>> = HashMap::new();
-        for i in 0..graph.len() {
-            ground_truth.insert(i, HashSet::from_iter(graph[i].iter().map(|x| x.idx())));
-        }
-        // let guard = pprof::ProfilerGuard::new(100).unwrap();
-        for _p in 0..try_times {
-            let cc = nn_descent_handler.iterate();
-            let mut error = 0;
-            for i in 0..nn_descent_handler.graph.len() {
-                let nn_descent_handler_val: Vec<Neighbor<f64, usize>> = nn_descent_handler.graph[i]
-                    .lock()
-                    .unwrap()
-                    .iter()
-                    .cloned()
-                    .collect();
-                for j in 0..nn_descent_handler_val.len() {
-                    if !ground_truth[&i].contains(&nn_descent_handler_val[j].idx()) {
-                        error += 1;
-                    }
-                }
-            }
-            println!(
-                "error {} /{:?} cc {:?} cost {:?} update_cnt {:?}",
-                error,
-                data.len() * 10,
-                cc,
-                nn_descent_handler.cost(),
-                nn_descent_handler.ths_update_cnt(),
-            );
-        }
-        // if let Ok(report) = guard.report().build() {
-        //     let file = File::create("flamegraph.svg").unwrap();
-        //     report.flamegraph(file).unwrap();
-        // };
+//         let try_times = 8;
+//         let mut ground_truth: HashMap<usize, HashSet<usize>> = HashMap::new();
+//         for i in 0..graph.len() {
+//             ground_truth.insert(i, HashSet::from_iter(graph[i].iter().map(|x| x.idx())));
+//         }
+//         // let guard = pprof::ProfilerGuard::new(100).unwrap();
+//         for _p in 0..try_times {
+//             let cc = nn_descent_handler.iterate();
+//             let mut error = 0;
+//             for i in 0..nn_descent_handler.graph.len() {
+//                 let nn_descent_handler_val: Vec<Neighbor<f64, usize>> = nn_descent_handler.graph[i]
+//                     .lock()
+//                     .unwrap()
+//                     .iter()
+//                     .cloned()
+//                     .collect();
+//                 for j in 0..nn_descent_handler_val.len() {
+//                     if !ground_truth[&i].contains(&nn_descent_handler_val[j].idx()) {
+//                         error += 1;
+//                     }
+//                 }
+//             }
+//             println!(
+//                 "error {} /{:?} cc {:?} cost {:?} update_cnt {:?}",
+//                 error,
+//                 data.len() * 10,
+//                 cc,
+//                 nn_descent_handler.cost(),
+//                 nn_descent_handler.ths_update_cnt(),
+//             );
+//         }
+//         // if let Ok(report) = guard.report().build() {
+//         //     let file = File::create("flamegraph.svg").unwrap();
+//         //     report.flamegraph(file).unwrap();
+//         // };
 
-        let base_since_the_epoch = SystemTime::now()
-            .duration_since(base_start)
-            .expect("Time went backwards");
-        println!(
-            "test for {:?} times, base use {:?} millisecond",
-            ns.len(),
-            base_since_the_epoch.as_millis()
-        );
-    }
-}
+//         let base_since_the_epoch = SystemTime::now()
+//             .duration_since(base_start)
+//             .expect("Time went backwards");
+//         println!(
+//             "test for {:?} times, base use {:?} millisecond",
+//             ns.len(),
+//             base_since_the_epoch.as_millis()
+//         );
+//     }
+// }

@@ -41,10 +41,11 @@ pub fn split_imbalance<T>(vec1: &[T], vec2: &[T]) -> f64 {
 
 #[cfg(test)]
 mod tests {
+    use crate::core::calc::dot;
     #[test]
     fn test_dot() {
         let a = [1., 2., 3.];
         let b = [1., 2., 3.];
-        assert_eq!(dot(&a, &b).unwrap(), 14.0);
+        assert_eq!(dot::<f32>(&a, &b).unwrap(), -14.0);
     }
 }

@@ -1,9 +1,7 @@
 #![deny(clippy::all)]
-use real_hora::core;
-use real_hora::core::ann_index::ANNIndex;
-
+use hora::core;
+use hora::core::ann_index::ANNIndex;
 use std::collections::HashSet;
-
 use std::time::SystemTime;
 
 struct StatMetrics {
@@ -58,19 +56,19 @@ fn bench_ssg<E: core::node::FloatElement>(
     neighbors: &Vec<HashSet<usize>>,
 ) {
     let params_set = vec![
-        real_hora::index::ssg_params::SSGParams::<E>::default()
+        hora::index::ssg_params::SSGParams::<E>::default()
             .angle(60.0)
             .init_k(20)
             .index_size(20)
             .neighbor_neighbor_size(30)
             .root_size(256),
-        real_hora::index::ssg_params::SSGParams::default()
+        hora::index::ssg_params::SSGParams::default()
             .angle(60.0)
             .init_k(50)
             .index_size(50)
             .neighbor_neighbor_size(50)
             .root_size(256),
-        real_hora::index::ssg_params::SSGParams::default()
+        hora::index::ssg_params::SSGParams::default()
             .angle(60.0)
             .init_k(50)
             .index_size(50)
@@ -81,7 +79,7 @@ fn bench_ssg<E: core::node::FloatElement>(
     let mut metrics_stats: Vec<StatMetrics> = Vec::new();
     for params in params_set.iter() {
         println!("start params {:?}", params);
-        let mut ssg_idx = Box::new(real_hora::index::ssg_idx::SSGIndex::<E, usize>::new(
+        let mut ssg_idx = Box::new(hora::index::ssg_idx::SSGIndex::<E, usize>::new(
             dimension, params,
         ));
         make_idx_baseline(train, &mut ssg_idx);
@@ -107,21 +105,21 @@ fn bench_hnsw<E: core::node::FloatElement>(
     neighbors: &Vec<HashSet<usize>>,
 ) {
     let params_set = vec![
-        real_hora::index::hnsw_params::HNSWParams::<E>::default()
+        hora::index::hnsw_params::HNSWParams::<E>::default()
             .max_item(10000000)
             .n_neighbor(16)
             .n_neighbor0(32)
             .ef_build(500)
             .ef_search(16)
             .has_deletion(false),
-        real_hora::index::hnsw_params::HNSWParams::<E>::default()
+        hora::index::hnsw_params::HNSWParams::<E>::default()
             .max_item(10000000)
             .n_neighbor(8)
             .n_neighbor0(16)
             .ef_build(500)
             .ef_search(16)
             .has_deletion(false),
-        real_hora::index::hnsw_params::HNSWParams::<E>::default()
+        hora::index::hnsw_params::HNSWParams::<E>::default()
             .max_item(10000000)
             .n_neighbor(16)
             .n_neighbor0(32)
@@ -132,7 +130,7 @@ fn bench_hnsw<E: core::node::FloatElement>(
 
     let mut metrics_stats: Vec<StatMetrics> = Vec::new();
     for params in params_set.iter() {
-        let mut hnsw_idx = Box::new(real_hora::index::hnsw_idx::HNSWIndex::<E, usize>::new(
+        let mut hnsw_idx = Box::new(hora::index::hnsw_idx::HNSWIndex::<E, usize>::new(
             dimension, params,
         ));
         make_idx_baseline(train, &mut hnsw_idx);
@@ -157,7 +155,7 @@ fn bench_ivfpq<E: core::node::FloatElement>(
     test: &Vec<Vec<E>>,
     neighbors: &Vec<HashSet<usize>>,
 ) {
-    let params_set = vec![real_hora::index::pq_params::IVFPQParams::<E>::default()
+    let params_set = vec![hora::index::pq_params::IVFPQParams::<E>::default()
         .n_sub(16)
         .sub_bits(4)
         .n_kmeans_center(256)
@@ -166,7 +164,7 @@ fn bench_ivfpq<E: core::node::FloatElement>(
 
     let mut metrics_stats: Vec<StatMetrics> = Vec::new();
     for params in params_set.iter() {
-        let mut ivfpq_idx = Box::new(real_hora::index::pq_idx::IVFPQIndex::<E, usize>::new(
+        let mut ivfpq_idx = Box::new(hora::index::pq_idx::IVFPQIndex::<E, usize>::new(
             dimension, params,
         ));
         make_idx_baseline(train, &mut ivfpq_idx);

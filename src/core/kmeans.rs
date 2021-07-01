@@ -339,8 +339,8 @@ mod tests {
     #[test]
     fn test_general_kmeans() {
         let dimension = 2;
-        let nodes_every_cluster = 10;
-        let node_n = 10;
+        let nodes_every_cluster = 5;
+        let node_n = 5;
         let (_, nso) =
             make_normal_distribution_clustering(node_n, nodes_every_cluster, dimension, 100000.0);
         println!("{:?}", nso);

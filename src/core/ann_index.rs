@@ -45,7 +45,7 @@ pub trait ANNIndex<E: node::FloatElement, T: node::IdxType>: Send + Sync {
     /// add multiple node one time
     ///
     /// return `Err(&'static str)` if there is something wrong with the adding process, and the `static str` is the debug reason
-    fn add_batch(&mut self, vss: &[&[E]], indices: &[T]) -> Result<(), &'static str> {
+    fn madd(&mut self, vss: &[&[E]], indices: &[T]) -> Result<(), &'static str> {
         if vss.len() != indices.len() {
             return Err("vector's size is different with index");
         }
@@ -78,7 +78,7 @@ pub trait ANNIndex<E: node::FloatElement, T: node::IdxType>: Send + Sync {
     /// it will return the all node's info including the original vectors, and the metric distance
     ///
     /// it require the item is the slice with the same dimension with index dimension, otherwise it will panic
-    fn search_full(&self, item: &[E], k: usize) -> Vec<(node::Node<E, T>, E)> {
+    fn search_nodes(&self, item: &[E], k: usize) -> Vec<(node::Node<E, T>, E)> {
         assert_eq!(item.len(), self.dimension());
         self.node_search_k(&node::Node::new(item), k)
     }

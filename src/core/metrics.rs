@@ -20,7 +20,6 @@ impl Default for Metric {
     }
 }
 
-// TODO: SIMD support
 // TODO: make these func private
 pub fn metric<T>(vec1: &[T], vec2: &[T], mt: Metric) -> Result<T, &'static str>
 where
@@ -50,7 +49,7 @@ where
     metric(&vec1[begin..end], &vec2[begin..end], mt)
 }
 
-pub fn dot_product<T>(vec1: &[T], vec2: &[T]) -> Result<T, &'static str>
+fn dot_product<T>(vec1: &[T], vec2: &[T]) -> Result<T, &'static str>
 where
     T: FloatElement,
 {
@@ -62,21 +61,21 @@ where
     }
 }
 
-pub fn manhattan_distance<T>(vec1: &[T], vec2: &[T]) -> Result<T, &'static str>
+fn manhattan_distance<T>(vec1: &[T], vec2: &[T]) -> Result<T, &'static str>
 where
     T: FloatElement,
 {
     T::manhattan_distance(vec1, vec2)
 }
 
-pub fn euclidean_distance<T>(vec1: &[T], vec2: &[T]) -> Result<T, &'static str>
+fn euclidean_distance<T>(vec1: &[T], vec2: &[T]) -> Result<T, &'static str>
 where
     T: FloatElement,
 {
     T::euclidean_distance(vec1, vec2)
 }
 
-pub fn cosine_similarity<T>(vec1: &[T], vec2: &[T]) -> Result<T, &'static str>
+fn cosine_similarity<T>(vec1: &[T], vec2: &[T]) -> Result<T, &'static str>
 where
     T: FloatElement,
 {
@@ -91,7 +90,7 @@ where
 // (a/|a| - b/|b|)^2
 // = a^2 / a^2 + b^2 / b^2 - 2ab/|a||b|
 // = 2 - 2cos
-pub fn angular_distance<T>(vec1: &[T], vec2: &[T]) -> Result<T, &'static str>
+fn angular_distance<T>(vec1: &[T], vec2: &[T]) -> Result<T, &'static str>
 where
     T: FloatElement,
 {

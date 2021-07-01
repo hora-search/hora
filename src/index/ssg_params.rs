@@ -43,11 +43,11 @@ impl<E: node::FloatElement> SSGParams<E> {
 impl<E: node::FloatElement> Default for SSGParams<E> {
     fn default() -> Self {
         SSGParams {
-            angle: E::from_f32(30.0).unwrap(),
+            angle: E::from_f32(60.0).unwrap(),
             init_k: 100,
             index_size: 100,
             neighbor_neighbor_size: 100,
-            root_size: 30,
+            root_size: 100,
         }
     }
 }

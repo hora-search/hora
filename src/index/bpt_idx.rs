@@ -5,7 +5,7 @@ use crate::core::metrics;
 use crate::core::neighbor;
 use crate::core::node;
 use crate::core::random;
-use crate::index::rpt_params::BPTParams;
+use crate::index::bpt_params::BPTParams;
 use serde::de::DeserializeOwned;
 use serde::{Deserialize, Serialize};
 use std::cmp::Ordering;
@@ -185,7 +185,7 @@ pub struct BPTIndex<E: node::FloatElement, T: node::IdxType> {
 }
 
 impl<E: node::FloatElement, T: node::IdxType> BPTIndex<E, T> {
-    pub fn new(dimension: usize, params: BPTParams) -> BPTIndex<E, T> {
+    pub fn new(dimension: usize, params: &BPTParams) -> BPTIndex<E, T> {
         BPTIndex {
             _built: false,
             _dimension: dimension,

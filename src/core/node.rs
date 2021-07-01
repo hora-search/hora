@@ -206,9 +206,9 @@ impl<E: FloatElement, T: IdxType> core::fmt::Display for Node<E, T> {
 #[test]
 fn node_test() {
     // f64
-    let v = vec![0.1, 0.2];
-    let v2 = vec![0.2, 0.1];
+    let v = vec![1.0, 1.0];
+    let v2 = vec![2.0, 2.0];
     let n = Node::<f64, usize>::new(&v);
     let n2 = Node::<f64, usize>::new(&v2);
-    n.metric(&n2, metrics::Metric::Manhattan).unwrap();
+    assert_eq!(n.metric(&n2, metrics::Metric::Manhattan).unwrap(), 2.0);
 }
