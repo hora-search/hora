@@ -4,7 +4,14 @@ use crate::core::node;
 use metrics::metric;
 use rand::prelude::*;
 use rayon::prelude::*;
-use std::sync::Mutex;
+use core::sync::Mutex;
+
+extern crate alloc;
+use alloc::vec::Vec;
+use alloc::vec;
+use alloc::boxed::Box;
+use core::cmp::Reverse;
+use crate::core::heap::BinaryHeap;
 
 #[derive(Default, Debug)]
 pub struct Kmeans<E: node::FloatElement> {

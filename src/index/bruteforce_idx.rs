@@ -6,11 +6,16 @@ use crate::core::node;
 use crate::index::bruteforce_params::BruteForceParams;
 use serde::de::DeserializeOwned;
 use serde::{Deserialize, Serialize};
-use std::collections::BinaryHeap;
 
-use std::fs::File;
 
-use std::io::Write;
+use core::fs::File;
+
+use core::io::Write;
+
+extern crate alloc;
+use alloc::vec::Vec;
+use alloc::boxed::Box;
+use crate::core::heap::BinaryHeap;
 
 #[derive(Debug, Serialize, Deserialize)]
 pub struct BruteForceIndex<E: node::FloatElement, T: node::IdxType> {

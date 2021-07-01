@@ -13,15 +13,21 @@ use rayon::prelude::*;
 use serde::de::DeserializeOwned;
 use serde::{Deserialize, Serialize};
 use std::cmp::Reverse;
-use std::collections::BinaryHeap;
+
 #[cfg(not(feature = "without_std"))]
 use std::collections::HashSet;
 use std::collections::LinkedList;
 use std::collections::VecDeque;
 
-use std::fs::File;
-use std::io::Write;
-use std::sync::{Arc, Mutex};
+use core::fs::File;
+use core::io::Write;
+use core::sync::{Arc, Mutex};
+
+extern crate alloc;
+use alloc::vec::Vec;
+use alloc::boxed::Box;
+use core::cmp::Reverse;
+use crate::core::heap::BinaryHeap;
 
 #[derive(Debug, Serialize, Deserialize)]
 pub struct SSGIndex<E: node::FloatElement, T: node::IdxType> {

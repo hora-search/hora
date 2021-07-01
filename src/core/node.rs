@@ -7,6 +7,9 @@ use core::hash::Hash;
 use core::iter::Sum;
 use num::traits::{FromPrimitive, NumAssign};
 use serde::{Deserialize, Serialize};
+extern crate alloc;
+use alloc::vec::Vec;
+use alloc::boxed::Box;
 #[cfg(feature = "use_smallvec")]
 use smallvec;
 
@@ -27,8 +30,8 @@ pub trait FloatElement:
     + PartialEq
     + PartialOrd
     + NumAssign
-    + num::Signed
-    + num::Float
+    + num::r#trait::Signed
+    + num::r#trait::Float
     + Sync
     + Send
     + Sum

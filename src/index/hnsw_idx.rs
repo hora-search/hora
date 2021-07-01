@@ -13,16 +13,21 @@ use rand::prelude::*;
 use rayon::{iter::IntoParallelIterator, prelude::*};
 use serde::de::DeserializeOwned;
 use serde::{Deserialize, Serialize};
-use std::collections::BinaryHeap;
+
 
 #[cfg(not(feature = "without_std"))]
 use std::collections::HashMap;
 #[cfg(not(feature = "without_std"))]
 use std::collections::HashSet;
-use std::fs::File;
-use std::io::Write;
+use core::fs::File;
+use core::io::Write;
 
 use std::sync::RwLock;
+
+extern crate alloc;
+use alloc::vec::Vec;
+use alloc::boxed::Box;
+use crate::core::heap::BinaryHeap;
 
 #[derive(Default, Debug, Serialize, Deserialize)]
 pub struct HNSWIndex<E: node::FloatElement, T: node::IdxType> {

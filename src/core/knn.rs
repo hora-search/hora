@@ -6,10 +6,13 @@ use fixedbitset::FixedBitSet;
 use rand::seq::SliceRandom;
 use rand::Rng;
 use rayon::prelude::*;
-use std::collections::BinaryHeap;
-use std::sync::mpsc;
 
-use std::sync::{Arc, Mutex};
+use core::sync::mpsc;
+
+use core::sync::{Arc, Mutex};
+extern crate alloc;
+use alloc::vec::Vec;
+use alloc::boxed::Box;
 
 pub fn naive_build_knn_graph<E: FloatElement, T: IdxType>(
     nodes: &[Box<Node<E, T>>],

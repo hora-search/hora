@@ -1,3 +1,4 @@
+#![no_std]
 pub mod core;
 pub mod index;
 
@@ -11,7 +12,7 @@ mod tests {
     use std::collections::HashSet;
 
     use std::sync::Arc;
-    use std::sync::Mutex;
+    use core::sync::Mutex;
     fn make_normal_distribution_clustering(
         clustering_n: usize,
         node_n: usize,

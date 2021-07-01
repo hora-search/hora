@@ -2,6 +2,8 @@
 
 use core::mem::{swap, ManuallyDrop};
 use core::ptr;
+extern crate alloc;
+use alloc::vec::Vec;
 
 pub struct BinaryHeap<T> {
     data: Vec<T>,

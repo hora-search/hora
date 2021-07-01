@@ -8,13 +8,18 @@ use crate::index::pq_params::IVFPQParams;
 use crate::index::pq_params::PQParams;
 use rayon::prelude::*;
 use serde::de::DeserializeOwned;
-use std::collections::BinaryHeap;
+
 
 use serde::{Deserialize, Serialize};
 
-use std::fs::File;
+use core::fs::File;
 
-use std::io::Write;
+use core::io::Write;
+
+extern crate alloc;
+use alloc::vec::Vec;
+use alloc::boxed::Box;
+use crate::core::heap::BinaryHeap;
 
 #[derive(Default, Debug, Serialize, Deserialize)]
 pub struct PQIndex<E: node::FloatElement, T: node::IdxType> {

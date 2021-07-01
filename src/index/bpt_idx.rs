@@ -9,10 +9,15 @@ use crate::index::bpt_params::BPTParams;
 use serde::de::DeserializeOwned;
 use serde::{Deserialize, Serialize};
 use std::cmp::Ordering;
-use std::collections::BinaryHeap;
-use std::fs::File;
 
-use std::io::Write;
+use core::fs::File;
+
+use core::io::Write;
+
+extern crate alloc;
+use alloc::vec::Vec;
+use alloc::boxed::Box;
+use crate::core::heap::BinaryHeap;
 
 // TODO: leaf as a trait with getter setter function
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
