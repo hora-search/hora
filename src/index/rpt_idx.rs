@@ -1,6 +1,5 @@
 #![allow(dead_code)]
 use crate::core::ann_index;
-use crate::core::arguments;
 use crate::core::calc;
 use crate::core::metrics;
 use crate::core::neighbor;
@@ -603,12 +602,7 @@ impl<E: node::FloatElement, T: node::IdxType> ann_index::ANNIndex<E, T> for BPTI
         self._built
     }
 
-    fn node_search_k(
-        &self,
-        item: &node::Node<E, T>,
-        k: usize,
-        _args: &arguments::Args,
-    ) -> Vec<(node::Node<E, T>, E)> {
+    fn node_search_k(&self, item: &node::Node<E, T>, k: usize) -> Vec<(node::Node<E, T>, E)> {
         self._search_k(item.vectors(), k).unwrap()
     }
 
@@ -624,7 +618,7 @@ impl<E: node::FloatElement, T: node::IdxType> ann_index::ANNIndex<E, T> for BPTI
 impl<E: node::FloatElement + DeserializeOwned, T: node::IdxType + DeserializeOwned>
     ann_index::SerializableIndex<E, T> for BPTIndex<E, T>
 {
-    fn load(path: &str, _args: &arguments::Args) -> Result<Self, &'static str> {
+    fn load(path: &str) -> Result<Self, &'static str> {
         let file = File::open(path).unwrap_or_else(|_| panic!("unable to open file {:?}", path));
         let mut instance: BPTIndex<E, T> = bincode::deserialize_from(&file).unwrap();
 
@@ -637,7 +631,7 @@ impl<E: node::FloatElement + DeserializeOwned, T: node::IdxType + DeserializeOwn
         Ok(instance)
     }
 
-    fn dump(&mut self, path: &str, _args: &arguments::Args) -> Result<(), &'static str> {
+    fn dump(&mut self, path: &str) -> Result<(), &'static str> {
         self.leaves
             .iter_mut()
             .for_each(|x| x.tmp_node = Some(*x.node.clone()));

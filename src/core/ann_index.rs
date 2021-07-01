@@ -1,4 +1,3 @@
-use crate::core::arguments;
 use crate::core::metrics;
 use crate::core::node;
 
@@ -72,12 +71,7 @@ pub trait ANNIndex<E: node::FloatElement, T: node::IdxType>: Send + Sync {
     }
 
     /// search for k nearest neighbors node internal method
-    fn node_search_k(
-        &self,
-        item: &node::Node<E, T>,
-        k: usize,
-        args: &arguments::Args,
-    ) -> Vec<(node::Node<E, T>, E)>;
+    fn node_search_k(&self, item: &node::Node<E, T>, k: usize) -> Vec<(node::Node<E, T>, E)>;
 
     /// search for k nearest neighbors and return full info
     ///
@@ -86,7 +80,7 @@ pub trait ANNIndex<E: node::FloatElement, T: node::IdxType>: Send + Sync {
     /// it require the item is the slice with the same dimension with index dimension, otherwise it will panic
     fn search_full(&self, item: &[E], k: usize) -> Vec<(node::Node<E, T>, E)> {
         assert_eq!(item.len(), self.dimension());
-        self.node_search_k(&node::Node::new(item), k, &arguments::Args::new())
+        self.node_search_k(&node::Node::new(item), k)
     }
 
     /// search for k nearest neighbors
@@ -96,7 +90,7 @@ pub trait ANNIndex<E: node::FloatElement, T: node::IdxType>: Send + Sync {
     /// it require the item is the slice with the same dimension with index dimension, otherwise it will panic
     fn search(&self, item: &[E], k: usize) -> Vec<T> {
         assert_eq!(item.len(), self.dimension());
-        self.node_search_k(&node::Node::new(item), k, &arguments::Args::new())
+        self.node_search_k(&node::Node::new(item), k)
             .iter()
             .map(|x| x.0.idx().as_ref().unwrap().clone())
             .collect::<Vec<T>>()
@@ -150,7 +144,7 @@ pub trait SerializableIndex<
 >: Send + Sync + ANNIndex<E, T>
 {
     /// load file with path
-    fn load(_path: &str, _args: &arguments::Args) -> Result<Self, &'static str>
+    fn load(_path: &str) -> Result<Self, &'static str>
     where
         Self: Sized,
     {
@@ -158,7 +152,7 @@ pub trait SerializableIndex<
     }
 
     /// dump the file into the path
-    fn dump(&mut self, _path: &str, _args: &arguments::Args) -> Result<(), &'static str> {
+    fn dump(&mut self, _path: &str) -> Result<(), &'static str> {
         Err("empty implementation")
     }
 }

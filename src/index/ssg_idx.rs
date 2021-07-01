@@ -1,6 +1,5 @@
 #![allow(dead_code)]
 use crate::core::ann_index;
-use crate::core::arguments;
 use crate::core::kmeans;
 use crate::core::metrics;
 use crate::core::neighbor;
@@ -405,12 +404,7 @@ impl<E: node::FloatElement, T: node::IdxType> SSGIndex<E, T> {
         );
     }
 
-    fn search(
-        &self,
-        query: &node::Node<E, T>,
-        k: usize,
-        _args: &arguments::Args,
-    ) -> Vec<(node::Node<E, T>, E)> {
+    fn search(&self, query: &node::Node<E, T>, k: usize) -> Vec<(node::Node<E, T>, E)> {
         // let mut search_flags = HashSet::with_capacity(self.nodes.len());
         let mut search_flags = FixedBitSet::with_capacity(self.nodes.len());
         let mut heap: BinaryHeap<neighbor::Neighbor<E, usize>> = BinaryHeap::new(); // max-heap
@@ -503,7 +497,7 @@ impl<E: node::FloatElement, T: node::IdxType> SSGIndex<E, T> {
 impl<E: node::FloatElement + DeserializeOwned, T: node::IdxType + DeserializeOwned>
     ann_index::SerializableIndex<E, T> for SSGIndex<E, T>
 {
-    fn load(path: &str, _args: &arguments::Args) -> Result<Self, &'static str> {
+    fn load(path: &str) -> Result<Self, &'static str> {
         let file = File::open(path).unwrap_or_else(|_| panic!("unable to open file {:?}", path));
         let mut instance: SSGIndex<E, T> = bincode::deserialize_from(&file).unwrap();
         instance.nodes = instance
@@ -514,7 +508,7 @@ impl<E: node::FloatElement + DeserializeOwned, T: node::IdxType + DeserializeOwn
         Ok(instance)
     }
 
-    fn dump(&mut self, path: &str, _args: &arguments::Args) -> Result<(), &'static str> {
+    fn dump(&mut self, path: &str) -> Result<(), &'static str> {
         self.tmp_nodes = self.nodes.iter().map(|x| *x.clone()).collect();
         let encoded_bytes = bincode::serialize(&self).unwrap();
         let mut file = File::create(path).unwrap();
@@ -538,13 +532,8 @@ impl<E: node::FloatElement, T: node::IdxType> ann_index::ANNIndex<E, T> for SSGI
     fn built(&self) -> bool {
         true
     }
-    fn node_search_k(
-        &self,
-        item: &node::Node<E, T>,
-        k: usize,
-        args: &arguments::Args,
-    ) -> Vec<(node::Node<E, T>, E)> {
-        self.search(item, k, args)
+    fn node_search_k(&self, item: &node::Node<E, T>, k: usize) -> Vec<(node::Node<E, T>, E)> {
+        self.search(item, k)
     }
 
     fn name(&self) -> &'static str {

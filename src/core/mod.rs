@@ -1,5 +1,4 @@
 pub mod ann_index;
-pub mod arguments;
 pub mod calc;
 pub mod kmeans;
 pub mod knn;

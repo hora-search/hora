@@ -1,6 +1,5 @@
 #![allow(dead_code)]
 use crate::core::ann_index;
-use crate::core::arguments;
 use crate::core::metrics;
 use crate::core::neighbor;
 use crate::core::node;
@@ -45,12 +44,7 @@ impl<E: node::FloatElement, T: node::IdxType> ann_index::ANNIndex<E, T> for Brut
     fn built(&self) -> bool {
         true
     }
-    fn node_search_k(
-        &self,
-        item: &node::Node<E, T>,
-        k: usize,
-        _args: &arguments::Args,
-    ) -> Vec<(node::Node<E, T>, E)> {
+    fn node_search_k(&self, item: &node::Node<E, T>, k: usize) -> Vec<(node::Node<E, T>, E)> {
         let mut heap = BinaryHeap::with_capacity(k + 1);
         self.nodes
             .iter()
@@ -90,7 +84,7 @@ impl<E: node::FloatElement, T: node::IdxType> ann_index::ANNIndex<E, T> for Brut
 impl<E: node::FloatElement + DeserializeOwned, T: node::IdxType + DeserializeOwned>
     ann_index::SerializableIndex<E, T> for BruteForceIndex<E, T>
 {
-    fn load(path: &str, _args: &arguments::Args) -> Result<Self, &'static str> {
+    fn load(path: &str) -> Result<Self, &'static str> {
         let file = File::open(path).unwrap_or_else(|_| panic!("unable to open file {:?}", path));
         let mut instance: BruteForceIndex<E, T> = bincode::deserialize_from(file).unwrap();
         instance.nodes = instance
@@ -101,7 +95,7 @@ impl<E: node::FloatElement + DeserializeOwned, T: node::IdxType + DeserializeOwn
         Ok(instance)
     }
 
-    fn dump(&mut self, path: &str, _args: &arguments::Args) -> Result<(), &'static str> {
+    fn dump(&mut self, path: &str) -> Result<(), &'static str> {
         self.tmp_nodes = self.nodes.iter().map(|x| *x.clone()).collect();
         let encoded_bytes = bincode::serialize(&self).unwrap();
         let mut file = File::create(path).unwrap();

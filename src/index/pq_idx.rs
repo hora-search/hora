@@ -1,6 +1,5 @@
 #![allow(dead_code)]
 use crate::core::ann_index;
-use crate::core::arguments;
 use crate::core::kmeans;
 use crate::core::metrics;
 use crate::core::neighbor::Neighbor;
@@ -208,12 +207,7 @@ impl<E: node::FloatElement, T: node::IdxType> ann_index::ANNIndex<E, T> for PQIn
         true
     }
 
-    fn node_search_k(
-        &self,
-        item: &node::Node<E, T>,
-        k: usize,
-        _args: &arguments::Args,
-    ) -> Vec<(node::Node<E, T>, E)> {
+    fn node_search_k(&self, item: &node::Node<E, T>, k: usize) -> Vec<(node::Node<E, T>, E)> {
         let mut ret: BinaryHeap<Neighbor<E, usize>> = self.search_knn_adc(item, k).unwrap();
         let mut result: Vec<(node::Node<E, T>, E)> = Vec::new();
         let mut result_idx: Vec<(usize, E)> = Vec::new();
@@ -246,7 +240,7 @@ impl<E: node::FloatElement, T: node::IdxType> ann_index::ANNIndex<E, T> for PQIn
 impl<E: node::FloatElement + DeserializeOwned, T: node::IdxType + DeserializeOwned>
     ann_index::SerializableIndex<E, T> for PQIndex<E, T>
 {
-    fn load(path: &str, _args: &arguments::Args) -> Result<Self, &'static str> {
+    fn load(path: &str) -> Result<Self, &'static str> {
         let file = File::open(path).unwrap_or_else(|_| panic!("unable to open file {:?}", path));
         let mut instance: PQIndex<E, T> = bincode::deserialize_from(&file).unwrap();
         instance._nodes = instance
@@ -257,7 +251,7 @@ impl<E: node::FloatElement + DeserializeOwned, T: node::IdxType + DeserializeOwn
         Ok(instance)
     }
 
-    fn dump(&mut self, path: &str, _args: &arguments::Args) -> Result<(), &'static str> {
+    fn dump(&mut self, path: &str) -> Result<(), &'static str> {
         self._nodes_tmp = self._nodes.iter().map(|x| *x.clone()).collect();
         let encoded_bytes = bincode::serialize(&self).unwrap();
         let mut file = File::create(path).unwrap();
@@ -462,12 +456,7 @@ impl<E: node::FloatElement, T: node::IdxType> ann_index::ANNIndex<E, T> for IVFP
         true
     }
 
-    fn node_search_k(
-        &self,
-        item: &node::Node<E, T>,
-        k: usize,
-        _args: &arguments::Args,
-    ) -> Vec<(node::Node<E, T>, E)> {
+    fn node_search_k(&self, item: &node::Node<E, T>, k: usize) -> Vec<(node::Node<E, T>, E)> {
         let mut ret: BinaryHeap<Neighbor<E, usize>> = self.search_knn_adc(item, k).unwrap();
         let mut result: Vec<(node::Node<E, T>, E)> = Vec::new();
         let mut result_idx: Vec<(usize, E)> = Vec::new();
@@ -500,7 +489,7 @@ impl<E: node::FloatElement, T: node::IdxType> ann_index::ANNIndex<E, T> for IVFP
 impl<E: node::FloatElement + DeserializeOwned, T: node::IdxType + DeserializeOwned>
     ann_index::SerializableIndex<E, T> for IVFPQIndex<E, T>
 {
-    fn load(path: &str, _args: &arguments::Args) -> Result<Self, &'static str> {
+    fn load(path: &str) -> Result<Self, &'static str> {
         let file = File::open(path).unwrap_or_else(|_| panic!("unable to open file {:?}", path));
         let mut instance: IVFPQIndex<E, T> = bincode::deserialize_from(&file).unwrap();
         instance._nodes = instance
@@ -520,7 +509,7 @@ impl<E: node::FloatElement + DeserializeOwned, T: node::IdxType + DeserializeOwn
         Ok(instance)
     }
 
-    fn dump(&mut self, path: &str, _args: &arguments::Args) -> Result<(), &'static str> {
+    fn dump(&mut self, path: &str) -> Result<(), &'static str> {
         self._nodes_tmp = self._nodes.iter().map(|x| *x.clone()).collect();
         for i in 0..self._n_kmeans_center {
             self._pq_list[i]._nodes_tmp =
