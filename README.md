@@ -1,10 +1,10 @@
 <div align="center">
-  <img src="asset/logo.svg" width="80%"/>
+  <img src="asset/logo.svg" width="100%"/>
 </div>
 
 # Hora
 
-a approximate nearest neighbor search library, written in Rust
+a approximate nearest neighbor search algorithm library, all code implemented in Rust🦀, because we think rust code is safe, high level abstraction and the speed is as fast as c++.
 
 Hora, `ほら` in Japanese, sound like `[hōlə]`, means `You see!` or `Look at that!`.
 
@@ -30,55 +30,35 @@ Hora, `ほら` in Japanese, sound like `[hōlə]`, means `You see!` or `Look at 
   * `Hierarchical Navigable Small World Graph Index(HNSW)` ([reference](https://arxiv.org/abs/1603.09320))
   * `Satellite System Graph (SSG)` ([reference](https://arxiv.org/abs/1907.06146))
   * `Product Quantization Inverted File(PQIVF)` ([reference](https://lear.inrialpes.fr/pubs/2011/JDS11/jegou_searching_with_quantization.pdf))
-  * `Random Projection Tree(RPT)`
+  * `Random Projection Tree(RPT)` (LSH, WIP)
   * `BruteForce`
 
 * **Portable** 💼
-  * `no_std` support (WIP)
-  * `Windows`, `Linux` and `OS X` support
+  * `no_std` support (in the future, not full support)
+  * `Windows`, `Linux` and `OS X` Support
   * `IOS` and `Android` Support (WIP)
   * thanks for `LLVM`, Hora can be used in `x66` and `ARM` CPUs
-  * the whole library did not dependent any heavy library, such as `BLAS`
-  * Hora support some features, such as `SIMD`, `no_std`
+  * without heavy library, such as `BLAS`
 
 * **Security** 🔒
-  * thanks for rust strict compiler
-  * all language lib's Hora memory is managed by the Rust
-  * full coverage testing
+  * rust compiler guarantee all code
+  * language lib like `Python lib`, the memory is managed by the Rust
+  * great coverage testing
 
 * **Multiple Distances Support** 🧮
-  * `Dot Product distance`
+  * `Dot Product Distance`
     * ![equation](https://latex.codecogs.com/gif.latex?D%28x%2Cy%29%20%3D%20%5Csum%7B%28x*y%29%7D)
-  * `Euclidean distance`
+  * `Euclidean Distance`
     * ![equation](https://latex.codecogs.com/gif.latex?D%28x%2Cy%29%20%3D%20%5Csqrt%7B%5Csum%7B%28x-y%29%5E2%7D%7D)
-  * `Manhattan distance`
+  * `Manhattan Distance`
     * ![equation](https://latex.codecogs.com/gif.latex?D%28x%2Cy%29%20%3D%20%5Csum%7B%7C%28x-y%29%7C%7D)
-  * `cosine distance`
+  * `Cosine Similarity`
     * ![equation](https://latex.codecogs.com/gif.latex?D%28x%2Cy%29%20%3D%20%5Cfrac%7Bx%20*y%7D%7B%7C%7Cx%7C%7C*%7C%7Cy%7C%7C%7D)
 
 * **Productive** ⭐
   * well documented
   * elegant and simple API, which is extremely easy to learn
 
-# Contents
-
-- [Hora](#hora)
-- [Key Features](#key-features)
-- [Contents](#contents)
-- [Installation](#installation)
-    - [rust](#rust)
-    - [Python](#python)
-    - [Building from source](#building-from-source)
-- [Benchmark](#benchmark)
-  - [Interface](#interface)
-- [Example](#example)
-- [Roadmap](#roadmap)
-- [Related Project and Comparison](#related-project-and-comparison)
-- [Contribute](#contribute)
-      - [clone the repo](#clone-the-repo)
-      - [build](#build)
-      - [try the changes](#try-the-changes)
-- [License](#license)
 
 # Installation
 
@@ -120,34 +100,15 @@ pub trait ANNIndex<E: node::FloatElement, T: node::IdxType>: Send + Sync {
     /// return `Err(&'static str)` if there is something wrong with the building process, and the `static str` is the debug reason
     fn build(&mut self, mt: metrics::Metric) -> Result<(), &'static str>;
 
-    /// add node internal method
-    ///
-    /// it will allocate a space in the heap(Vector), and init a `Node`
-    /// return `Err(&'static str)` if there is something wrong with the adding process, and the `static str` is the debug reason
-    fn add_node(&mut self, item: &node::Node<E, T>) -> Result<(), &'static str>;
-
     /// add node
     ///
     /// call `add_node()` internal
-    fn add(&mut self, vs: &[E], idx: T) -> Result<(), &'static str> {
-        self.add_node(&node::Node::new_with_idx(vs, idx))
-    }
+    fn add(&mut self, vs: &[E], idx: T) -> Result<(), &'static str>;
 
     /// add multiple node one time
     ///
     /// return `Err(&'static str)` if there is something wrong with the adding process, and the `static str` is the debug reason
-    fn add_batch(&mut self, vss: &[&[E]], indices: &[T]) -> Result<(), &'static str> {
-        if vss.len() != indices.len() {
-            return Err("vector's size is different with index");
-        }
-        for idx in 0..vss.len() {
-            let n = node::Node::new_with_idx(vss[idx], indices[idx].clone());
-            if let Err(err) = self.add_node(&n) {
-                return Err(err);
-            }
-        }
-        Ok(())
-    }
+    fn madd(&mut self, vss: &[&[E]], indices: &[T]) -> Result<(), &'static str>;
 
     /// return the index has already been built or not
     ///
@@ -161,36 +122,12 @@ pub trait ANNIndex<E: node::FloatElement, T: node::IdxType>: Send + Sync {
         Err("not implement")
     }
 
-    /// search for k nearest neighbors node internal method
-    fn node_search_k(
-        &self,
-        item: &node::Node<E, T>,
-        k: usize,
-        args: &arguments::Args,
-    ) -> Vec<(node::Node<E, T>, E)>;
-
-    /// search for k nearest neighbors and return full info
-    ///
-    /// it will return the all node's info including the original vectors, and the metric distance
-    ///
-    /// it require the item is the slice with the same dimension with index dimension, otherwise it will panic
-    fn search_full(&self, item: &[E], k: usize) -> Vec<(node::Node<E, T>, E)> {
-        assert_eq!(item.len(), self.dimension());
-        self.node_search_k(&node::Node::new(item), k, &arguments::Args::new())
-    }
-
     /// search for k nearest neighbors
     ///
     /// it only return the idx of the nearest node
     ///
     /// it require the item is the slice with the same dimension with index dimension, otherwise it will panic
-    fn search(&self, item: &[E], k: usize) -> Vec<T> {
-        assert_eq!(item.len(), self.dimension());
-        self.node_search_k(&node::Node::new(item), k, &arguments::Args::new())
-            .iter()
-            .map(|x| x.0.idx().as_ref().unwrap().clone())
-            .collect::<Vec<T>>()
-    }
+    fn search(&self, item: &[E], k: usize) -> Vec<T>;
 
     /// return the name of the Index
     /// format like this
@@ -206,14 +143,10 @@ pub trait ANNIndex<E: node::FloatElement, T: node::IdxType>: Send + Sync {
     fn clear(&mut self) {}
 
     /// return String of Index statistics informations
-    fn idx_info(&self) -> String {
-        "not implement".to_string()
-    }
+    fn idx_info(&self) -> String;
 
     /// return the dimension it require
-    fn dimension(&self) -> usize {
-        0
-    }
+    fn dimension(&self) -> usize;
 }
 
 pub trait SerializableIndex<
@@ -224,15 +157,10 @@ pub trait SerializableIndex<
     /// load file with path
     fn load(_path: &str, _args: &arguments::Args) -> Result<Self, &'static str>
     where
-        Self: Sized,
-    {
-        Err("empty implementation")
-    }
+        Self: Sized;
 
     /// dump the file into the path
-    fn dump(&mut self, _path: &str, _args: &arguments::Args) -> Result<(), &'static str> {
-        Err("empty implementation")
-    }
+    fn dump(&mut self, _path: &str, _args: &arguments::Args) -> Result<(), &'static str>;
 }
 ```
 
@@ -262,10 +190,16 @@ Python usage exmaple
 
 # Related Project and Comparison
 
-* [Faiss](https://github.com/facebookresearch/faiss): Facebook AI Similarity Search, which is the most popular ANN library currently
-  * Diffrences: Faiss more focus on the GPU scene, and Hora is more light than Faiss
+* [Faiss](https://github.com/facebookresearch/faiss), [Annoy](https://github.com/spotify/annoy), [ScaNN](https://github.com/google-research/google-research/tree/master/scann): **In fact `Hora`'s implementation is strongly inspired by these lib.**
+  * `Faiss` more focus on the GPU scene, and `Hora` is more light than Faiss
+  * `Hora` wish to support more language, and all the thing related to speed should be implemented by Rust🦀
+  * `Annoy` only implement `LSH(Random Projection)` algorithm
+  * `ScaNN` and `Faiss` is not easy to use, it's lack of document.
+  * **ALL IN RUST** 🦀
 
-* Annoy
+* [Milvus](https://github.com/milvus-io/milvus), [Vald](https://github.com/vdaas/vald)
+  * `Milvus` and `Vald` also support multiple languages, but it serve as a service, not a lib
+  * `Milvus` is built upon some libs like `Faiss`, but `Hora` is a algorithm lib, all the algo is implemented by itself
 
 # Contribute
 
