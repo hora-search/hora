@@ -95,14 +95,14 @@ mod tests {
             let w = ns.get(target).unwrap();
 
             let base_set: HashSet<usize> = bf_idx
-                .search_full(&w, 100)
+                .search_nodes(&w, 100)
                 .iter()
                 .map(|(n, _dist)| n.idx().unwrap())
                 .collect();
 
             for j in 0..indices.len() {
                 accuracy.lock().unwrap()[j] = 0.0;
-                let result = indices[j].search_full(&w, 100);
+                let result = indices[j].search_nodes(&w, 100);
                 for (n, _dist) in result.iter() {
                     if base_set.contains(&n.idx().unwrap()) {
                         accuracy.lock().unwrap()[j] += 1.0;
