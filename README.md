@@ -4,7 +4,7 @@
 
 # Hora
 
-***Hora Search Everywhere***
+***Hora Search Everywhere!***
 
 Hora, a approximate nearest neighbor search algorithm library, all code implemented in Rust 🦀, because we think rust code is safe, high level abstraction and the speed is as fast as c++.
 
