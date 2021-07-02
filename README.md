@@ -4,7 +4,9 @@
 
 # Hora
 
-a approximate nearest neighbor search algorithm library, all code implemented in Rust🦀, because we think rust code is safe, high level abstraction and the speed is as fast as c++.
+***Hora Search Everywhere***
+
+Hora, a approximate nearest neighbor search algorithm library, all code implemented in Rust 🦀, because we think rust code is safe, high level abstraction and the speed is as fast as c++.
 
 Hora, `ほら` in Japanese, sound like `[hōlə]`, means `You see!` or `Look at that!`.
 
@@ -27,9 +29,9 @@ Hora, `ほら` in Japanese, sound like `[hōlə]`, means `You see!` or `Look at 
   * **also can serve as a service**
 
 * **Multiple Index support** 🚀
-  * `Hierarchical Navigable Small World Graph Index(HNSW)` ([reference](https://arxiv.org/abs/1603.09320))
-  * `Satellite System Graph (SSG)` ([reference](https://arxiv.org/abs/1907.06146))
-  * `Product Quantization Inverted File(PQIVF)` ([reference](https://lear.inrialpes.fr/pubs/2011/JDS11/jegou_searching_with_quantization.pdf))
+  * `Hierarchical Navigable Small World Graph Index(HNSW)` ([detail](https://arxiv.org/abs/1603.09320))
+  * `Satellite System Graph (SSG)` ([detail](https://arxiv.org/abs/1907.06146))
+  * `Product Quantization Inverted File(PQIVF)` ([detail](https://lear.inrialpes.fr/pubs/2011/JDS11/jegou_searching_with_quantization.pdf))
   * `Random Projection Tree(RPT)` (LSH, WIP)
   * `BruteForce`
 
@@ -87,6 +89,20 @@ $ cargo build
 # Benchmark
 
 <img src="asset/fashion-mnist-784-euclidean_10_euclidean.png"/>
+
+# Example
+
+Rust usage example
+
+```Rust
+
+```
+
+Python usage exmaple
+
+```Python
+
+```
 
 ## Interface
 
@@ -164,22 +180,6 @@ pub trait SerializableIndex<
 }
 ```
 
-
-
-# Example
-
-Rust usage example
-
-```Rust
-
-```
-
-Python usage exmaple
-
-```Python
-
-```
-
 # Roadmap
 
 - [ ] Full Coverage Test
@@ -190,7 +190,8 @@ Python usage exmaple
 
 # Related Project and Comparison
 
-* [Faiss](https://github.com/facebookresearch/faiss), [Annoy](https://github.com/spotify/annoy), [ScaNN](https://github.com/google-research/google-research/tree/master/scann): **In fact `Hora`'s implementation is strongly inspired by these lib.**
+* [Faiss](https://github.com/facebookresearch/faiss), [Annoy](https://github.com/spotify/annoy), [ScaNN](https://github.com/google-research/google-research/tree/master/scann): 
+  * **In fact `Hora`'s implementation is strongly inspired by these lib.**
   * `Faiss` more focus on the GPU scene, and `Hora` is more light than Faiss
   * `Hora` wish to support more language, and all the thing related to speed should be implemented by Rust🦀
   * `Annoy` only implement `LSH(Random Projection)` algorithm
@@ -220,6 +221,12 @@ git clone https://github.com/hora-search/hora
 
 ```bash
 cargo build
+```
+
+#### test
+
+```bash
+cargo test --lib
 ```
 
 #### try the changes
