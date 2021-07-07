@@ -8,21 +8,21 @@
 
 Hora, a approximate nearest neighbor search algorithm library, all code implemented in Rust 🦀, because we think rust code is safe, high level abstraction and the speed is as fast as c++.
 
-Hora, `ほら` in Japanese, sound like `[hōlə]`, means `You see!` or `Look at that!`.
+Hora, **`ほら`** in Japanese, sound like `[hōlə]`, means `Wow`, `You see!` or `Look at that!`.The name is inspired by a famous lyrics **`「ほら あなたにとって大事な人ほど すぐそばにいるの」`** of a famous Japanese song **`小さな恋のうた`**, it means **`You See, the most important people to you is always stay near you`**
 
 # Key Features
 
 * **Performant** ⚡️
-  * SIMD acceleration
-  * stuble algorithm implementation
-  * multiple threads design
+  * **SIMD acceleration**
+  * **stuble algorithm implementation**
+  * **multiple threads design**
 
 * **Multi Language Support** ☄️
   * `Python`
   * `Javascript`
   * `Java`
-  * `Go`
-  * `Ruby`
+  * `Go` (WIP)
+  * `Ruby` (WIP)
   * `Swift` (WIP)
   * `R` (WIP)
   * `Julia` (WIP)

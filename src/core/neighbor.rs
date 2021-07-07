@@ -2,7 +2,8 @@ extern crate num;
 use crate::core::node;
 use core::cmp::Ordering;
 
-// util class
+/// internal temp structure
+///
 #[derive(Default, Clone, PartialEq, Debug)]
 pub struct Neighbor<E: node::FloatElement, T: node::IdxType> {
     pub _idx: T,

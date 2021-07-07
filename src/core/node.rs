@@ -8,6 +8,8 @@ use core::iter::Sum;
 use num::traits::{FromPrimitive, NumAssign};
 use serde::{Deserialize, Serialize};
 
+/// FloatElement trait, the generic of two primitive type `f32` and `f64`
+///
 pub trait FloatElement:
     FromPrimitive
     + Sized
@@ -28,7 +30,6 @@ pub trait FloatElement:
     + Serialize
     + simd_metrics::SIMDOptmized
 {
-    // TODO: make it static
     fn float_one() -> Self;
 
     fn float_two() -> Self;
@@ -38,6 +39,8 @@ pub trait FloatElement:
     fn zero_patch_num() -> Self;
 }
 
+/// IdxType trait indicate the primitive type used for the data index
+///
 pub trait IdxType:
     Sized + Clone + Default + core::fmt::Debug + Eq + Ord + Sync + Send + Serialize + Hash
 {
@@ -86,6 +89,10 @@ to_idx_type!(u32);
 to_idx_type!(u64);
 to_idx_type!(u128);
 
+/// Node is the main container for the point in the space
+///
+/// it contains a array of `FloatElement` and a index
+///
 #[derive(Clone, Debug, Default, Serialize, Deserialize)]
 pub struct Node<E: FloatElement, T: IdxType> {
     vectors: Vec<E>,
@@ -93,6 +100,9 @@ pub struct Node<E: FloatElement, T: IdxType> {
 }
 
 impl<E: FloatElement, T: IdxType> Node<E, T> {
+    /// new without idx
+    ///
+    /// new a point without a idx
     pub fn new(vectors: &[E]) -> Node<E, T> {
         Node::<E, T>::valid_elements(vectors);
         Node {
@@ -101,41 +111,45 @@ impl<E: FloatElement, T: IdxType> Node<E, T> {
         }
     }
 
+    /// new with idx
+    ///
+    /// new a point with a idx
     pub fn new_with_idx(vectors: &[E], id: T) -> Node<E, T> {
         let mut n = Node::new(vectors);
         n.set_idx(id);
         n
     }
 
+    /// calculate the point distance
     pub fn metric(&self, other: &Node<E, T>, t: metrics::Metric) -> Result<E, &'static str> {
         metrics::metric(&self.vectors, &other.vectors, t)
     }
 
-    // const value
+    // return internal embeddings
     pub fn vectors(&self) -> &Vec<E> {
         &self.vectors
     }
 
+    // return mut internal embeddings
     pub fn mut_vectors(&mut self) -> &mut Vec<E> {
         &mut self.vectors
     }
 
+    // set internal embeddings
     pub fn set_vectors(&mut self, v: &[E]) {
         self.vectors = v.to_vec();
     }
 
-    pub fn push(&mut self, e: &E) {
-        self.vectors.push(*e);
-    }
-
+    // internal embeddings length
     pub fn len(&self) -> usize {
         self.vectors.len()
     }
 
-    pub fn is_empty(&self) -> bool {
+    fn is_empty(&self) -> bool {
         self.vectors.is_empty()
     }
 
+    // return node's idx
     pub fn idx(&self) -> &Option<T> {
         &self.idx
     }
