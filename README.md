@@ -8,16 +8,16 @@
 
 Hora, a approximate nearest neighbor search algorithm library, all code implemented in Rust 🦀, because we think rust code is safe, high level abstraction and the speed is as fast as c++.
 
-Hora, **`ほら`** in Japanese, sound like `[hōlə]`, means `Wow`, `You see!` or `Look at that!`.The name is inspired by a famous lyrics **`「ほら あなたにとって大事な人ほど すぐそばにいるの」`** of a famous Japanese song **`小さな恋のうた`**, it means **`You See, the most important people to you is always stay near you`**
+Hora, **`ほら`** in Japanese, sound like `[hōlə]`, means `Wow`, `You see!` or `Look at that!`. The name is inspired by a famous Japanese song **`小さな恋のうた`**.
 
 # Key Features
 
 * **Performant** ⚡️
-  * **SIMD acceleration**
-  * **stuble algorithm implementation**
-  * **multiple threads design**
+  * **SIMD-Accelerated ([packed_simd](https://github.com/rust-lang/packed_simd))**
+  * **Stable Algorithm Implementation**
+  * **Multiple Threads Design**
 
-* **Multi Language Support** ☄️
+* **Multiple Languages Support** ☄️
   * `Python`
   * `Javascript`
   * `Java`
@@ -28,24 +28,23 @@ Hora, **`ほら`** in Japanese, sound like `[hōlə]`, means `Wow`, `You see!` o
   * `Julia` (WIP)
   * **also can serve as a service**
 
-* **Multiple Index support** 🚀
+* **Multiple Indexes Support** 🚀
   * `Hierarchical Navigable Small World Graph Index(HNSW)` ([detail](https://arxiv.org/abs/1603.09320))
   * `Satellite System Graph (SSG)` ([detail](https://arxiv.org/abs/1907.06146))
   * `Product Quantization Inverted File(PQIVF)` ([detail](https://lear.inrialpes.fr/pubs/2011/JDS11/jegou_searching_with_quantization.pdf))
   * `Random Projection Tree(RPT)` (LSH, WIP)
-  * `BruteForce`
+  * `BruteForce` (naive implementation with SIMD)
 
 * **Portable** 💼
   * `no_std` support (in the future, not full support)
   * `Windows`, `Linux` and `OS X` Support
   * `IOS` and `Android` Support (WIP)
-  * thanks for `LLVM`, Hora can be used in `x66` and `ARM` CPUs
-  * without heavy library, such as `BLAS`
+  * **without** any heavy library, such as `BLAS`
 
 * **Security** 🔒
   * rust compiler guarantee all code
   * language lib like `Python lib`, the memory is managed by the Rust
-  * great coverage testing
+  * great testing coverage
 
 * **Multiple Distances Support** 🧮
   * `Dot Product Distance`
@@ -60,7 +59,6 @@ Hora, **`ほら`** in Japanese, sound like `[hōlə]`, means `Wow`, `You see!` o
 * **Productive** ⭐
   * well documented
   * elegant and simple API, which is extremely easy to learn
-
 
 # Installation
 
@@ -198,7 +196,7 @@ pub trait SerializableIndex<
   * `ScaNN` and `Faiss` is not easy to use, it's lack of document.
   * **ALL IN RUST** 🦀
 
-* [Milvus](https://github.com/milvus-io/milvus), [Vald](https://github.com/vdaas/vald)
+* [Milvus](https://github.com/milvus-io/milvus), [Vald](https://github.com/vdaas/vald), [Jina AI](https://github.com/jina-ai/jina)
   * `Milvus` and `Vald` also support multiple languages, but it serve as a service, not a lib
   * `Milvus` is built upon some libs like `Faiss`, but `Hora` is a algorithm lib, all the algo is implemented by itself
 
