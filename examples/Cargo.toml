@@ -8,4 +8,5 @@ edition = "2018"
 hora = { package = "hora", path = "../", features=["simd"]}
 hdf5 = {version = "0.7.1"}
 rayon = "^1.5"
-rand = "0.7.3"
+rand = "0.8.4"
+rand_distr = "0.4.1"
