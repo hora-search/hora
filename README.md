@@ -4,18 +4,20 @@
 
 # Hora
 
+**[[Homepage](http://horasearch.com/)]** **[[Document](https://horasearch.com/doc)]** **[[Examples](https://horasearch.com/doc/example.html)]**
+
 ***Hora Search Everywhere!***
 
-Hora, a approximate nearest neighbor search algorithm library, all code implemented in Rust 🦀, because we think rust code is safe, high level abstraction and the speed is as fast as c++.
+Hora, a approximate nearest neighbor search algorithm library. We implement all code in `Rust🦀` for reliability, high level abstraction and high speed comparable to `C++`.
 
-Hora, **`ほら`** in Japanese, sound like `[hōlə]`, means `Wow`, `You see!` or `Look at that!`. The name is inspired by a famous Japanese song **`小さな恋のうた`**.
+Hora, **`ほら`** in Japanese, sound like `[hōlə]`, means `Wow`, `You see!` or `Look at that!`. The name is inspired by a famous Japanese song **`「小さな恋のうた」`**.
 
 # Key Features
 
 * **Performant** ⚡️
   * **SIMD-Accelerated ([packed_simd](https://github.com/rust-lang/packed_simd))**
-  * **Stable Algorithm Implementation**
-  * **Multiple Threads Design**
+  * **Stable algorithm implementation**
+  * **Multiple threads design**
 
 * **Multiple Languages Support** ☄️
   * `Python`
@@ -36,15 +38,15 @@ Hora, **`ほら`** in Japanese, sound like `[hōlə]`, means `Wow`, `You see!` o
   * `BruteForce` (naive implementation with SIMD)
 
 * **Portable** 💼
-  * `no_std` support (in the future, not full support)
-  * `Windows`, `Linux` and `OS X` Support
-  * `IOS` and `Android` Support (WIP)
-  * **without** any heavy library, such as `BLAS`
+  * Support `no_std` (WIP, partial)
+  * Support `Windows`, `Linux` and `OS X`
+  * Support `IOS` and `Android` (WIP)
+  * **No** heavy dependency, such as `BLAS`
 
-* **Security** 🔒
-  * rust compiler guarantee all code
-  * language lib like `Python lib`, the memory is managed by the Rust
-  * great testing coverage
+* **Reliability** 🔒
+  * `Rust` compiler secure all code
+  * Memory managed by `Rust` for all language libs such as `Python lib`
+  * Broad testing coverage
 
 * **Multiple Distances Support** 🧮
   * `Dot Product Distance`
@@ -57,27 +59,27 @@ Hora, **`ほら`** in Japanese, sound like `[hōlə]`, means `Wow`, `You see!` o
     * ![equation](https://latex.codecogs.com/gif.latex?D%28x%2Cy%29%20%3D%20%5Cfrac%7Bx%20*y%7D%7B%7C%7Cx%7C%7C*%7C%7Cy%7C%7C%7D)
 
 * **Productive** ⭐
-  * well documented
-  * elegant and simple API, which is extremely easy to learn
+  * Well documented
+  * Elegant and simple API, easy to learn
 
 # Installation
 
-### rust
+### `Rust`
 
-add this into `Cargo.toml`
+in `Cargo.toml`
 
 ```toml
 [dependencies]
 hora = "0.1.0"
 ```
 
-### Python
+### `Python`
 
 ```Bash
 $ pip install hora
 ```
 
-### Building from source
+### `Building from source`
 
 ```bash
 $ git clone https://github.com/hora-search/hora
@@ -85,12 +87,13 @@ $ cargo build
 ```
 
 # Benchmark
-
 <img src="asset/fashion-mnist-784-euclidean_10_euclidean.png"/>
 
-# Example
+by `aws t2.medium (CPU: Intel(R) Xeon(R) CPU E5-2686 v4 @ 2.30GHz)`
 
-Rust usage example
+# Examples
+
+**`Rust` example**
 
 ```Rust
 use hora::core::ann_index::ANNIndex;
@@ -131,7 +134,7 @@ pub fn demo() {
 }
 ```
 
-Python usage exmaple
+**`Python` exmaple**
 
 ```Python
 import numpy as np
@@ -149,28 +152,27 @@ print("{} has neighbors: {}".format(target, index.search(samples[target], 10))) 
 
 ```
 
-
 # Roadmap
 
 - [ ] Full Coverage Test
-- [ ] implement a [EFANNA](http://arxiv.org/abs/1609.07228) to achieve faster KNN buiding
+- [ ] implement [EFANNA](http://arxiv.org/abs/1609.07228) algo to achieve faster KNN graph building
 - [ ] Swift Support and also IOS/Mac OS deployment example
-- [ ] R Support
-- [ ] mmap file support
+- [ ] Support `R` 
+- [ ] support `mmap`
 
-# Related Project and Comparison
+# Related Projects and Comparison
 
 * [Faiss](https://github.com/facebookresearch/faiss), [Annoy](https://github.com/spotify/annoy), [ScaNN](https://github.com/google-research/google-research/tree/master/scann): 
-  * **In fact `Hora`'s implementation is strongly inspired by these lib.**
-  * `Faiss` more focus on the GPU scene, and `Hora` is more light than Faiss
-  * `Hora` wish to support more language, and all the thing related to speed should be implemented by Rust🦀
-  * `Annoy` only implement `LSH(Random Projection)` algorithm
-  * `ScaNN` and `Faiss` is not easy to use, it's lack of document.
-  * **ALL IN RUST** 🦀
+  * **`Hora`'s implementation is strongly inspired by these lib.**
+  * `Faiss` focus more on the GPu scenerio, and `Hora` is lighter than Faiss, such as **no heavy dependency**.
+  * `Hora` expects to support more language, and everything related to performance shall be implemented by Rust🦀.
+  * `Annoy` only support `LSH(Random Projection)` algorithm.
+  * `ScaNN` and `Faiss` are less user-friendly, such as lack of document.
+  * Hora is **ALL IN RUST** 🦀.
 
 * [Milvus](https://github.com/milvus-io/milvus), [Vald](https://github.com/vdaas/vald), [Jina AI](https://github.com/jina-ai/jina)
-  * `Milvus` and `Vald` also support multiple languages, but it serve as a service, not a lib
-  * `Milvus` is built upon some libs like `Faiss`, but `Hora` is a algorithm lib, all the algo is implemented by itself
+  * `Milvus` and `Vald` also support multiple languages, but serve as a service instead of a lib
+  * `Milvus` is built upon some libs such as `Faiss`, while `Hora` is an algorithm lib with all the algo implemented by itself
 
 # Contribute
 
@@ -208,4 +210,4 @@ cargo run
 
 # License
 
-The entire repo is under Apache License.
+The entire repo is under [Apache License](https://github.com/hora-search/hora/blob/main/LICENSE).
