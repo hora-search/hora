@@ -1,5 +1,6 @@
 mod ann_bench;
+mod demo;
 
 fn main() {
-    ann_bench::ann_bench();
+    demo::demo();
 }
