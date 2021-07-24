@@ -1,27 +1,32 @@
 [package]
-authors = ["aljun <gagasalamer@outlook.com>"]
+authors = ["aljun <gagasalamer@outlook.com>", "moonlight"]
 edition = "2018"
 license = "Apache-2.0"
 name = "hora"
 version = "0.1.0"
 
 description = "Hora Search Everywhere"
-documentation = "https://docs.rs/hora/"
+documentation = "https://horasearch.com/doc"
+homepage = "https://horasearch.com"
+readme = "README.md"
 repository = "https://github.com/hora-search/hora"
 
-categories = ["artificial intelligence"]
-keywords = ["approximate nearest neighbor search", "artificial intelligence", "SIMD", "nearest-neighbor-search", "no_std"]
+categories = ["artificial intelligence", "algorithms", "data-structures"]
+keywords = ["approximate nearest neighbor search", "artificial intelligence", "neighbor", "SIMD", "nearest-neighbor-search", "no_std", "ANN", "distance"]
+
+[package.metadata.docs.rs]
+all-features = true
 
 [profile.dev]
-codegen-units = 4 
-debug = 1 # required for line numbers in tests, see tikv #5049
-debug-assertions = true 
-incremental = true 
-lto = false 
-opt-level = 0 
-overflow-checks = false 
-panic = 'unwind' 
-rpath = false 
+codegen-units = 4
+debug = 1
+debug-assertions = true
+incremental = true
+lto = false
+opt-level = 0
+overflow-checks = false
+panic = 'unwind'
+rpath = false
 
 [profile.release]
 codegen-units = 1
@@ -39,7 +44,7 @@ no_std = ["hashbrown"]
 simd = ["packed_simd"]
 
 [dependencies]
-bincode = "1.3.2"
+bincode = "^1.3"
 fixedbitset = "0.4.0"
 hashbrown = {version = "0.11.2", optional = true}
 log = "^0.4"
@@ -47,8 +52,7 @@ num = "0.4.0"
 packed_simd = {version = "0.3.5", package = "packed_simd_2", optional = true}
 rand = "0.8.3"
 rayon = "^1.5"
-serde = {version = "1.0", features = ["derive"]}
-smallvec = {version = "1.6.1", features = ["serde"], optional = true}
+serde = {version = "^1.0", features = ["derive"]}
 
 [dev-dependencies]
 criterion = "0.3.4"

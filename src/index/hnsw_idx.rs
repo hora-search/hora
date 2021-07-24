@@ -154,7 +154,6 @@ impl<E: node::FloatElement, T: node::IdxType> HNSWIndex<E, T> {
         if selected_neighbors.len() > n_neigh {
             return Err("Should be not be more than M_ candidates returned by the heuristic");
         }
-        // println!("{:?}",top_candidates);
         if selected_neighbors.is_empty() {
             return Err("top candidate is empty, impossible!");
         }
@@ -470,13 +469,8 @@ impl<E: node::FloatElement, T: node::IdxType> HNSWIndex<E, T> {
             .into_par_iter()
             .for_each(|insert_id: usize| {
                 self.construct_single_item(insert_id).unwrap();
-                // println!("insert_id {}", insert_id);
             });
 
-        // for insert_id in self._n_constructed_items..self._n_items{
-        //     // println!("insert id {}", insert_id);
-        //     self.construct_single_item(insert_id);
-        // }
         self._n_constructed_items = self._n_items;
         Ok(())
     }
@@ -528,11 +522,7 @@ impl<E: node::FloatElement, T: node::IdxType> HNSWIndex<E, T> {
 
     fn construct_single_item(&self, insert_id: usize) -> Result<(), &'static str> {
         let insert_level = self._id2level[insert_id];
-        // println!("insert id {} insert_level {}", insert_id, insert_level);
-        // println!("self._cur_level {}", self._cur_level);
         let mut cur_id = self._root_id;
-        // println!("insert_id {:?}",insert_id);
-        // println!("insert_id {:?}, insert_level {:?} ", insert_id, insert_level);
 
         if insert_id == 0 {
             return Ok(());
@@ -593,8 +583,6 @@ impl<E: node::FloatElement, T: node::IdxType> HNSWIndex<E, T> {
                     top_candidates.pop();
                 }
             }
-            // println!("cur_id {:?}", insert_id);
-            // println!("{:?}", top_candidates);
             sorted_candidates = top_candidates.into_sorted_vec();
             if sorted_candidates.is_empty() {
                 return Err("sorted sorted_candidate is empty");

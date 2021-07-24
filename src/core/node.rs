@@ -145,7 +145,7 @@ impl<E: FloatElement, T: IdxType> Node<E, T> {
         self.vectors.len()
     }
 
-    fn is_empty(&self) -> bool {
+    pub fn is_empty(&self) -> bool {
         self.vectors.is_empty()
     }
 

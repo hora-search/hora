@@ -385,20 +385,16 @@ impl<E: node::FloatElement, T: node::IdxType> SSGIndex<E, T> {
 
         self.root_nodes = kmeans::general_kmeans(self.root_size, 256, &self.nodes, self.mt);
 
-        let mut max = 0;
-        let mut min = self.nodes.len();
-        let mut avg: f32 = 0.;
-        for t in 0..self.nodes.len() {
-            let size = self.graph[t].len();
-            max = if max < size { size } else { max };
-            min = if min > size { size } else { min };
-            avg += size as f32;
-        }
-        avg /= 1.0 * self.nodes.len() as f32;
-        println!(
-            "stat: k: {:?}, max {:?}, min {:?}, avg {:?}",
-            self.init_k, max, min, avg
-        );
+        // let mut max = 0;
+        // let mut min = self.nodes.len();
+        // let mut avg: f32 = 0.;
+        // for t in 0..self.nodes.len() {
+        //     let size = self.graph[t].len();
+        //     max = if max < size { size } else { max };
+        //     min = if min > size { size } else { min };
+        //     avg += size as f32;
+        // }
+        // avg /= 1.0 * self.nodes.len() as f32;
     }
 
     fn search(&self, query: &node::Node<E, T>, k: usize) -> Vec<(node::Node<E, T>, E)> {
@@ -477,17 +473,8 @@ impl<E: node::FloatElement, T: node::IdxType> SSGIndex<E, T> {
             if visited.contains(&id) {
                 continue;
             }
-
-            for x in 0..self.graph[id].len() {
-                queue.push_back(self.graph[id][x]);
-                if self.graph[id][x] > self.nodes.len() {
-                    // println!("{:?} {:?} {:?}", self.graph[id][x], self.graph[id], id);
-                }
-            }
             visited.insert(id);
         }
-
-        println!("connectivity: {:?} {:?}", self.nodes.len(), visited.len());
     }
 }
 

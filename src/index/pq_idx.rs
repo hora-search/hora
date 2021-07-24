@@ -371,8 +371,6 @@ impl<E: node::FloatElement, T: node::IdxType> IVFPQIndex<E, T> {
             self._ivflist[center_id].push(i);
         });
         for i in 0..n_center {
-            // println!("train center {:?}", i);
-            // println!("train center len {:?}", self._ivflist[i].len());
             let mut center_pq = PQIndex::<E, T>::new(
                 self._dimension,
                 &PQParams::default()
@@ -386,7 +384,6 @@ impl<E: node::FloatElement, T: node::IdxType> IVFPQIndex<E, T> {
                     .add_item(&self._nodes[self._ivflist[i][j]].clone())
                     .unwrap();
             }
-            // println!("center: {:?}", self._centers[i].to_vec())
             center_pq.set_residual(self._centers[i].to_vec());
             center_pq.train_center();
             self._pq_list.push(center_pq);
@@ -423,7 +420,6 @@ impl<E: node::FloatElement, T: node::IdxType> IVFPQIndex<E, T> {
         let mut top_candidate: BinaryHeap<Neighbor<E, usize>> = BinaryHeap::new();
         for _i in 0..self._search_n_center {
             let center = top_centers.pop().unwrap().idx();
-            // println!("{:?}", center);
             let mut ret = self._pq_list[center]
                 .search_knn_adc(search_data, k)
                 .unwrap();

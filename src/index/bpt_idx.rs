@@ -226,13 +226,6 @@ impl<E: node::FloatElement, T: node::IdxType> BPTIndex<E, T> {
         self._tot_leaves_cnt = self._tot_items_cnt; // init with build.
         self._build(self._tree_num, self.mt);
         self._built = true;
-        println!(
-            "tree number: {:?}, leaves: {:?}, items: {:?}, leaf size: {:?}",
-            self._tree_num,
-            self._tot_leaves_cnt,
-            self._tot_items_cnt,
-            self.get_k()
-        );
         Ok(())
     }
 
@@ -531,12 +524,6 @@ impl<E: node::FloatElement, T: node::IdxType> BPTIndex<E, T> {
             if !(item.children[0] == 0 && item.children[1] == 0) {
                 v.extend(&item.children);
             }
-            println!(
-                "item {} children {:?}, vectors {:?}",
-                i,
-                item.children,
-                item.node.vectors()
-            );
         }
     }
 

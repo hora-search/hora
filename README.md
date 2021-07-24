@@ -31,11 +31,11 @@ Hora, **`ほら`** in Japanese, sound like `[hōlə]`, means `Wow`, `You see!` o
   * **also can serve as a service**
 
 * **Multiple Indexes Support** 🚀
-  * `Hierarchical Navigable Small World Graph Index(HNSW)` ([detail](https://arxiv.org/abs/1603.09320))
-  * `Satellite System Graph (SSG)` ([detail](https://arxiv.org/abs/1907.06146))
-  * `Product Quantization Inverted File(PQIVF)` ([detail](https://lear.inrialpes.fr/pubs/2011/JDS11/jegou_searching_with_quantization.pdf))
-  * `Random Projection Tree(RPT)` (LSH, WIP)
-  * `BruteForce` (naive implementation with SIMD)
+  * `Hierarchical Navigable Small World Graph Index(HNSWIndex)` ([detail](https://arxiv.org/abs/1603.09320))
+  * `Satellite System Graph (SSGIndex)` ([detail](https://arxiv.org/abs/1907.06146))
+  * `Product Quantization Inverted File(PQIVFIndex)` ([detail](https://lear.inrialpes.fr/pubs/2011/JDS11/jegou_searching_with_quantization.pdf))
+  * `Random Projection Tree(RPTIndex)` (LSH, WIP)
+  * `BruteForce (BruteForceIndex)` (naive implementation with SIMD)
 
 * **Portable** 💼
   * Support `no_std` (WIP, partial)
@@ -89,13 +89,13 @@ $ cargo build
 # Benchmark
 <img src="asset/fashion-mnist-784-euclidean_10_euclidean.png"/>
 
-by `aws t2.medium (CPU: Intel(R) Xeon(R) CPU E5-2686 v4 @ 2.30GHz)`
+by `aws t2.medium (CPU: Intel(R) Xeon(R) CPU E5-2686 v4 @ 2.30GHz)` [more information](https://github.com/hora-search/ann-benchmarks)
 
 # Examples
 
-**`Rust` example**
+**`Rust` example** [[more info](https://github.com/hora-search/hora/tree/main/examples)]
 
-```Rust
+```Rust 
 use hora::core::ann_index::ANNIndex;
 use rand::{thread_rng, Rng};
 use rand_distr::{Distribution, Normal};
@@ -115,26 +115,29 @@ pub fn demo() {
         samples.push(sample);
     }
 
+    // init index
     let mut index = hora::index::hnsw_idx::HNSWIndex::<f32, usize>::new(
         dimension,
         &hora::index::hnsw_params::HNSWParams::<f32>::default(),
-    ); // init index
+    );
     for (i, sample) in samples.iter().enumerate().take(n) {
-        index.add(sample, i).unwrap(); // add point
+        // add point
+        index.add(sample, i).unwrap();
     }
     index.build(hora::core::metrics::Metric::Euclidean).unwrap();
 
     let mut rng = thread_rng();
     let target: usize = rng.gen_range(0..n);
+    // 523 has neighbors: [523, 762, 364, 268, 561, 231, 380, 817, 331, 246]
     println!(
         "{:?} has neighbors: {:?}",
         target,
         index.search(&samples[target], 10) // search for k nearest neighbors
-    ); // 523 has neighbors: [523, 762, 364, 268, 561, 231, 380, 817, 331, 246]
+    );
 }
 ```
 
-**`Python` exmaple**
+**`Python` exmaple** [[more info](https://github.com/hora-search/hora-python)]
 
 ```Python
 import numpy as np
@@ -142,14 +145,74 @@ from hora import HNSWIndex
 
 dimension = 50
 n = 1000
-index = HNSWIndex(dimension, "usize")
+index = HNSWIndex(dimension, "usize")  # init index instance
 samples = np.float32(np.random.rand(n, dimension))
 for i in range(0, len(samples)):
-    index.add(np.float32(samples[i]), i)
-index.build("euclidean")
+    index.add(np.float32(samples[i]), i)  # add node
+index.build("euclidean")  # build index
 target = np.random.randint(0, n)
-print("{} has neighbors: {}".format(target, index.search(samples[target], 10))) # 631 has neighbors: [631, 656, 113, 457, 584, 179, 586, 979, 619, 976]
+print("{} has neighbors: {}".format(
+    target, index.search(samples[target], 10)))  # search
+# 631 has neighbors: [631, 656, 113, 457, 584, 179, 586, 979, 619, 976]
+```
 
+**`Javascript` example** [[more info](https://github.com/hora-search/hora-wasm)]
+
+```JavaScript
+const demo = () => {
+  const dimension = 50;
+
+  var bf_idx = hora_wasm.BruteForceIndexUsize.new(dimension);
+  for (var i = 0; i < 1000; i++) {
+    var feature = [];
+    for (var j = 0; j < dimension; j++) {
+      feature.push(Math.random());
+    }
+    bf_idx.add(feature, i); // add point 
+  }
+  bf_idx.build("euclidean"); // build index
+  var feature = [];
+  for (var j = 0; j < dimension; j++) {
+    feature.push(Math.random());
+  }
+  console.log("bf result",  .search(feature, 10)); //bf result Uint32Array(10) [704, 113, 358, 835, 408, 379, 117, 414, 808, 826]
+}
+```
+
+**`Java` examples** [[more info](https://github.com/hora-search/hora-java)]
+
+```Java
+public void demo() {
+    final int dimension = 2;
+    final float variance = 2.0f;
+    Random fRandom = new Random();
+
+    BruteForceIndex bruteforce_idx = new BruteForceIndex(dimension); // init index instance
+
+    List<float[]> tmp = new ArrayList<>();
+    for (int i = 0; i < 5; i++) {
+        for (int p = 0; p < 10; p++) {
+            float[] features = new float[dimension];
+            for (int j = 0; j < dimension; j++) {
+                features[j] = getGaussian(fRandom, (float) (i * 10), variance);
+            }
+            bruteforce_idx.add("bf", features, i * 10 + p); // add point
+            tmp.add(features);
+          }
+    }
+    bruteforce_idx.build("bf", "euclidean"); // build index
+
+    int search_index = fRandom.nextInt(tmp.size());
+    // nearest neighbor search
+    int[] result = bruteforce_idx.search("bf", 10, tmp.get(search_index)); 
+    // [main] INFO com.hora.app.ANNIndexTest  - demo bruteforce_idx[7, 8, 0, 5, 3, 9, 1, 6, 4, 2]
+    log.info("demo bruteforce_idx" + Arrays.toString(result)); 
+}
+
+private static float getGaussian(Random fRandom, float aMean, float variance) {
+    float r = (float) fRandom.nextGaussian();
+    return aMean + r * variance;
+}
 ```
 
 # Roadmap
@@ -176,32 +239,26 @@ print("{} has neighbors: {}".format(target, index.search(samples[target], 10))) 
 
 # Contribute
 
+**We appreciate your help!**
+
 we are pretty gald to have you to participate, any contributions is welcome, including the documentations and tests.
 you can do the  `Pull Requests`, `Issue` on the github, and we will review it as soon as possible.
 
 We use GitHub issues for tracking suggestions and bugs.
 
-To install for development:
-
 #### clone the repo
 
 ```bash
+# clone to local
 git clone https://github.com/hora-search/hora
-```
 
-#### build
-
-```bash
+## build
 cargo build
-```
-
-#### test
-
-```bash
+## test
 cargo test --lib
 ```
 
-#### try the changes
+#### try changes
 
 ```bash
 cd exmaples

@@ -17,20 +17,23 @@ pub fn demo() {
         samples.push(sample);
     }
 
+    // init index
     let mut index = hora::index::hnsw_idx::HNSWIndex::<f32, usize>::new(
         dimension,
         &hora::index::hnsw_params::HNSWParams::<f32>::default(),
-    ); // init index
+    );
     for (i, sample) in samples.iter().enumerate().take(n) {
-        index.add(sample, i).unwrap(); // add point
+        // add point
+        index.add(sample, i).unwrap();
     }
     index.build(hora::core::metrics::Metric::Euclidean).unwrap();
 
     let mut rng = thread_rng();
     let target: usize = rng.gen_range(0..n);
+    // 523 has neighbors: [523, 762, 364, 268, 561, 231, 380, 817, 331, 246]
     println!(
         "{:?} has neighbors: {:?}",
         target,
         index.search(&samples[target], 10) // search for k nearest neighbors
-    ); // 523 has neighbors: [523, 762, 364, 268, 561, 231, 380, 817, 331, 246]
+    );
 }
