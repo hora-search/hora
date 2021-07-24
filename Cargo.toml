@@ -10,7 +10,7 @@ homepage = "https://horasearch.com"
 readme = "README.md"
 repository = "https://github.com/hora-search/hora"
 
-categories = ["artificial intelligence", "algorithms", "data-structures", "AI"]
+categories = ["algorithms", "data-structures"]
 keywords = ["intelligence", "neighbor", "SIMD", "search", "distance"]
 
 [package.metadata.docs.rs]
