@@ -6,12 +6,11 @@ name = "hora"
 version = "0.1.0"
 
 description = "Hora Search Everywhere"
-documentation = "https://horasearch.com/doc"
 homepage = "https://horasearch.com"
 readme = "README.md"
 repository = "https://github.com/hora-search/hora"
 
-categories = ["artificial intelligence", "algorithms", "data-structures"]
+categories = ["artificial intelligence", "algorithms", "data-structures", "AI"]
 keywords = ["approximate nearest neighbor search", "artificial intelligence", "neighbor", "SIMD", "nearest-neighbor-search", "no_std", "ANN", "distance"]
 
 [package.metadata.docs.rs]
