@@ -64,7 +64,7 @@ Hora, **`ほら`** in Japanese, sound like `[hōlə]`, means `Wow`, `You see!` o
 
 # Installation
 
-### `Rust`
+**`Rust`**
 
 in `Cargo.toml`
 
@@ -73,13 +73,13 @@ in `Cargo.toml`
 hora = "0.1.0"
 ```
 
-### `Python`
+**`Python`**
 
 ```Bash
 $ pip install hora
 ```
 
-### `Building from source`
+**`Building from source`**
 
 ```bash
 $ git clone https://github.com/hora-search/hora
