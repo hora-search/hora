@@ -11,7 +11,7 @@ readme = "README.md"
 repository = "https://github.com/hora-search/hora"
 
 categories = ["artificial intelligence", "algorithms", "data-structures", "AI"]
-keywords = ["artificial-intelligence", "neighbor", "SIMD", "nearest-neighbor-search", "distance"]
+keywords = ["intelligence", "neighbor", "SIMD", "search", "distance"]
 
 [package.metadata.docs.rs]
 all-features = true
