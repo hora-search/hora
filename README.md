@@ -76,7 +76,7 @@ hora = "0.1.0"
 **`Python`**
 
 ```Bash
-$ pip install hora
+$ pip install horapy
 ```
 
 **`Building from source`**
