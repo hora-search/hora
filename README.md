@@ -15,7 +15,7 @@ Hora, **`「ほら」`** in Japanese, sound like `[hōlə]`, means `Wow`, `You s
 # Demos
 **👩 Face-Match [[online demo](https://horasearch.com/#Demos)]**
 <div align="center">
-  <img src="asset/demo1.gif" width="100%"/>
+  <img src="asset/demo3.gif" width="100%"/>
 </div>
 
 **🍷  Dream wine comments search [[online demo](https://horasearch.com/#Demos)]**
