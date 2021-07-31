@@ -13,12 +13,14 @@ Hora, a **approximate nearest neighbor search algorithm** library. We implement 
 Hora, **`「ほら」`** in Japanese, sound like `[hōlə]`, means `Wow`, `You see!` or `Look at that!`. The name is inspired by a famous Japanese song **`「小さな恋のうた」`**.
 
 # Demos
-**👩 Face-Match [[online demo](https://horasearch.com/#Demos)]**
+**👩 Face-Match [[online demo](https://horasearch.com/#Demos)] have a try! which is indeed pretty fast)**
+
 <div align="center">
   <img src="asset/demo3.gif" width="100%"/>
 </div>
 
-**🍷  Dream wine comments search [[online demo](https://horasearch.com/#Demos)]**
+**🍷  Dream wine comments search [[online demo](https://horasearch.com/#Demos)] have a try! which is indeed pretty fast)**
+
 <div align="center">
   <img src="asset/demo2.gif" width="100%"/>
 </div>
