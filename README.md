@@ -282,7 +282,7 @@ cargo test --lib
 #### Try changes
 
 ```bash
-cd exmaples
+cd examples
 cargo run
 ```
 
