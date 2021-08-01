@@ -1,33 +1,33 @@
 # Contribute
 
-we are pretty gald to have you to participate, any contributions is welcome, including the documentations and tests.
-you can do the  `Pull Requests`, `Issue` on the github, and we will review it as soon as possible.
+We are glad to have you participate. Any contributions are welcome, including documentations and tests.
+You can create a `Pull Request` or `Issue` on GitHub, and we will review it as soon as possible.
 
 We use GitHub issues for tracking suggestions and bugs.
 
 To install for development:
 
-#### clone the repo
+#### Clone the repo
 
 ```bash
 git clone https://github.com/hora-search/hora
 ```
 
-#### build
+#### Build
 
 ```bash
 cargo build
 ```
 
-#### test
+#### Test
 
 ```bash
 cargo test --lib
 ```
 
-#### try the changes
+#### Try the changes
 
 ```bash
-cd exmaples
+cd examples
 cargo run
 ```
