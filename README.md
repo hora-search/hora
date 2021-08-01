@@ -8,18 +8,18 @@
 
 ***Hora Search Everywhere!***
 
-Hora, a **approximate nearest neighbor search algorithm** library. We implement all code in `Rust🦀` for reliability, high level abstraction and high speed comparable to `C++`.
+Hora is an **approximate nearest neighbor search algorithm** library. We implement all code in `Rust🦀` for reliability, high level abstraction and high speeds comparable to `C++`.
 
-Hora, **`「ほら」`** in Japanese, sound like `[hōlə]`, means `Wow`, `You see!` or `Look at that!`. The name is inspired by a famous Japanese song **`「小さな恋のうた」`**.
+Hora, **`「ほら」`** in Japanese, sounds like `[hōlə]`, and means `Wow`, `You see!` or `Look at that!`. The name is inspired by a famous Japanese song **`「小さな恋のうた」`**.
 
 # Demos
-**👩 Face-Match [[online demo](https://horasearch.com/#Demos)] have a try! which is indeed pretty fast)**
+**👩 Face-Match [[online demo](https://horasearch.com/#Demos)], have a try!**
 
 <div align="center">
   <img src="asset/demo3.gif" width="100%"/>
 </div>
 
-**🍷  Dream wine comments search [[online demo](https://horasearch.com/#Demos)] have a try! which is indeed pretty fast)**
+**🍷  Dream wine comments search [[online demo](https://horasearch.com/#Demos)], have a try!**
 
 <div align="center">
   <img src="asset/demo2.gif" width="100%"/>
@@ -32,7 +32,7 @@ Hora, **`「ほら」`** in Japanese, sound like `[hōlə]`, means `Wow`, `You s
   * **Stable algorithm implementation**
   * **Multiple threads design**
 
-* **Multiple Languages Support** ☄️
+* **Supports Multiple Languages** ☄️
   * `Python`
   * `Javascript`
   * `Java`
@@ -41,27 +41,27 @@ Hora, **`「ほら」`** in Japanese, sound like `[hōlə]`, means `Wow`, `You s
   * `Swift` (WIP)
   * `R` (WIP)
   * `Julia` (WIP)
-  * **also can serve as a service**
+  * **Can also be used as a service**
 
-* **Multiple Indexes Support** 🚀
-  * `Hierarchical Navigable Small World Graph Index(HNSWIndex)` ([detail](https://arxiv.org/abs/1603.09320))
-  * `Satellite System Graph (SSGIndex)` ([detail](https://arxiv.org/abs/1907.06146))
-  * `Product Quantization Inverted File(PQIVFIndex)` ([detail](https://lear.inrialpes.fr/pubs/2011/JDS11/jegou_searching_with_quantization.pdf))
+* **Supports Multiple Indexes** 🚀
+  * `Hierarchical Navigable Small World Graph Index (HNSWIndex)` ([details](https://arxiv.org/abs/1603.09320))
+  * `Satellite System Graph (SSGIndex)` ([details](https://arxiv.org/abs/1907.06146))
+  * `Product Quantization Inverted File(PQIVFIndex)` ([details](https://lear.inrialpes.fr/pubs/2011/JDS11/jegou_searching_with_quantization.pdf))
   * `Random Projection Tree(RPTIndex)` (LSH, WIP)
   * `BruteForce (BruteForceIndex)` (naive implementation with SIMD)
 
 * **Portable** 💼
-  * Support `no_std` (WIP, partial)
-  * Support `Windows`, `Linux` and `OS X`
-  * Support `IOS` and `Android` (WIP)
-  * **No** heavy dependency, such as `BLAS`
+  * Supports `no_std` (WIP, partial)
+  * Supports `Windows`, `Linux` and `OS X`
+  * Supports `IOS` and `Android` (WIP)
+  * **No** heavy dependencies, such as `BLAS`
 
 * **Reliability** 🔒
-  * `Rust` compiler secure all code
-  * Memory managed by `Rust` for all language libs such as `Python lib`
+  * `Rust` compiler secures all code
+  * Memory managed by `Rust` for all language libraries such as `Python's`
   * Broad testing coverage
 
-* **Multiple Distances Support** 🧮
+* **Supports Multiple Distances** 🧮
   * `Dot Product Distance`
     * ![equation](https://latex.codecogs.com/gif.latex?D%28x%2Cy%29%20%3D%20%5Csum%7B%28x*y%29%7D)
   * `Euclidean Distance`
@@ -73,7 +73,7 @@ Hora, **`「ほら」`** in Japanese, sound like `[hōlə]`, means `Wow`, `You s
 
 * **Productive** ⭐
   * Well documented
-  * Elegant and simple API, easy to learn
+  * Elegant, simple and easy to learn API 
 
 # Installation
 
@@ -99,7 +99,7 @@ $ git clone https://github.com/hora-search/hora
 $ cargo build
 ```
 
-# Benchmark
+# Benchmarks
 <img src="asset/fashion-mnist-784-euclidean_10_euclidean.png"/>
 
 by `aws t2.medium (CPU: Intel(R) Xeon(R) CPU E5-2686 v4 @ 2.30GHz)` [more information](https://github.com/hora-search/ann-benchmarks)
@@ -150,7 +150,7 @@ pub fn demo() {
 }
 ```
 
-**`Python` exmaple** [[more info](https://github.com/hora-search/horapy)]
+**`Python` example** [[more info](https://github.com/hora-search/horapy)]
 
 ```Python
 import numpy as np
@@ -177,7 +177,7 @@ print("{} in {} \nhas neighbors: {}".format(
 
 ```
 
-**`Javascript` example** [[more info](https://github.com/hora-search/hora-wasm)]
+**`JavaScript` example** [[more info](https://github.com/hora-search/hora-wasm)]
 
 ```JavaScript
 const demo = () => {
@@ -200,7 +200,7 @@ const demo = () => {
 }
 ```
 
-**`Java` examples** [[more info](https://github.com/hora-search/hora-java)]
+**`Java` example** [[more info](https://github.com/hora-search/hora-java)]
 
 ```Java
 public void demo() {
@@ -238,36 +238,36 @@ private static float getGaussian(Random fRandom, float aMean, float variance) {
 
 # Roadmap
 
-- [ ] Full Coverage Test
-- [ ] implement [EFANNA](http://arxiv.org/abs/1609.07228) algo to achieve faster KNN graph building
-- [ ] Swift Support and also IOS/Mac OS deployment example
+- [ ] Full test coverage
+- [ ] Implement [EFANNA](http://arxiv.org/abs/1609.07228) algorithm to achieve faster KNN graph building
+- [ ] Swift support and iOS/macOS deployment example
 - [ ] Support `R` 
 - [ ] support `mmap`
 
 # Related Projects and Comparison
 
 * [Faiss](https://github.com/facebookresearch/faiss), [Annoy](https://github.com/spotify/annoy), [ScaNN](https://github.com/google-research/google-research/tree/master/scann): 
-  * **`Hora`'s implementation is strongly inspired by these lib.**
-  * `Faiss` focus more on the GPu scenerio, and `Hora` is lighter than Faiss, such as **no heavy dependency**.
-  * `Hora` expects to support more language, and everything related to performance shall be implemented by Rust🦀.
-  * `Annoy` only support `LSH(Random Projection)` algorithm.
-  * `ScaNN` and `Faiss` are less user-friendly, such as lack of document.
+  * **`Hora`'s implementation is strongly inspired by these libraries.**
+  * `Faiss` focuses more on the GPU scenerio, and `Hora` is lighter than Faiss (**no heavy dependencies)**.
+  * `Hora` expects to support more languages, and everything related to performance will be implemented by Rust🦀.
+  * `Annoy` only supports the `LSH (Random Projection)` algorithm.
+  * `ScaNN` and `Faiss` are less user-friendly, (e.g. lack of documentation).
   * Hora is **ALL IN RUST** 🦀.
 
 * [Milvus](https://github.com/milvus-io/milvus), [Vald](https://github.com/vdaas/vald), [Jina AI](https://github.com/jina-ai/jina)
-  * `Milvus` and `Vald` also support multiple languages, but serve as a service instead of a lib
-  * `Milvus` is built upon some libs such as `Faiss`, while `Hora` is an algorithm lib with all the algo implemented by itself
+  * `Milvus` and `Vald` also support multiple languages, but serve as a service instead of a library
+  * `Milvus` is built upon some libraries such as `Faiss`, while `Hora` is a library with all the algorithms implemented itself
 
 # Contribute
 
 **We appreciate your help!**
 
-we are pretty gald to have you to participate, any contributions is welcome, including the documentations and tests.
-you can do the  `Pull Requests`, `Issue` on the github, and we will review it as soon as possible.
+We are glad to have you participate, any contributions are welcome, including documentations and tests.
+You can create a `Pull Request` or `Issue` on GitHub, and we will review it as soon as possible.
 
 We use GitHub issues for tracking suggestions and bugs.
 
-#### clone the repo
+#### Clone the repo
 
 ```bash
 # clone to local
@@ -279,13 +279,13 @@ cargo build
 cargo test --lib
 ```
 
-#### try changes
+#### Try changes
 
 ```bash
-cd exmaples
+cd examples
 cargo run
 ```
 
 # License
 
-The entire repo is under [Apache License](https://github.com/hora-search/hora/blob/main/LICENSE).
+The entire repository is licensed under the [Apache License](https://github.com/hora-search/hora/blob/main/LICENSE).
