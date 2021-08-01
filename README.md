@@ -270,16 +270,22 @@ We use GitHub issues for tracking suggestions and bugs.
 #### Clone the repo
 
 ```bash
-# clone to local
 git clone https://github.com/hora-search/hora
+```
 
-## build
+#### Build
+
+```bash
 cargo build
-## test
+```
+
+#### Test
+
+```bash
 cargo test --lib
 ```
 
-#### Try changes
+#### Try the changes
 
 ```bash
 cd examples
