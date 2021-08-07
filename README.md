@@ -194,24 +194,32 @@ print("{} in {} \nhas neighbors: {}".format(
 **`JavaScript` example** [[more info](https://github.com/hora-search/hora-wasm)]
 
 ```JavaScript
-const demo = () => {
-  const dimension = 50;
+import * as horajs from "horajs";
 
-  var bf_idx = hora_wasm.BruteForceIndexUsize.new(dimension);
-  for (var i = 0; i < 1000; i++) {
+const demo = () => {
+    const dimension = 50;
+    var bf_idx = horajs.BruteForceIndexUsize.new(dimension);
+    // var hnsw_idx = horajs.HNSWIndexUsize.new(dimension, 1000000, 32, 64, 20, 500, 16, false);
+    for (var i = 0; i < 1000; i++) {
+        var feature = [];
+        for (var j = 0; j < dimension; j++) {
+            feature.push(Math.random());
+        }
+        bf_idx.add(feature, i); // add point 
+    }
+    bf_idx.build("euclidean"); // build index
     var feature = [];
     for (var j = 0; j < dimension; j++) {
-      feature.push(Math.random());
+        feature.push(Math.random());
     }
-    bf_idx.add(feature, i); // add point
-  }
-  bf_idx.build("euclidean"); // build index
-  var feature = [];
-  for (var j = 0; j < dimension; j++) {
-    feature.push(Math.random());
-  }
-  console.log("bf result",  .search(feature, 10)); //bf result Uint32Array(10) [704, 113, 358, 835, 408, 379, 117, 414, 808, 826]
+    console.log("bf result", bf_idx.search(feature, 10)); //bf result Uint32Array(10) [704, 113, 358, 835, 408, 379, 117, 414, 808, 826]
 }
+
+(async () => {
+    await horajs.default();
+    await horajs.init_env();
+    demo();
+})();
 ```
 
 **`Java` example** [[more info](https://github.com/hora-search/hora-java)]
