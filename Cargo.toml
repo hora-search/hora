@@ -41,6 +41,7 @@ rpath = false
 [features]
 no_std = ["hashbrown"]
 simd = ["packed_simd"]
+no_thread = []
 
 [dependencies]
 bincode = "^1.3"

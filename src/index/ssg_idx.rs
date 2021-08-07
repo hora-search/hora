@@ -5,8 +5,10 @@ use crate::core::metrics;
 use crate::core::neighbor;
 use crate::core::node;
 use crate::index::ssg_params::SSGParams;
+use crate::vec_iter;
 use fixedbitset::FixedBitSet;
 use rand::prelude::*;
+#[cfg(not(feature = "no_thread"))]
 use rayon::prelude::*;
 use serde::de::DeserializeOwned;
 use serde::{Deserialize, Serialize};
@@ -66,8 +68,8 @@ impl<E: node::FloatElement, T: node::IdxType> SSGIndex<E, T> {
 
     fn build_knn_graph(&mut self) {
         let tmp_graph = Arc::new(Mutex::new(vec![vec![0]; self.nodes.len()]));
-        (0..self.nodes.len()).into_par_iter().for_each(|n| {
-            let item = &self.nodes[n];
+        vec_iter!(self.nodes, ctr);
+        ctr.zip(0..self.nodes.len()).for_each(|(item, n)| {
             let mut heap = BinaryHeap::with_capacity(self.init_k);
             self.nodes
                 .iter()
