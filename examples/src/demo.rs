@@ -3,7 +3,7 @@ use rand::{thread_rng, Rng};
 use rand_distr::{Distribution, Normal};
 
 pub fn demo() {
-    let n = 1000;
+    let n = 1000000;
     let dimension = 64;
 
     // make sample points

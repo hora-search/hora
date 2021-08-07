@@ -6,6 +6,8 @@ use crate::core::neighbor::Neighbor;
 use crate::core::node;
 use crate::index::pq_params::IVFPQParams;
 use crate::index::pq_params::PQParams;
+use crate::vec_iter_mut;
+#[cfg(not(feature = "no_thread"))]
 use rayon::prelude::*;
 use serde::de::DeserializeOwned;
 use std::collections::BinaryHeap;
@@ -167,7 +169,8 @@ impl<E: node::FloatElement, T: node::IdxType> PQIndex<E, T> {
     ) -> Result<BinaryHeap<Neighbor<E, usize>>, &'static str> {
         let mut dis2centers: Vec<E> = Vec::new();
         dis2centers.resize(self._n_sub * self._n_sub_center, E::from_f32(0.0).unwrap());
-        dis2centers.par_iter_mut().enumerate().for_each(|(idx, x)| {
+        vec_iter_mut!(dis2centers, ctr);
+        ctr.enumerate().for_each(|(idx, x)| {
             let i = idx / self._n_sub_center;
             let j = idx % self._n_sub_center;
             let begin = self._dimension_range[i][0];

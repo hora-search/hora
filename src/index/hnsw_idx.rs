@@ -4,10 +4,11 @@ use crate::core::metrics;
 use crate::core::neighbor::Neighbor;
 use crate::core::node;
 use crate::index::hnsw_params::HNSWParams;
+use crate::into_iter;
 use fixedbitset::FixedBitSet;
-
 use rand::prelude::*;
-use rayon::{iter::IntoParallelIterator, prelude::*};
+#[cfg(not(feature = "no_thread"))]
+use rayon::prelude::*;
 use serde::de::DeserializeOwned;
 use serde::{Deserialize, Serialize};
 use std::collections::BinaryHeap;
@@ -465,11 +466,10 @@ impl<E: node::FloatElement, T: node::IdxType> HNSWIndex<E, T> {
             return Err("contruct error");
         }
 
-        (self._n_constructed_items..self._n_items)
-            .into_par_iter()
-            .for_each(|insert_id: usize| {
-                self.construct_single_item(insert_id).unwrap();
-            });
+        into_iter!((self._n_constructed_items..self._n_items), ctr);
+        ctr.for_each(|insert_id: usize| {
+            self.construct_single_item(insert_id).unwrap();
+        });
 
         self._n_constructed_items = self._n_items;
         Ok(())

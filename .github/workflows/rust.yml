@@ -15,7 +15,13 @@ jobs:
 
     steps:
       - uses: actions/checkout@v2
+      - name: nightly
+        run: rustup toolchain install nightly
       - name: Build
         run: cargo build --verbose
+      - name: Build no_thread
+        run: cargo build --features no_thread
+      - name: Build no_thread
+        run: cargo +nightly build --features simd
       - name: Run tests
-        run: cargo test --lib --verbose
+        run: cargo test --lib --verbose --release
