@@ -2,19 +2,15 @@
   <img src="asset/logo.svg" width="70%"/>
 </div>
 
-<div align="center">
-  <h4>  English | <a href=""> Français </a> | <a href=""> 日本語 </a> | <a href="">한국어</a> | <a href="">Русский</a> </h4>
-</div>
-
 # Hora
 
 **[[Homepage](http://horasearch.com/)]** **[[Document](https://horasearch.com/doc)]** **[[Examples](https://horasearch.com/doc/example.html)]**
 
 **_Hora Search Everywhere!_**
 
-Hora is an **approximate nearest neighbor search algorithm** ([wiki](https://en.wikipedia.org/wiki/Nearest_neighbor_search)) library. We implement all code in `Rust🦀` for reliability, high level abstraction and high speeds comparable to `C++`.
+Hora는 **근접 이웃 검색 알고리즘**([wiki](https://en.wikipedia.org/wiki/Nearest_neighbor_search)) 라이브러리입니다. 우리는 `C++`에 필적하는 신뢰성, 높은 수준의 추상화 및 고속을 위해 `Rust🦀`에서 모든 코드를 구현합니다.
 
-Hora, **`「ほら」`** in Japanese, sounds like `[hōlə]`, and means `Wow`, `You see!` or `Look at that!`. The name is inspired by a famous Japanese song **`「小さな恋のうた」`**.
+Hora, **`「ほら」`**는 일본어로 '[hōlə]'처럼 들리며 '와우', '알겠습니다!' 또는 '저걸 봐!'를 의미합니다. 이름은 유명한 일본 노래 **`「小さな恋のうた」`**에서 영감을 받았습니다.
 
 # Demos
 
@@ -168,8 +164,6 @@ pub fn demo() {
 }
 ```
 
-and thank @vaaaaanquish for this complete pure rust image search [example](https://github.com/vaaaaanquish/rust-ann-search-example), For more information about this example, you can click [Pure Rustな近似最近傍探索ライブラリhoraを用いた画像検索を実装する](https://vaaaaaanquish.hatenablog.com/entry/2021/08/10/065117)
-
 **`Python` example** [[more info](https://github.com/hora-search/horapy)]
 
 ```Python
@@ -266,35 +260,35 @@ private static float getGaussian(Random fRandom, float aMean, float variance) {
 
 # Roadmap
 
-- [ ] Full test coverage
-- [ ] Implement [EFANNA](http://arxiv.org/abs/1609.07228) algorithm to achieve faster KNN graph building
-- [ ] Swift support and iOS/macOS deployment example
-- [ ] Support `R`
-- [ ] support `mmap`
+- [ ] 전체 테스트 범위
+- [ ] 더 빠른 KNN 그래프 구축을 달성하기 위해 [EFANNA](http://arxiv.org/abs/1609.07228) 알고리즘 구현
+- [ ] Swift 지원 및 `iOS`/`macOS` 배포 예시
+- [ ] 지원 `R`
+- [ ] `mmap` 지원
 
 # Related Projects and Comparison
 
 - [Faiss](https://github.com/facebookresearch/faiss), [Annoy](https://github.com/spotify/annoy), [ScaNN](https://github.com/google-research/google-research/tree/master/scann):
 
-  - **`Hora`'s implementation is strongly inspired by these libraries.**
-  - `Faiss` focuses more on the GPU scenerio, and `Hora` is lighter than Faiss (**no heavy dependencies)**.
-  - `Hora` expects to support more languages, and everything related to performance will be implemented by Rust🦀.
-  - `Annoy` only supports the `LSH (Random Projection)` algorithm.
-  - `ScaNN` and `Faiss` are less user-friendly, (e.g. lack of documentation).
+  - **`Hora`의 구현은 이러한 라이브러리에서 크게 영감을 받았습니다.**
+  - `Faiss`는 GPU 장면에 더 중점을 두고 `Hora`는 Faiss보다 가볍습니다(**중대한 종속성 없음)**.
+  - `Hora`는 더 많은 언어를 지원할 예정이며 성능과 관련된 모든 것은 Rust🦀에서 구현됩니다.
+  - 'Annoy'는 'LSH(Random Projection)' 알고리즘만 지원합니다.
+  - `ScaNN` 및 `Faiss`는 사용자 친화적이지 않습니다(예: 문서 부족).
   - Hora is **ALL IN RUST** 🦀.
 
 - [Milvus](https://github.com/milvus-io/milvus), [Vald](https://github.com/vdaas/vald), [Jina AI](https://github.com/jina-ai/jina)
-  - `Milvus` and `Vald` also support multiple languages, but serve as a service instead of a library
-  - `Milvus` is built upon some libraries such as `Faiss`, while `Hora` is a library with all the algorithms implemented itself
+  - 'Milvus'와 'Vald'도 여러 언어를 지원하지만 라이브러리 대신 서비스 역할을 합니다.
+  - 'Milvus'는 'Faiss'와 같은 일부 라이브러리를 기반으로 하는 반면, 'Hora'는 모든 알고리즘이 자체적으로 구현된 라이브러리입니다.
 
 # Contribute
 
 **We appreciate your help!**
 
-We are glad to have you participate, any contributions are welcome, including documentations and tests.
-You can create a `Pull Request` or `Issue` on GitHub, and we will review it as soon as possible.
+문서 및 테스트를 포함하여 모든 기여를 환영합니다.
+GitHub에서 `Pull Request` 또는 `Issue` 를 생성할 수 있으며 최대한 빨리 검토하겠습니다.
 
-We use GitHub issues for tracking suggestions and bugs.
+제안 및 버그를 추적하기 위해 GitHub 문제를 사용합니다.
 
 #### Clone the repo
 
