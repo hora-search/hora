@@ -2,43 +2,39 @@
   <img src="asset/logo.svg" width="70%"/>
 </div>
 
-<div align="center">
-  <h4>  English | <a href="https://github.com/hora-search/hora/blob/main/README_FR.md"> Français </a> | <a href="https://github.com/hora-search/hora/blob/main/README_JP.md"> 日本語 </a> | <a href="https://github.com/hora-search/hora/blob/main/README_KR.md">한국어</a> | <a href="https://github.com/hora-search/hora/blob/main/README_RU.md">Русский</a> </h4>
-</div>
-
 # Hora
 
 **[[Homepage](http://horasearch.com/)]** **[[Document](https://horasearch.com/doc)]** **[[Examples](https://horasearch.com/doc/example.html)]**
 
 **_Hora Search Everywhere!_**
 
-Hora is an **approximate nearest neighbor search algorithm** ([wiki](https://en.wikipedia.org/wiki/Nearest_neighbor_search)) library. We implement all code in `Rust🦀` for reliability, high level abstraction and high speeds comparable to `C++`.
+Hora - это **приблизительный алгоритм поиска ближайшего соседа** ([wiki](https://en.wikipedia.org/wiki/Nearest_neighbor_search)) библиотека. Мы реализуем весь код на `Rust🦀 ` для надежности, высокого уровня абстракции и высокой скорости, сравнимой с `C++`.
 
-Hora, **`「ほら」`** in Japanese, sounds like `[hōlə]`, and means `Wow`, `You see!` or `Look at that!`. The name is inspired by a famous Japanese song **`「小さな恋のうた」`**.
+Hora, **`「ほら」`** на японском языке, звучит как `[hōlə]` и означает `Вау`,`Ты видишь!`Или`Посмотри на это!`. Название навеяно известной японской песней **`「小さな恋のうた」`**.
 
-# Demos
+# Демо
 
-**👩 Face-Match [[online demo](https://horasearch.com/#Demos)], have a try!**
+**👩 Face-Match [[online demo](https://horasearch.com/#Demos)], попробуй!**
 
 <div align="center">
   <img src="asset/demo3.gif" width="100%"/>
 </div>
 
-**🍷 Dream wine comments search [[online demo](https://horasearch.com/#Demos)], have a try!**
+**🍷 Dream wine comments search [[online demo](https://horasearch.com/#Demos)], попробуй!**
 
 <div align="center">
   <img src="asset/demo2.gif" width="100%"/>
 </div>
 
-# Features
+# ключевая особенность
 
-- **Performant** ⚡️
+- **Исполнитель** ⚡️
 
   - **SIMD-Accelerated ([packed_simd](https://github.com/rust-lang/packed_simd))**
-  - **Stable algorithm implementation**
-  - **Multiple threads design**
+  - **Быстрая реализация алгоритма**
+  - **Многопоточная конструкция**
 
-- **Supports Multiple Languages** ☄️
+- **Поддерживает несколько языков программирования** ☄️
 
   - `Python`
   - `Javascript`
@@ -48,9 +44,9 @@ Hora, **`「ほら」`** in Japanese, sounds like `[hōlə]`, and means `Wow`, `
   - `Swift` (WIP)
   - `R` (WIP)
   - `Julia` (WIP)
-  - **Can also be used as a service**
+  - **Также может использоваться как услуга**
 
-- **Supports Multiple Indexes** 🚀
+- **Поддерживает несколько индексов** 🚀
 
   - `Hierarchical Navigable Small World Graph Index (HNSWIndex)` ([details](https://arxiv.org/abs/1603.09320))
   - `Satellite System Graph (SSGIndex)` ([details](https://arxiv.org/abs/1907.06146))
@@ -58,35 +54,36 @@ Hora, **`「ほら」`** in Japanese, sounds like `[hōlə]`, and means `Wow`, `
   - `Random Projection Tree(RPTIndex)` (LSH, WIP)
   - `BruteForce (BruteForceIndex)` (naive implementation with SIMD)
 
-- **Portable** 💼
+- **Портативный** 💼
+
   - Supports `WebAssembly`
   - Supports `Windows`, `Linux` and `OS X`
   - Supports `IOS` and `Android` (WIP)
   - Supports `no_std` (WIP, partial)
-  - **No** heavy dependencies, such as `BLAS`
+  - Никаких тяжелых зависимостей, таких как `BLAS`
 
-- **Reliability** 🔒
+- **Надежность** 🔒
 
-  - `Rust` compiler secures all code
-  - Memory managed by `Rust` for all language libraries such as `Python's`
+  - Компилятор `Rust` защищает весь код
+  - Память, управляемая `Rust` для всех языковых библиотек, таких как `Python`
   - Broad testing coverage
 
-- **Supports Multiple Distances** 🧮
+- **Широкий охват тестирования** 🧮
 
-  - `Dot Product Distance`
+  - `Расстояние точечного продукта`
     - ![equation](https://latex.codecogs.com/gif.latex?D%28x%2Cy%29%20%3D%20%5Csum%7B%28x*y%29%7D)
-  - `Euclidean Distance`
+  - `Евклидово расстояние`
     - ![equation](https://latex.codecogs.com/gif.latex?D%28x%2Cy%29%20%3D%20%5Csqrt%7B%5Csum%7B%28x-y%29%5E2%7D%7D)
-  - `Manhattan Distance`
+  - `Манхэттен Расстояние`
     - ![equation](https://latex.codecogs.com/gif.latex?D%28x%2Cy%29%20%3D%20%5Csum%7B%7C%28x-y%29%7C%7D)
-  - `Cosine Similarity`
+  - `Косинусное подобие`
     - ![equation](https://latex.codecogs.com/gif.latex?D%28x%2Cy%29%20%3D%20%5Cfrac%7Bx%20*y%7D%7B%7C%7Cx%7C%7C*%7C%7Cy%7C%7C%7D)
 
-- **Productive** ⭐
-  - Well documented
-  - Elegant, simple and easy to learn API
+- **Продуктивный** ⭐
+  - Хорошо задокументированы
+  - Элегантный, простой и легкий в освоении API
 
-# Installation
+# Монтаж
 
 **`Rust`**
 
@@ -116,15 +113,15 @@ $ git clone https://github.com/hora-search/hora
 $ cargo build
 ```
 
-# Benchmarks
+# Контрольный показатель
 
 <img src="asset/fashion-mnist-784-euclidean_10_euclidean.png"/>
 
 by `aws t2.medium (CPU: Intel(R) Xeon(R) CPU E5-2686 v4 @ 2.30GHz)` [more information](https://github.com/hora-search/ann-benchmarks)
 
-# Examples
+# Примеры
 
-**`Rust` example** [[more info](https://github.com/hora-search/hora/tree/main/examples)]
+**`Rust` Примеры** [[more info](https://github.com/hora-search/hora/tree/main/examples)]
 
 ```Rust
 use hora::core::ann_index::ANNIndex;
@@ -168,9 +165,7 @@ pub fn demo() {
 }
 ```
 
-thank @vaaaaanquish for this complete pure `Rust 🦀` image search [example](https://github.com/vaaaaanquish/rust-ann-search-example), For more information about this example, you can click [Pure Rustな近似最近傍探索ライブラリhoraを用いた画像検索を実装する](https://vaaaaaanquish.hatenablog.com/entry/2021/08/10/065117)
-
-**`Python` example** [[more info](https://github.com/hora-search/horapy)]
+**`Python` Примеры** [[more info](https://github.com/hora-search/horapy)]
 
 ```Python
 import numpy as np
@@ -197,7 +192,7 @@ print("{} in {} \nhas neighbors: {}".format(
 
 ```
 
-**`JavaScript` example** [[more info](https://github.com/hora-search/hora-wasm)]
+**`JavaScript` Примеры** [[more info](https://github.com/hora-search/hora-wasm)]
 
 ```JavaScript
 import * as horajs from "horajs";
@@ -211,7 +206,7 @@ const demo = () => {
         for (var j = 0; j < dimension; j++) {
             feature.push(Math.random());
         }
-        bf_idx.add(feature, i); // add point 
+        bf_idx.add(feature, i); // add point
     }
     bf_idx.build("euclidean"); // build index
     var feature = [];
@@ -228,7 +223,7 @@ const demo = () => {
 })();
 ```
 
-**`Java` example** [[more info](https://github.com/hora-search/hora-java)]
+**`Java` Примеры** [[more info](https://github.com/hora-search/hora-java)]
 
 ```Java
 public void demo() {
@@ -264,37 +259,37 @@ private static float getGaussian(Random fRandom, float aMean, float variance) {
 }
 ```
 
-# Roadmap
+# Дорожная карта
 
-- [ ] Full test coverage
-- [ ] Implement [EFANNA](http://arxiv.org/abs/1609.07228) algorithm to achieve faster KNN graph building
-- [ ] Swift support and iOS/macOS deployment example
-- [ ] Support `R`
-- [ ] support `mmap`
+- [ ] Полное тестовое покрытие
+- [ ] Внедрить алгоритм [EFANNA](http://arxiv.org/abs/1609.07228) для более быстрого построения графа KNN.
+- [ ] Поддержка`Swift` и пример развертывания `iOS` / `macOS`
+- [ ] Поддержка `R`
+- [ ] поддержка `mmap`
 
-# Related Projects and Comparison
+# Связанные проекты и сравнение
 
 - [Faiss](https://github.com/facebookresearch/faiss), [Annoy](https://github.com/spotify/annoy), [ScaNN](https://github.com/google-research/google-research/tree/master/scann):
 
-  - **`Hora`'s implementation is strongly inspired by these libraries.**
-  - `Faiss` focuses more on the GPU scenerio, and `Hora` is lighter than Faiss (**no heavy dependencies)**.
-  - `Hora` expects to support more languages, and everything related to performance will be implemented by Rust🦀.
-  - `Annoy` only supports the `LSH (Random Projection)` algorithm.
-  - `ScaNN` and `Faiss` are less user-friendly, (e.g. lack of documentation).
+  - **Реализация `Hora` сильно вдохновлена этими библиотеками.**
+  - `Faiss` больше ориентирован на сценарий GPU, а `Hora` легче, чем `Faiss`.
+  - `Hora` рассчитывает поддерживать больше языков, и все, что связано с производительностью, будет реализовано Rust🦀.
+  - `Annoy` поддерживает только алгоритм `LSH (Random Projection)`.
+  - `ScaNN` и `Faiss` менее удобны для пользователя (например, отсутствие документации).
   - Hora is **ALL IN RUST** 🦀.
 
 - [Milvus](https://github.com/milvus-io/milvus), [Vald](https://github.com/vdaas/vald), [Jina AI](https://github.com/jina-ai/jina)
-  - `Milvus` and `Vald` also support multiple languages, but serve as a service instead of a library
-  - `Milvus` is built upon some libraries such as `Faiss`, while `Hora` is a library with all the algorithms implemented itself
+  - `Milvus` и `Vald` также поддерживают несколько языков, но служат в качестве службы, а не библиотеки.
+  - `Milvus` построен на некоторых библиотеках, таких как `Faiss`, а `Hora` - это библиотека со всеми реализованными алгоритмами.
 
-# Contribute
+# Способствовать
 
 **We appreciate your help!**
 
-We are glad to have you participate, any contributions are welcome, including documentations and tests.
-You can create a `Pull Request` or `Issue` on GitHub, and we will review it as soon as possible.
+Мы рады, что вы участвуете, приветствуются любые взносы, включая документацию и тесты.
+Вы можете создать `Pull Request` или `Issue` на GitHub, и мы рассмотрим его как можно скорее.
 
-We use GitHub issues for tracking suggestions and bugs.
+Мы используем проблемы GitHub для отслеживания предложений и ошибок.
 
 #### Clone the repo
 
