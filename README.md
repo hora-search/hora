@@ -3,7 +3,7 @@
 </div>
 
 <div align="center">
-  <h4>  English | <a href=""> Français </a> | <a href=""> 日本語 </a> | <a href="">한국어</a> | <a href="">Русский</a> </h4>
+  <h4>  English | <a href="https://github.com/hora-search/hora/blob/main/README_FR.md"> Français </a> | <a href="https://github.com/hora-search/hora/blob/main/README_JP.md"> 日本語 </a> | <a href="https://github.com/hora-search/hora/blob/main/README_KR.md">한국어</a> | <a href="https://github.com/hora-search/hora/blob/main/README_RU.md">Русский</a> </h4>
 </div>
 
 # Hora
@@ -168,7 +168,7 @@ pub fn demo() {
 }
 ```
 
-and thank @vaaaaanquish for this complete pure rust image search [example](https://github.com/vaaaaanquish/rust-ann-search-example), For more information about this example, you can click [Pure Rustな近似最近傍探索ライブラリhoraを用いた画像検索を実装する](https://vaaaaaanquish.hatenablog.com/entry/2021/08/10/065117)
+thank @vaaaaanquish for this complete pure `Rust 🦀` image search [example](https://github.com/vaaaaanquish/rust-ann-search-example), For more information about this example, you can click [Pure Rustな近似最近傍探索ライブラリhoraを用いた画像検索を実装する](https://vaaaaaanquish.hatenablog.com/entry/2021/08/10/065117)
 
 **`Python` example** [[more info](https://github.com/hora-search/horapy)]
 

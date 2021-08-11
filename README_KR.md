@@ -8,9 +8,9 @@
 
 **_Hora Search Everywhere!_**
 
-Hora는 **근접 이웃 검색 알고리즘**([wiki](https://en.wikipedia.org/wiki/Nearest_neighbor_search)) 라이브러리입니다. 우리는 `C++`에 필적하는 신뢰성, 높은 수준의 추상화 및 고속을 위해 `Rust🦀`에서 모든 코드를 구현합니다.
+Hora는 **근접 이웃 검색 알고리즘**([wiki](https://en.wikipedia.org/wiki/Nearest_neighbor_search)) 라이브러리입니다. 우리는 `C++` 에 필적하는 신뢰성, 높은 수준의 추상화 및 고속을 위해 `Rust🦀 `에서 모든 코드를 구현합니다.
 
-Hora, **`「ほら」`**는 일본어로 '[hōlə]'처럼 들리며 '와우', '알겠습니다!' 또는 '저걸 봐!'를 의미합니다. 이름은 유명한 일본 노래 **`「小さな恋のうた」`**에서 영감을 받았습니다.
+Hora, `「ほら」`는 일본어로 `[hōlə]`처럼 들리며 `와우`, `알겠습니다!` 또는 `저걸 봐!`를 의미합니다. 이름은 유명한 일본 노래 `「小さな恋のうた」`에서 영감을 받았습니다.
 
 # Demos
 
@@ -163,6 +163,8 @@ pub fn demo() {
     );
 }
 ```
+
+thank @vaaaaanquish for this complete pure rust image search [example](https://github.com/vaaaaanquish/rust-ann-search-example), For more information about this example, please can click [Pure Rustな近似最近傍探索ライブラリhoraを用いた画像検索を実装する](https://vaaaaaanquish.hatenablog.com/entry/2021/08/10/065117)
 
 **`Python` example** [[more info](https://github.com/hora-search/horapy)]
 

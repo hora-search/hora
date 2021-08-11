@@ -28,7 +28,7 @@ Hora、おおよその**最近傍探索アルゴリズムライブラリ** [[wik
 
 # 特徴
 
-- **パフォーマンス** ⚡️
+- **性能** ⚡️
 
   - **SIMD アクセラレーション ([packed_simd](https://github.com/rust-lang/packed_simd))**
   - **高速アルゴリズムの実装**

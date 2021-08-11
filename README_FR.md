@@ -165,7 +165,7 @@ pub fn demo() {
 }
 ```
 
-et merci @vaaaaanquish pour cette recherche complète d'images de rouille pure [exemple](https://github.com/vaaaaanquish/rust-ann-search-example), Pour plus d'informations sur cet exemple, vous pouvez cliquer sur [Pure Rustな近似最近 horaを用いた画像検索を実装する](https://vaaaaaanquish.hatenablog.com/entry/2021/08/10/065117)
+merci @vaaaaanquish pour cette recherche complète d'images de rouille pure [exemple] (https://github.com/vaaaaanquish/rust-ann-search-example), Pour plus d'informations sur cet exemple, veuillez cliquer sur [Pure Rustな近似最近傍 horaを用いた画像検索を実装する](https://vaaaaaanquish.hatenablog.com/entry/2021/08/10/065117)
 
 **`Python` exemple** [[more info](https://github.com/hora-search/horapy)]
 
