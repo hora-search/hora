@@ -3,7 +3,7 @@
 </div>
 
 <div align="center">
-  <h4>  English | <a href="https://github.com/hora-search/hora/blob/main/README_FR.md"> Français </a> | <a href="https://github.com/hora-search/hora/blob/main/README_JP.md"> 日本語 </a> | <a href="https://github.com/hora-search/hora/blob/main/README_KR.md">한국어</a> | <a href="https://github.com/hora-search/hora/blob/main/README_RU.md">Русский</a> </h4>
+  <h3>  English | <a href="https://github.com/hora-search/hora/blob/main/README_FR.md"> Français </a> | <a href="https://github.com/hora-search/hora/blob/main/README_JP.md"> 日本語 </a> | <a href="https://github.com/hora-search/hora/blob/main/README_KR.md">한국어</a> | <a href="https://github.com/hora-search/hora/blob/main/README_RU.md">Русский</a> | <a href="https://github.com/hora-search/hora/blob/main/README_CN.md">中文</a> </h3>
 </div>
 
 # Hora
@@ -59,6 +59,7 @@ Hora, **`「ほら」`** in Japanese, sounds like `[hōlə]`, and means `Wow`, `
   - `BruteForce (BruteForceIndex)` (naive implementation with SIMD)
 
 - **Portable** 💼
+
   - Supports `WebAssembly`
   - Supports `Windows`, `Linux` and `OS X`
   - Supports `IOS` and `Android` (WIP)
@@ -168,7 +169,7 @@ pub fn demo() {
 }
 ```
 
-thank @vaaaaanquish for this complete pure `Rust 🦀` image search [example](https://github.com/vaaaaanquish/rust-ann-search-example), For more information about this example, you can click [Pure Rustな近似最近傍探索ライブラリhoraを用いた画像検索を実装する](https://vaaaaaanquish.hatenablog.com/entry/2021/08/10/065117)
+thank @vaaaaanquish for this complete pure `Rust 🦀` image search [example](https://github.com/vaaaaanquish/rust-ann-search-example), For more information about this example, you can click [Pure Rust な近似最近傍探索ライブラリ hora を用いた画像検索を実装する](https://vaaaaaanquish.hatenablog.com/entry/2021/08/10/065117)
 
 **`Python` example** [[more info](https://github.com/hora-search/horapy)]
 
@@ -211,7 +212,7 @@ const demo = () => {
         for (var j = 0; j < dimension; j++) {
             feature.push(Math.random());
         }
-        bf_idx.add(feature, i); // add point 
+        bf_idx.add(feature, i); // add point
     }
     bf_idx.build("euclidean"); // build index
     var feature = [];
@@ -289,7 +290,7 @@ private static float getGaussian(Random fRandom, float aMean, float variance) {
 
 # Contribute
 
-**We appreciate your help!**
+**We appreciate your participation!**
 
 We are glad to have you participate, any contributions are welcome, including documentations and tests.
 You can create a `Pull Request` or `Issue` on GitHub, and we will review it as soon as possible.

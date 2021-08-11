@@ -8,9 +8,9 @@
 
 **_Hora Search Everywhere!_**
 
-Hora는 **근접 이웃 검색 알고리즘**([wiki](https://en.wikipedia.org/wiki/Nearest_neighbor_search)) 라이브러리입니다. 우리는 `C++` 에 필적하는 신뢰성, 높은 수준의 추상화 및 고속을 위해 `Rust🦀 `에서 모든 코드를 구현합니다.
+**Hora** 完全基于 **Rust🦀** 实现，事实证明，**Rust** 确实非常非常快，完全可以媲美 **C++** ，且`Hora`使用 **SIMD**进行了加速，速度非常快⚡️⚡️⚡️，具体速度可以参考下面的 benchmark.
 
-Hora, `「ほら」`는 일본어로 `[hōlə]`처럼 들리며 `와우`, `알겠습니다!` 또는 `저걸 봐!`를 의미합니다. 이름은 유명한 일본 노래 `「小さな恋のうた」`에서 영감을 받았습니다.
+**Hora**, 日语为 **「ほら」**，读法像 **[hōlə]** ，意思是 **Wow**, **You see!** , **Look at that!** 。 这个名字的灵感来自日本著名歌曲 **[「小さな恋のうた」]( https://www.youtube.com/watch?v=u8EkSB9zSpE)** 。
 
 # Demos
 
@@ -164,7 +164,7 @@ pub fn demo() {
 }
 ```
 
-thank @vaaaaanquish for this complete pure rust image search [example](https://github.com/vaaaaanquish/rust-ann-search-example), For more information about this example, please can click [Pure Rustな近似最近傍探索ライブラリhoraを用いた画像検索を実装する](https://vaaaaaanquish.hatenablog.com/entry/2021/08/10/065117)
+感谢 @vaaaaanquish 这个完整的纯 `Rust 🦀` 图片检索 [example](https://github.com/vaaaaanquish/rust-ann-search-example), 想了解更多可以点击 [Pure Rustな近似最近傍探索ライブラリhoraを用いた画像検索を実装する](https://vaaaaaanquish.hatenablog.com/entry/2021/08/10/065117)
 
 **`Python` example** [[more info](https://github.com/hora-search/horapy)]
 
@@ -262,35 +262,34 @@ private static float getGaussian(Random fRandom, float aMean, float variance) {
 
 # Roadmap
 
-- [ ] 전체 테스트 범위
-- [ ] 더 빠른 KNN 그래프 구축을 달성하기 위해 [EFANNA](http://arxiv.org/abs/1609.07228) 알고리즘 구현
-- [ ] Swift 지원 및 `iOS`/`macOS` 배포 예시
-- [ ] 지원 `R`
-- [ ] `mmap` 지원
+- [ ] Full test coverage
+- [ ] Implement [EFANNA](http://arxiv.org/abs/1609.07228) algorithm to achieve faster KNN graph building
+- [ ] Swift support and iOS/macOS deployment example
+- [ ] Support `R`
+- [ ] support `mmap`
 
 # Related Projects and Comparison
 
 - [Faiss](https://github.com/facebookresearch/faiss), [Annoy](https://github.com/spotify/annoy), [ScaNN](https://github.com/google-research/google-research/tree/master/scann):
-
-  - **`Hora`의 구현은 이러한 라이브러리에서 크게 영감을 받았습니다.**
-  - `Faiss`는 GPU 장면에 더 중점을 두고 `Hora`는 Faiss보다 가볍습니다(**중대한 종속성 없음)**.
-  - `Hora`는 더 많은 언어를 지원할 예정이며 성능과 관련된 모든 것은 Rust🦀에서 구현됩니다.
-  - `Annoy`는 ``LSH (Random Projection)` 알고리즘만 지원합니다.
-  - `ScaNN` 및 `Faiss`는 사용자 친화적이지 않습니다(예: 문서 부족).
+  - **`Hora` 的实现受到这些库的强烈启发。**
+  - `Faiss` 更侧重于 GPU 场景，`Hora` 比 Faiss 更轻（**无重度依赖）**。
+  - `Hora` 期待支持更多的语言，与性能相关的一切都会由 Rust🦀 实现。
+  - `Annoy` 只支持 `LSH (Random Projection)` 算法。
+  - `ScaNN` 和 `Faiss` 不太用户友好，（例如缺乏文档）。
   - Hora is **ALL IN RUST** 🦀.
 
 - [Milvus](https://github.com/milvus-io/milvus), [Vald](https://github.com/vdaas/vald), [Jina AI](https://github.com/jina-ai/jina)
-  - 'Milvus'와 'Vald'도 여러 언어를 지원하지만 라이브러리 대신 서비스 역할을 합니다.
-  - 'Milvus'는 'Faiss'와 같은 일부 라이브러리를 기반으로 하는 반면, 'Hora'는 모든 알고리즘이 자체적으로 구현된 라이브러리입니다.
+  - `Milvus` 和 `Vald` 也支持多种语言，但作为服务而不是库
+  - `Milvus` 是建立在一些库上的，比如 `Faiss`，而 `Hora` 是一个库，所有算法都是自己实现的
 
 # Contribute
 
 **We appreciate your help!**
 
-문서 및 테스트를 포함하여 모든 기여를 환영합니다.
-GitHub에서 `Pull Request` 또는 `Issue` 를 생성할 수 있으며 최대한 빨리 검토하겠습니다.
+我们很高兴您的参与，欢迎任何贡献，包括文档和测试。
+您可以在 GitHub 上创建 `Pull Request` 或 `Issue`，我们会尽快审核。
 
-제안 및 버그를 추적하기 위해 GitHub 문제를 사용합니다.
+我们使用 GitHub 问题来跟踪建议和错误。
 
 #### Clone the repo
 
