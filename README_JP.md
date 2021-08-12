@@ -8,19 +8,19 @@
 
 **_Hora Search Everywhere!_**
 
-Hora、おおよその**最近傍探索アルゴリズムライブラリ** [[wiki](https://en.wikipedia.org/wiki/Nearest_neighbor_search)]。 信頼性、高レベルの抽象化、および `C++`に匹敵する高速性のために、すべてのコードを `Rust🦀`で実装します。
+Horaは**近似最近傍探索アルゴリズムライブラリ** [[Wikipedia](https://ja.wikipedia.org/wiki/%E6%9C%80%E8%BF%91%E5%82%8D%E6%8E%A2%E7%B4%A2)]です。 信頼性、高レベルの抽象化、および `C++`に匹敵する高速性を達成するために、すべてのコードを`Rust🦀`で実装しています。
 
-ホラ、日本語で`「ほら」`は、`[hōlə]`のように聞こえます。 またはそれを見てください！ 彼の名前は、日本の歌`「小さな恋のうた」`の有名な歌詞`「ほら あなたにとって大事な人ほど すぐそばにいるの」`にちなんで付けられました。
+日本語で「ほら」は、`[hōlə]`のように聞こえます。この名前は、日本の歌「小さな恋のうた」の有名な歌詞「ほら あなたにとって大事な人ほど すぐそばにいるの」にちなんで付けられました。
 
-# Demos
+# デモ
 
-**👩 Face-Match [[online demo](https://horasearch.com/#Demos)], 試してみてください!**
+**👩 Face-Match [[online demo](https://horasearch.com/#Demos)]**
 
 <div align="center">
   <img src="asset/demo3.gif" width="100%"/>
 </div>
 
-**🍷 Dream wine comments search [[online demo](https://horasearch.com/#Demos)], 試してみてください!**
+**🍷 Dream wine comments search [[online demo](https://horasearch.com/#Demos)]**
 
 <div align="center">
   <img src="asset/demo2.gif" width="100%"/>
@@ -31,10 +31,10 @@ Hora、おおよその**最近傍探索アルゴリズムライブラリ** [[wik
 - **性能** ⚡️
 
   - **SIMD アクセラレーション ([packed_simd](https://github.com/rust-lang/packed_simd))**
-  - **高速アルゴリズムの実装**
-  - **マルチスレッディングデザイン**
+  - **安定したアルゴリズムの実装**
+  - **マルチスレッドデザイン**
 
-- **複数のプログラミング言語 lib をサポート** ☄️
+- **複数のプログラミング言語をサポート** ☄️
 
   - `Python`
   - `Javascript`
@@ -44,7 +44,7 @@ Hora、おおよその**最近傍探索アルゴリズムライブラリ** [[wik
   - `Swift` (WIP)
   - `R` (WIP)
   - `Julia` (WIP)
-  - **Can also be used as a service**
+  - **サービスとしても使用可能**
 
 - **複数のインデックスをサポート** 🚀
 
@@ -52,20 +52,20 @@ Hora、おおよその**最近傍探索アルゴリズムライブラリ** [[wik
   - `Satellite System Graph (SSGIndex)` ([details](https://arxiv.org/abs/1907.06146))
   - `Product Quantization Inverted File(PQIVFIndex)` ([details](https://lear.inrialpes.fr/pubs/2011/JDS11/jegou_searching_with_quantization.pdf))
   - `Random Projection Tree(RPTIndex)` (LSH, WIP)
-  - `BruteForce (BruteForceIndex)` (naive implementation with SIMD)
+  - `BruteForce (BruteForceIndex)` (SIMDを使った素朴な実装)
 
-- **ポータブル** 💼
+- **移植性** 💼
 
-  - Supports `WebAssembly`
-  - Supports `Windows`, `Linux` and `OS X`
-  - Supports `IOS` and `Android` (WIP)
-  - Supports `no_std` (WIP, partial)
-  - `BLAS`などの大きな依存関係はありません
+  - `WebAssembly`対応
+  - `Windows`、`Linux`および`OS X`に対応
+  - `iOS`および`Android`対応 (WIP)
+  - `no_std`対応 (WIP, partial)
+  - `BLAS`などの大きな依存関係は**ありません**
 
 - **信頼性** 🔒
 
   - `Rust`コンパイラはすべてのコードを保護します
-  - `Python's`などのすべての言語ライブラリの` Rust`によって管理されるメモリ
+  - `Python`などの全ての言語向けのライブラリで`Rust`によるメモリ管理
   - 幅広いテスト範囲
 
 - **複数の距離をサポート** 🧮
@@ -79,9 +79,9 @@ Hora、おおよその**最近傍探索アルゴリズムライブラリ** [[wik
   - `Cosine Similarity`
     - ![equation](https://latex.codecogs.com/gif.latex?D%28x%2Cy%29%20%3D%20%5Cfrac%7Bx%20*y%7D%7B%7C%7Cx%7C%7C*%7C%7Cy%7C%7C%7D)
 
-- **生産性が高い** ⭐
-  - doc は非常に完全です
-  - エレガントでシンプル、そして習得しやすい API
+- **生産性** ⭐
+  - 整備されたドキュメント
+  - エレガントかつシンプル、そして習得しやすいAPI
 
 # インストール
 
@@ -104,7 +104,7 @@ $ pip install horapy
 $ npm i horajs
 ```
 
-**`Building from source`**
+**`ソースコードからビルド`**
 
 ```bash
 $ git clone https://github.com/hora-search/hora
@@ -119,7 +119,7 @@ by `aws t2.medium (CPU: Intel(R) Xeon(R) CPU E5-2686 v4 @ 2.30GHz)` [more inform
 
 # Examples
 
-**`Rust` example** [[more info](https://github.com/hora-search/hora/tree/main/examples)]
+**`Rust`** [[詳細](https://github.com/hora-search/hora/tree/main/examples)]
 
 ```Rust
 use hora::core::ann_index::ANNIndex;
@@ -163,9 +163,9 @@ pub fn demo() {
 }
 ```
 
-この完全な純粋な錆画像検索[例](https://github.com/vaaaaanquish/rust-ann-search-example)を@vaaaaanquishに感謝します。この例の詳細については、[Pure Rustな近似最近傍探索ライブラリhoraを用いた画像検索を実装する](https://vaaaaaanquish.hatenablog.com/entry/2021/08/10/065117)
+この完全な純粋な錆画像検索の[コード例](https://github.com/vaaaaanquish/rust-ann-search-example)を公開して下さった@vaaaaanquish様に感謝申し上げます。この例の詳細については、[Pure Rustな近似最近傍探索ライブラリhoraを用いた画像検索を実装する](https://vaaaaaanquish.hatenablog.com/entry/2021/08/10/065117)をご覧ください。
 
-**`Python` example** [[more info](https://github.com/hora-search/horapy)]
+**`Python`** [[詳細](https://github.com/hora-search/horapy)]
 
 ```Python
 import numpy as np
@@ -192,7 +192,7 @@ print("{} in {} \nhas neighbors: {}".format(
 
 ```
 
-**`JavaScript` example** [[more info](https://github.com/hora-search/hora-wasm)]
+**`JavaScript`** [[詳細](https://github.com/hora-search/hora-wasm)]
 
 ```JavaScript
 import * as horajs from "horajs";
@@ -223,7 +223,7 @@ const demo = () => {
 })();
 ```
 
-**`Java` example** [[more info](https://github.com/hora-search/hora-java)]
+**`Java`** [[詳細](https://github.com/hora-search/hora-java)]
 
 ```Java
 public void demo() {
@@ -259,63 +259,63 @@ private static float getGaussian(Random fRandom, float aMean, float variance) {
 }
 ```
 
-# Roadmap
+# ロードマップ
 
 - [ ] 完全なテストカバレッジ
-- [ ] [EFANNA](http://arxiv.org/abs/1609.07228) アルゴリズムを実装して、より高速な KNN グラフ構築を実現します
-- [ ] Swift のサポートと iOS / macOS のデプロイ例
-- [ ] `R` サポート
-- [ ] `mmap` サポート
+- [ ] [EFANNA](http://arxiv.org/abs/1609.07228)アルゴリズムを実装して、より高速なKNNグラフ構築を実現する
+- [ ] SwiftのサポートとiOS/macOSのデプロイ例
+- [ ] `R`のサポート
+- [ ] `mmap`のサポート
 
 # 関連プロジェクトと比較
 
 - [Faiss](https://github.com/facebookresearch/faiss), [Annoy](https://github.com/spotify/annoy), [ScaNN](https://github.com/google-research/google-research/tree/master/scann):
 
   - **Hora の実装は、これらのライブラリに強く影響を受けています。**
-  - `Faiss`は GPU シーンリオに重点を置いており、` Hora`は Faiss よりも軽量です（**大きな依存関係はありません）**。
-  - `Hora`はより多くの言語をサポートすることを期待しており、パフォーマンスに関連するすべては Rust によって実装されます 🦀。
-  - `Annoy`は`LSH（Random Projection）`アルゴリズムのみをサポートします。.
-  - `ScaN`と` Fats`はユーザーフレンドリーではありません（例：doc）.
-  - Hora is **ALL IN RUST** 🦀.
+  - `Faiss`はGPUの使用に重点を置いており、`Hora`はFaissよりも軽量です **(大きな依存関係はありません)**。
+  - `Hora`はより多くの言語をサポートすることを期待しており、パフォーマンスに関連する部分は全てRustで実装しています🦀
+  - `Annoy`は`LSH(Random Projection)`アルゴリズムのみをサポートします。
+  - `ScaN`と`Fats`はドキュメントなどの面においてユーザーフレンドリーではありません
+  - Hora is **ALL IN RUST** 🦀 (Horaは**全てRustで実装しています**🦀)
 
 - [Milvus](https://github.com/milvus-io/milvus), [Vald](https://github.com/vdaas/vald), [Jina AI](https://github.com/jina-ai/jina)
   - `Milvus`と` Vald`も複数の言語をサポートしていますが、ライブラリではなくサービスとして機能します
-  - `Milvus`は` Faiss`などのいくつかのライブラリに基づいて構築されていますが、 `Hora`はすべてのアルゴリズムが実装されたライブラリです
+  - `Milvus`は`Faiss`などのいくつかのライブラリにの上に成り立っていますが、 `Hora`ではすべてのアルゴリズムが実装されています。
 
 # 貢献に参加する
 
 **We appreciate your participation!**
 
-皆様のご参加をお待ちしております。doc や test など、あらゆる貢献を歓迎します。
-GitHub で「プルリクエスト」または「問題」を作成できます。できるだけ早く確認します。
+皆様のご参加をお待ちしております。ドキュメントやテストなど、あらゆる貢献を歓迎します。
+GitHub でPull RequestsまたはIssuesを作成できます。できるだけ早く確認します。
 
-提案やバグを追跡するために GitHub の問題を使用します。
+提案やバグを管理するためにGitHubのIssuesを使用します。
 
-#### Clone the repo
+#### リポジトリのclone
 
 ```bash
 git clone https://github.com/hora-search/hora
 ```
 
-#### Build
+#### ビルド
 
 ```bash
 cargo build
 ```
 
-#### Test
+#### テスト
 
 ```bash
 cargo test --lib
 ```
 
-#### Try the changes
+#### 変更の確認
 
 ```bash
 cd examples
 cargo run
 ```
 
-# License
+# ライセンス
 
-The entire repository is licensed under the [Apache License](https://github.com/hora-search/hora/blob/main/LICENSE).
+このリポジトリは[Apache License](https://github.com/hora-search/hora/blob/main/LICENSE)でライセンスされています。
