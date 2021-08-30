@@ -1,6 +1,5 @@
 #![allow(dead_code)]
-use crate::core::metrics;
-use crate::core::node;
+use crate::core::{metrics, node};
 use metrics::metric;
 use rand::prelude::*;
 use rayon::prelude::*;
@@ -292,9 +291,7 @@ pub fn general_kmeans<E: node::FloatElement, T: node::IdxType>(
 #[cfg(test)]
 mod tests {
     use super::*;
-
     use rand::distributions::Standard;
-
     use rand::Rng;
 
     fn make_normal_distribution_clustering(

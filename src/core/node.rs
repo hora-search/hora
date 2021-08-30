@@ -1,10 +1,7 @@
 #![allow(dead_code)]
 use crate::core::metrics;
-
 use crate::core::simd_metrics;
-
-use core::hash::Hash;
-use core::iter::Sum;
+use core::{hash::Hash, iter::Sum};
 use num::traits::{FromPrimitive, NumAssign};
 use serde::{Deserialize, Serialize};
 

@@ -1,7 +1,5 @@
 extern crate num;
-use crate::core::calc::dot;
-
-use crate::core::node::FloatElement;
+use crate::core::{calc::dot, node::FloatElement};
 use serde::{Deserialize, Serialize};
 
 #[derive(Debug, Clone, Copy, Eq, PartialEq, Serialize, Deserialize)]
@@ -55,10 +53,7 @@ where
 {
     assert_eq!(vec1.len(), vec2.len());
     // smaller means closer.
-    match dot(vec1, vec2) {
-        Ok(x) => Result::Ok(-x),
-        Err(err) => Err(err),
-    }
+    dot(vec1, vec2).map(|x| -x)
 }
 
 fn manhattan_distance<T>(vec1: &[T], vec2: &[T]) -> Result<T, &'static str>
@@ -81,7 +76,7 @@ where
 {
     assert_eq!(vec1.len(), vec2.len());
     // smaller means closer.
-    Result::Ok(
+    Ok(
         -dot(vec1, vec2).unwrap()
             / (dot(vec1, vec1).unwrap().sqrt() * dot(vec2, vec2).unwrap().sqrt()),
     )
@@ -101,8 +96,8 @@ where
     let rlmul = rhd * lhd;
     let two = T::float_two();
     if rlmul > T::float_zero() {
-        Result::Ok(two - two * rldot / rlmul.sqrt())
+        Ok(two - two * rldot / rlmul.sqrt())
     } else {
-        Result::Ok(two)
+        Ok(two)
     }
 }
