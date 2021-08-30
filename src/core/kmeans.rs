@@ -160,6 +160,7 @@ impl<E: node::FloatElement> Kmeans<E> {
             return Err("None to assigned impossible split center");
         }
 
+        const EPS: f32 = 1.0 / 1024.0;
         (0..n_center).for_each(|i| {
             if n_assigned_per_center[i] == 0 {
                 //rand pick split center
@@ -173,7 +174,7 @@ impl<E: node::FloatElement> Kmeans<E> {
                     }
                     split_center_id = (split_center_id + 1) % n_center;
                 }
-                const EPS: f32 = 1.0 / 1024.0;
+
                 (0..dimension).for_each(|j| {
                     if j % 2 == 0 {
                         self._centers[i][j] =
