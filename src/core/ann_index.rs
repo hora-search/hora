@@ -17,7 +17,7 @@ use serde::de::DeserializeOwned;
 /// for i in 0..embs.len() {
 ///    bf_idx.add_node(&core::node::Node::<E, usize>::new_with_idx(&embs[i], i)); // add index
 /// }
-/// idx.build(core::metrics::Metric::Euclidean).unwrap(); // build up index
+/// bf_idx.build(core::metrics::Metric::Euclidean).unwrap(); // build up index
 /// println!("{embedding {}'s nearest neighbor is {}}", 0, bf_idx.search(embs[0]);
 /// ```
 ///
@@ -65,7 +65,7 @@ pub trait ANNIndex<E: node::FloatElement, T: node::IdxType>: Send + Sync {
 
     /// to rebuild the index with all nodes inside
     ///
-    /// /// return `Err(&'static str)` if there is something wrong with the rebuilding process, and the `static str` is the debug reason
+    /// return `Err(&'static str)` if there is something wrong with the rebuilding process, and the `static str` is the debug reason
     fn rebuild(&mut self, _mt: metrics::Metric) -> Result<(), &'static str> {
         Err("not implement")
     }
