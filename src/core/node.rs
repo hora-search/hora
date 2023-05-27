@@ -86,18 +86,20 @@ to_idx_type!(u32);
 to_idx_type!(u64);
 to_idx_type!(u128);
 
-pub trait Node<E: FloatElement, T: IdxType>: Send + Sync {
-    fn new(vectors: &[E]) -> Self;
-    fn new_with_index(vectors: &[E], id: T) -> Self;
-    fn metric(&self, other: impl Node<E, T>, t: metrics::Metric) -> Result<E, &'static str>;
-    fn vectors(&self) -> Vec<E>;
-    fn mut_vectors(&mut self) -> &mut Vec<E>;
-    fn set_vectors(&mut self, v: &[E]);
+pub trait Node: Send + Sync {
+    type E;
+    type T;
+    fn new(vectors: &[Self::E]) -> Self;
+    fn new_with_idx(vectors: &[Self::E], id: Self::T) -> Self;
+    fn metric(&self, other: impl Node, t: metrics::Metric) -> Result<Self::E, &'static str>;
+    fn vectors(&self) -> Vec<Self::E>;
+    fn mut_vectors(&mut self) -> &mut Vec<Self::E>;
+    fn set_vectors(&mut self, v: &[Self::E]);
     fn len(&self) -> usize;
     fn is_empty(&self) -> bool;
-    fn idx(&self) -> &Option<T>;
-    fn set_idx(&mut self, id: T);
-    fn valid_elements(vectors: &[E]) -> bool;
+    fn idx(&self) -> &Option<Self::T>;
+    fn set_idx(&mut self, id: Self::T);
+    fn valid_elements(vectors: &[Self::E]) -> bool;
 }
 
 /// Node is the main container for the point in the space
@@ -110,7 +112,7 @@ pub struct MemoryNode<E: FloatElement, T: IdxType> {
     idx: Option<T>, // data id, it can be any type;
 }
 
-impl<E: FloatElement, T: IdxType> Node<E, T> for MemoryNode<E, T> {
+impl<E: FloatElement, T: IdxType> Node for MemoryNode<E, T> {
     /// new without idx
     ///
     /// new a point without a idx
@@ -132,7 +134,7 @@ impl<E: FloatElement, T: IdxType> Node<E, T> for MemoryNode<E, T> {
     }
 
     /// calculate the point distance
-    fn metric(&self, other: &impl Node<E, T>, t: metrics::Metric) -> Result<E, &'static str> {
+    fn metric(&self, other: &impl Node, t: metrics::Metric) -> Result<E, &'static str> {
         metrics::metric(&self.vectors, &other.vectors(), t)
     }
 

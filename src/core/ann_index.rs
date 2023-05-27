@@ -22,7 +22,7 @@ use serde::de::DeserializeOwned;
 /// ```
 ///
 
-pub trait ANNIndex<E: node::FloatElement, T: node::IdxType, N: node::Node<E, T>>:
+pub trait ANNIndex<E: node::FloatElement, T: node::IdxType, N: node::Node<E = E, T = T>>:
     Send + Sync
 {
     /// build up the ANN index
@@ -35,7 +35,7 @@ pub trait ANNIndex<E: node::FloatElement, T: node::IdxType, N: node::Node<E, T>>
     ///
     /// it will allocate a space in the heap(Vector), and init a `Node`
     /// return `Err(&'static str)` if there is something wrong with the adding process, and the `static str` is the debug reason
-    fn add_node(&mut self, item: &impl node::Node<E, T>) -> Result<(), &'static str>;
+    fn add_node(&mut self, item: &impl node::Node<E = E, T = T>) -> Result<(), &'static str>;
 
     /// add node
     ///
@@ -143,7 +143,7 @@ pub trait ANNIndex<E: node::FloatElement, T: node::IdxType, N: node::Node<E, T>>
 pub trait SerializableIndex<
     E: node::FloatElement + DeserializeOwned,
     T: node::IdxType + DeserializeOwned,
-    N: node::Node<E, T>,
+    N: node::Node<E = E, T = T>,
 >: Send + Sync + ANNIndex<E, T, N>
 {
     /// load file with path

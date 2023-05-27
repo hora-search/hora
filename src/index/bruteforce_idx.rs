@@ -13,7 +13,7 @@ use std::fs::File;
 use std::io::Write;
 
 #[derive(Debug, Serialize, Deserialize)]
-pub struct BruteForceIndex<E: node::FloatElement, T: node::IdxType, N: node::Node<E, T>> {
+pub struct BruteForceIndex<N: node::Node> {
     #[serde(skip_serializing, skip_deserializing)]
     nodes: Vec<Box<N>>,
     tmp_nodes: Vec<N>, // only use for serialization scene
@@ -21,9 +21,9 @@ pub struct BruteForceIndex<E: node::FloatElement, T: node::IdxType, N: node::Nod
     dimension: usize,
 }
 
-impl<E: node::FloatElement, T: node::IdxType, N: node::Node<E, T>> BruteForceIndex<E, T, N> {
-    pub fn new(dimension: usize, _params: &BruteForceParams) -> BruteForceIndex<E, T, N> {
-        BruteForceIndex::<E, T> {
+impl<E: node::FloatElement, T: node::IdxType, N: node::Node<E, T>> BruteForceIndex<N> {
+    pub fn new(dimension: usize, _params: &BruteForceParams) -> BruteForceIndex<N> {
+        BruteForceIndex::<N> {
             nodes: Vec::new(),
             mt: metrics::Metric::Unknown,
             tmp_nodes: Vec::new(),
