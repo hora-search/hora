@@ -46,7 +46,7 @@ pub struct SSGIndex<E: node::FloatElement, N: node::Node<E = E>> {
 
 impl<E: node::FloatElement, T: node::IdxType, N: node::Node<E = E, T = T>> SSGIndex<E, N> {
     pub fn new(dimension: usize, params: &SSGParams<E>) -> SSGIndex<E, N> {
-        SSGIndex::<E, T> {
+        SSGIndex::<E, N> {
             nodes: Vec::new(),
             tmp_nodes: Vec::new(),
             mt: metrics::Metric::Unknown,
@@ -80,7 +80,7 @@ impl<E: node::FloatElement, T: node::IdxType, N: node::Node<E = E, T = T>> SSGIn
                     }
                     heap.push(neighbor::Neighbor::new(
                         i,
-                        item.metric(node, self.mt).unwrap(),
+                        item.metric(&**node, self.mt).unwrap(),
                     ));
                     if heap.len() > self.init_k {
                         heap.pop();
@@ -121,7 +121,7 @@ impl<E: node::FloatElement, T: node::IdxType, N: node::Node<E = E, T = T>> SSGIn
                     continue;
                 }
                 flags.insert(*nn_id);
-                let dist = self.nodes[q].metric(&self.nodes[*nn_id], self.mt).unwrap();
+                let dist = self.nodes[q].metric(&*self.nodes[*nn_id], self.mt).unwrap();
                 expand_neighbors_tmp.push(neighbor::Neighbor::new(*nn_id, dist));
                 if expand_neighbors_tmp.len() >= self.neighbor_neighbor_size {
                     return;
@@ -217,7 +217,7 @@ impl<E: node::FloatElement, T: node::IdxType, N: node::Node<E = E, T = T>> SSGIn
             expand_neighbors_tmp.push(neighbor::Neighbor::new(
                 *linked_id,
                 self.nodes[query_id]
-                    .metric(&self.nodes[*linked_id], self.mt)
+                    .metric(&*self.nodes[*linked_id], self.mt)
                     .unwrap(),
             ));
         });
@@ -241,7 +241,7 @@ impl<E: node::FloatElement, T: node::IdxType, N: node::Node<E = E, T = T>> SSGIn
                     break;
                 }
                 let djk = self.nodes[iter.idx()]
-                    .metric(&self.nodes[p.idx()], self.mt)
+                    .metric(&*self.nodes[p.idx()], self.mt)
                     .unwrap();
                 let cos_ij = (p.distance().powi(2) + iter.distance().powi(2) - djk.powi(2))
                     / (E::from_usize(2).unwrap() * (p.distance() * iter.distance()));
@@ -321,7 +321,7 @@ impl<E: node::FloatElement, T: node::IdxType, N: node::Node<E = E, T = T>> SSGIn
                             break;
                         }
                         let djk = self.nodes[rt.idx()]
-                            .metric(&self.nodes[p.idx()], self.mt)
+                            .metric(&*self.nodes[p.idx()], self.mt)
                             .unwrap();
                         let cos_ij = (p.distance().powi(2) + rt.distance().powi(2) - djk.powi(2))
                             / (E::from_usize(2).unwrap() * (p.distance() * rt.distance()));

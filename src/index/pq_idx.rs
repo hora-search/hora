@@ -55,7 +55,7 @@ impl<E: node::FloatElement, T: node::IdxType, N: node::Node<E = E, T = T>> PQInd
         assert!(sub_bits <= 32);
         let n_center_per_sub = (1 << sub_bits) as usize;
         let code_bytes = sub_bytes * n_sub;
-        let mut new_pq = PQIndex::<E, T> {
+        let mut new_pq = PQIndex::<E, N> {
             _dimension: dimension,
             _n_sub: n_sub,
             _sub_dimension: sub_dimension,
@@ -208,7 +208,7 @@ impl<E: node::FloatElement, T: node::IdxType, N: node::Node<E = E, T = T>>
 
     fn node_search_k(&self, item: &N, k: usize) -> Vec<(N, E)> {
         let mut ret: BinaryHeap<Neighbor<E, usize>> = self.search_knn_adc(item, k).unwrap();
-        let mut result: Vec<(node::Node<E, T>, E)> = Vec::new();
+        let mut result: Vec<(N, E)> = Vec::new();
         let mut result_idx: Vec<(usize, E)> = Vec::new();
         while !ret.is_empty() {
             let top = ret.peek().unwrap();
@@ -244,7 +244,7 @@ impl<
 {
     fn load(path: &str) -> Result<Self, &'static str> {
         let file = File::open(path).unwrap_or_else(|_| panic!("unable to open file {:?}", path));
-        let mut instance: PQIndex<E, T> = bincode::deserialize_from(&file).unwrap();
+        let mut instance: PQIndex<E, N> = bincode::deserialize_from(&file).unwrap();
         instance._nodes = instance
             ._nodes_tmp
             .iter()
@@ -373,7 +373,7 @@ impl<E: node::FloatElement, T: node::IdxType, N: node::Node<E = E, T = T>> IVFPQ
             self._ivflist[center_id].push(i);
         });
         for i in 0..n_center {
-            let mut center_pq = PQIndex::<E, T>::new(
+            let mut center_pq = PQIndex::<E, N>::new(
                 self._dimension,
                 &PQParams::default()
                     .n_sub(self._n_sub)
@@ -452,7 +452,7 @@ impl<E: node::FloatElement, T: node::IdxType, N: node::Node<E = E, T = T>>
 
     fn node_search_k(&self, item: &N, k: usize) -> Vec<(N, E)> {
         let mut ret: BinaryHeap<Neighbor<E, usize>> = self.search_knn_adc(item, k).unwrap();
-        let mut result: Vec<(node::Node<E, T>, E)> = Vec::new();
+        let mut result: Vec<(N, E)> = Vec::new();
         let mut result_idx: Vec<(usize, E)> = Vec::new();
         while !ret.is_empty() {
             let top = ret.peek().unwrap();
@@ -488,7 +488,7 @@ impl<
 {
     fn load(path: &str) -> Result<Self, &'static str> {
         let file = File::open(path).unwrap_or_else(|_| panic!("unable to open file {:?}", path));
-        let mut instance: IVFPQIndex<E, T> = bincode::deserialize_from(&file).unwrap();
+        let mut instance: IVFPQIndex<E, T, N> = bincode::deserialize_from(&file).unwrap();
         instance._nodes = instance
             ._nodes_tmp
             .iter()

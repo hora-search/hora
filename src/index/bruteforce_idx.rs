@@ -55,7 +55,7 @@ impl<E: node::FloatElement, T: node::IdxType, N: node::Node<E = E, T = T>>
                 heap.push(neighbor::Neighbor::new(
                     // use max heap, and every time pop out the greatest one in the heap
                     i,
-                    item.metric(node, self.mt).unwrap(),
+                    item.metric(&**node, self.mt).unwrap(),
                 ));
                 if heap.len() > k {
                     let _xp = heap.pop().unwrap();
@@ -91,7 +91,7 @@ impl<
 {
     fn load(path: &str) -> Result<Self, &'static str> {
         let file = File::open(path).unwrap_or_else(|_| panic!("unable to open file {:?}", path));
-        let mut instance: BruteForceIndex<E, T> = bincode::deserialize_from(file).unwrap();
+        let mut instance: BruteForceIndex<N> = bincode::deserialize_from(file).unwrap();
         instance.nodes = instance
             .tmp_nodes
             .iter()

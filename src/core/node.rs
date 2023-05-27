@@ -86,8 +86,8 @@ to_idx_type!(u32);
 to_idx_type!(u64);
 to_idx_type!(u128);
 
-pub trait Node: Clone + Send + Sync {
-    type E;
+pub trait Node: Clone + Send + Sync + Serialize + Default {
+    type E: PartialOrd;
     type T;
     fn new(vectors: &[Self::E]) -> Self;
     fn new_with_idx(vectors: &[Self::E], id: Self::T) -> Self;
@@ -140,8 +140,12 @@ impl<E: FloatElement, T: IdxType> Node for MemoryNode<E, T> {
     }
 
     /// calculate the point distance
-    fn metric(&self, other: &impl Node, t: metrics::Metric) -> Result<E, &'static str> {
-        metrics::metric(&self.vectors, &other.vectors(), t)
+    fn metric(
+        &self,
+        other: &impl Node<E = E, T = T>,
+        t: metrics::Metric,
+    ) -> Result<E, &'static str> {
+        metrics::metric(&self.vectors, &*other.vectors(), t)
     }
 
     // return internal embeddings
@@ -202,7 +206,7 @@ fn node_test() {
     // f64
     let v = vec![1.0, 1.0];
     let v2 = vec![2.0, 2.0];
-    let n = Node::<f64, usize>::new(&v);
-    let n2 = Node::<f64, usize>::new(&v2);
+    let n: MemoryNode<f64, usize> = Node::new(&v);
+    let n2: MemoryNode<f64, usize> = Node::new(&v2);
     assert_eq!(n.metric(&n2, metrics::Metric::Manhattan).unwrap(), 2.0);
 }
