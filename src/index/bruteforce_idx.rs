@@ -21,7 +21,7 @@ pub struct BruteForceIndex<N: node::Node> {
     dimension: usize,
 }
 
-impl<E: node::FloatElement, T: node::IdxType, N: node::Node<E, T>> BruteForceIndex<N> {
+impl<E: node::FloatElement, T: node::IdxType, N: node::Node<E = E, T = T>> BruteForceIndex<N> {
     pub fn new(dimension: usize, _params: &BruteForceParams) -> BruteForceIndex<N> {
         BruteForceIndex::<N> {
             nodes: Vec::new(),
@@ -32,8 +32,8 @@ impl<E: node::FloatElement, T: node::IdxType, N: node::Node<E, T>> BruteForceInd
     }
 }
 
-impl<E: node::FloatElement, T: node::IdxType, N: node::Node<E, T>> ann_index::ANNIndex<E, T, N>
-    for BruteForceIndex<E, T, N>
+impl<E: node::FloatElement, T: node::IdxType, N: node::Node<E = E, T = T>>
+    ann_index::ANNIndex<E, T, N> for BruteForceIndex<N>
 {
     fn build(&mut self, mt: metrics::Metric) -> Result<(), &'static str> {
         self.mt = mt;
@@ -86,8 +86,8 @@ impl<E: node::FloatElement, T: node::IdxType, N: node::Node<E, T>> ann_index::AN
 impl<
         E: node::FloatElement + DeserializeOwned,
         T: node::IdxType + DeserializeOwned,
-        N: node::Node<E, T> + DeserializeOwned,
-    > ann_index::SerializableIndex<E, T, N> for BruteForceIndex<E, T, N>
+        N: node::Node<E = E, T = T> + DeserializeOwned,
+    > ann_index::SerializableIndex<E, T, N> for BruteForceIndex<N>
 {
     fn load(path: &str) -> Result<Self, &'static str> {
         let file = File::open(path).unwrap_or_else(|_| panic!("unable to open file {:?}", path));

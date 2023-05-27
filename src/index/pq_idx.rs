@@ -19,7 +19,7 @@ use std::fs::File;
 use std::io::Write;
 
 #[derive(Default, Debug, Serialize, Deserialize)]
-pub struct PQIndex<E: node::FloatElement, T: node::IdxType, N: node::Node<E, T>> {
+pub struct PQIndex<E: node::FloatElement, N: node::Node<E = E>> {
     _dimension: usize,                 //dimension of data
     _n_sub: usize,                     //num of subdata
     _sub_dimension: usize,             //dimension of subdata
@@ -44,8 +44,8 @@ pub struct PQIndex<E: node::FloatElement, T: node::IdxType, N: node::Node<E, T>>
     _nodes_tmp: Vec<N>,
 }
 
-impl<E: node::FloatElement, T: node::IdxType, N: node::Node<E, T>> PQIndex<E, T, N> {
-    pub fn new(dimension: usize, params: &PQParams<E>) -> PQIndex<E, T, N> {
+impl<E: node::FloatElement, T: node::IdxType, N: node::Node<E = E, T = T>> PQIndex<E, N> {
+    pub fn new(dimension: usize, params: &PQParams<E>) -> PQIndex<E, N> {
         let n_sub = params.n_sub;
         let sub_bits = params.sub_bits;
         let train_epoch = params.train_epoch;
@@ -188,8 +188,8 @@ impl<E: node::FloatElement, T: node::IdxType, N: node::Node<E, T>> PQIndex<E, T,
     }
 }
 
-impl<E: node::FloatElement, T: node::IdxType, N: node::Node<E, T>> ann_index::ANNIndex<E, T, N>
-    for PQIndex<E, T, N>
+impl<E: node::FloatElement, T: node::IdxType, N: node::Node<E = E, T = T>>
+    ann_index::ANNIndex<E, T, N> for PQIndex<E, N>
 {
     fn build(&mut self, _mt: metrics::Metric) -> Result<(), &'static str> {
         self.mt = _mt;
@@ -239,8 +239,8 @@ impl<E: node::FloatElement, T: node::IdxType, N: node::Node<E, T>> ann_index::AN
 impl<
         E: node::FloatElement + DeserializeOwned,
         T: node::IdxType + DeserializeOwned,
-        N: node::Node<E, T> + DeserializeOwned,
-    > ann_index::SerializableIndex<E, T, N> for PQIndex<E, T, N>
+        N: node::Node<E = E, T = T> + DeserializeOwned,
+    > ann_index::SerializableIndex<E, T, N> for PQIndex<E, N>
 {
     fn load(path: &str) -> Result<Self, &'static str> {
         let file = File::open(path).unwrap_or_else(|_| panic!("unable to open file {:?}", path));
@@ -264,7 +264,7 @@ impl<
 }
 
 #[derive(Default, Debug, Serialize, Deserialize)]
-pub struct IVFPQIndex<E: node::FloatElement, T: node::IdxType, N: node::Node<E, T>> {
+pub struct IVFPQIndex<E: node::FloatElement, T: node::IdxType, N: node::Node<E = E, T = T>> {
     _dimension: usize,     //dimension of data
     _n_sub: usize,         //num of subdata
     _sub_dimension: usize, //dimension of subdata
@@ -278,7 +278,7 @@ pub struct IVFPQIndex<E: node::FloatElement, T: node::IdxType, N: node::Node<E, 
     _n_kmeans_center: usize,
     _centers: Vec<Vec<E>>,
     _ivflist: Vec<Vec<usize>>, //ivf center id
-    _pq_list: Vec<PQIndex<E, T, N>>,
+    _pq_list: Vec<PQIndex<E, N>>,
     _is_trained: bool,
 
     _n_items: usize,
@@ -290,7 +290,7 @@ pub struct IVFPQIndex<E: node::FloatElement, T: node::IdxType, N: node::Node<E, 
     _nodes_tmp: Vec<N>,
 }
 
-impl<E: node::FloatElement, T: node::IdxType, N: node::Node<E, T>> IVFPQIndex<E, T, N> {
+impl<E: node::FloatElement, T: node::IdxType, N: node::Node<E = E, T = T>> IVFPQIndex<E, T, N> {
     pub fn new(dimension: usize, params: &IVFPQParams<E>) -> IVFPQIndex<E, T, N> {
         let n_sub = params.n_sub;
         let sub_bits = params.sub_bits;
@@ -432,8 +432,8 @@ impl<E: node::FloatElement, T: node::IdxType, N: node::Node<E, T>> IVFPQIndex<E,
     }
 }
 
-impl<E: node::FloatElement, T: node::IdxType, N: node::Node<E, T>> ann_index::ANNIndex<E, T, N>
-    for IVFPQIndex<E, T, N>
+impl<E: node::FloatElement, T: node::IdxType, N: node::Node<E = E, T = T>>
+    ann_index::ANNIndex<E, T, N> for IVFPQIndex<E, T, N>
 {
     fn build(&mut self, _mt: metrics::Metric) -> Result<(), &'static str> {
         self.mt = _mt;
@@ -483,7 +483,7 @@ impl<E: node::FloatElement, T: node::IdxType, N: node::Node<E, T>> ann_index::AN
 impl<
         E: node::FloatElement + DeserializeOwned,
         T: node::IdxType + DeserializeOwned,
-        N: node::Node<E, T> + DeserializeOwned,
+        N: node::Node<E = E, T = T> + DeserializeOwned,
     > ann_index::SerializableIndex<E, T, N> for IVFPQIndex<E, T, N>
 {
     fn load(path: &str) -> Result<Self, &'static str> {

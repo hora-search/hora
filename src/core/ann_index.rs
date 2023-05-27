@@ -35,7 +35,7 @@ pub trait ANNIndex<E: node::FloatElement, T: node::IdxType, N: node::Node<E = E,
     ///
     /// it will allocate a space in the heap(Vector), and init a `Node`
     /// return `Err(&'static str)` if there is something wrong with the adding process, and the `static str` is the debug reason
-    fn add_node(&mut self, item: &impl node::Node<E = E, T = T>) -> Result<(), &'static str>;
+    fn add_node(&mut self, item: &N) -> Result<(), &'static str>;
 
     /// add node
     ///

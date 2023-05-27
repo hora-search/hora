@@ -23,7 +23,7 @@ use std::io::Write;
 use std::sync::{Arc, Mutex};
 
 #[derive(Debug, Serialize, Deserialize)]
-pub struct SSGIndex<E: node::FloatElement, T: node::IdxType, N: node::Node<E, T>> {
+pub struct SSGIndex<E: node::FloatElement, N: node::Node<E = E>> {
     #[serde(skip_serializing, skip_deserializing)]
     nodes: Vec<Box<N>>,
     tmp_nodes: Vec<N>, // only use for serialization scene
@@ -44,8 +44,8 @@ pub struct SSGIndex<E: node::FloatElement, T: node::IdxType, N: node::Node<E, T>
     search_times: usize,
 }
 
-impl<E: node::FloatElement, T: node::IdxType, N: node::Node<E, T>> SSGIndex<E, T, N> {
-    pub fn new(dimension: usize, params: &SSGParams<E>) -> SSGIndex<E, T, N> {
+impl<E: node::FloatElement, T: node::IdxType, N: node::Node<E = E, T = T>> SSGIndex<E, N> {
+    pub fn new(dimension: usize, params: &SSGParams<E>) -> SSGIndex<E, N> {
         SSGIndex::<E, T> {
             nodes: Vec::new(),
             tmp_nodes: Vec::new(),
@@ -483,12 +483,12 @@ impl<E: node::FloatElement, T: node::IdxType, N: node::Node<E, T>> SSGIndex<E, T
 impl<
         E: node::FloatElement + DeserializeOwned,
         T: node::IdxType + DeserializeOwned,
-        N: node::Node<E, T> + DeserializeOwned,
-    > ann_index::SerializableIndex<E, T, N> for SSGIndex<E, T, N>
+        N: node::Node<E = E, T = T> + DeserializeOwned,
+    > ann_index::SerializableIndex<E, T, N> for SSGIndex<E, N>
 {
     fn load(path: &str) -> Result<Self, &'static str> {
         let file = File::open(path).unwrap_or_else(|_| panic!("unable to open file {:?}", path));
-        let mut instance: SSGIndex<E, T> = bincode::deserialize_from(&file).unwrap();
+        let mut instance: SSGIndex<E, N> = bincode::deserialize_from(&file).unwrap();
         instance.nodes = instance
             .tmp_nodes
             .iter()
@@ -507,8 +507,8 @@ impl<
     }
 }
 
-impl<E: node::FloatElement, T: node::IdxType, N: node::Node<E, T>> ann_index::ANNIndex<E, T, N>
-    for SSGIndex<E, T, N>
+impl<E: node::FloatElement, T: node::IdxType, N: node::Node<E = E, T = T>>
+    ann_index::ANNIndex<E, T, N> for SSGIndex<E, N>
 {
     fn build(&mut self, mt: metrics::Metric) -> Result<(), &'static str> {
         self.mt = mt;

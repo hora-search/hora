@@ -113,14 +113,14 @@ mod tests {
         }
     }
 
-    fn make_idx_baseline<E, T>(embs: Vec<Vec<E>>, idx: &mut Box<T>)
+    fn make_idx_baseline<E, T, N>(embs: Vec<Vec<E>>, idx: &mut Box<T>)
     where
         E: core::node::FloatElement,
         T: core::ann_index::ANNIndex<E, usize, MemoryNode<E, usize>> + ?Sized,
+        N: core::node::Node<E = E, T = T>,
     {
         for i in 0..embs.len() {
-            idx.add_node(&core::node::Node::<E, usize>::new_with_idx(&embs[i], i))
-                .unwrap();
+            idx.add_node(&N::new_with_idx(&embs[i], i)).unwrap();
         }
         idx.build(core::metrics::Metric::Euclidean).unwrap();
     }

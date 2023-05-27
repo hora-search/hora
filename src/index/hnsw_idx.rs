@@ -21,7 +21,7 @@ use std::io::Write;
 use std::sync::RwLock;
 
 #[derive(Default, Debug, Serialize, Deserialize)]
-pub struct HNSWIndex<E: node::FloatElement, T: node::IdxType, N: node::Node<E, T>> {
+pub struct HNSWIndex<T: node::IdxType, N: node::Node<T = T>> {
     _dimension: usize, // dimension
     _n_items: usize,   // next item count
     _n_constructed_items: usize,
@@ -55,8 +55,8 @@ pub struct HNSWIndex<E: node::FloatElement, T: node::IdxType, N: node::Node<E, T
     _delete_ids_tmp: Vec<usize>,
 }
 
-impl<E: node::FloatElement, T: node::IdxType, N: node::Node<E, T>> HNSWIndex<E, T, N> {
-    pub fn new(dimension: usize, params: &HNSWParams<E>) -> HNSWIndex<E, T, N> {
+impl<E: node::FloatElement, T: node::IdxType, N: node::Node<E = E, T = T>> HNSWIndex<T, N> {
+    pub fn new(dimension: usize, params: &HNSWParams<E>) -> HNSWIndex<T, N> {
         HNSWIndex {
             _dimension: dimension,
             _n_items: 0,
@@ -599,8 +599,8 @@ impl<E: node::FloatElement, T: node::IdxType, N: node::Node<E, T>> HNSWIndex<E, 
     }
 }
 
-impl<E: node::FloatElement, T: node::IdxType, N: node::Node<E, T>> ann_index::ANNIndex<E, T, N>
-    for HNSWIndex<E, T, N>
+impl<E: node::FloatElement, T: node::IdxType, N: node::Node<E = E, T = T>>
+    ann_index::ANNIndex<E, T, N> for HNSWIndex<T, N>
 {
     fn build(&mut self, mt: metrics::Metric) -> Result<(), &'static str> {
         self.mt = mt;
@@ -646,8 +646,8 @@ impl<E: node::FloatElement, T: node::IdxType, N: node::Node<E, T>> ann_index::AN
 impl<
         E: node::FloatElement + DeserializeOwned,
         T: node::IdxType + DeserializeOwned,
-        N: node::Node<E, T>,
-    > ann_index::SerializableIndex<E, T, N> for HNSWIndex<E, T, N>
+        N: node::Node<E = E, T = T>,
+    > ann_index::SerializableIndex<E, T, N> for HNSWIndex<T, N>
 {
     fn load(path: &str) -> Result<Self, &'static str> {
         let file = File::open(path).unwrap_or_else(|_| panic!("unable to open file {:?}", path));

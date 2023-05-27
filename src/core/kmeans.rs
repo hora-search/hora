@@ -213,7 +213,7 @@ impl<E: node::FloatElement> Kmeans<E> {
     }
 }
 
-pub fn general_kmeans<E: node::FloatElement, T: node::IdxType, N: node::Node<E, T>>(
+pub fn general_kmeans<E: node::FloatElement, T: node::IdxType, N: node::Node>(
     k: usize,
     epoch: usize,
     nodes: &[Box<N>],

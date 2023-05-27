@@ -86,13 +86,17 @@ to_idx_type!(u32);
 to_idx_type!(u64);
 to_idx_type!(u128);
 
-pub trait Node: Send + Sync {
+pub trait Node: Clone + Send + Sync {
     type E;
     type T;
     fn new(vectors: &[Self::E]) -> Self;
     fn new_with_idx(vectors: &[Self::E], id: Self::T) -> Self;
-    fn metric(&self, other: impl Node, t: metrics::Metric) -> Result<Self::E, &'static str>;
-    fn vectors(&self) -> Vec<Self::E>;
+    fn metric(
+        &self,
+        other: &impl Node<E = Self::E, T = Self::T>,
+        t: metrics::Metric,
+    ) -> Result<Self::E, &'static str>;
+    fn vectors(&self) -> &Vec<Self::E>;
     fn mut_vectors(&mut self) -> &mut Vec<Self::E>;
     fn set_vectors(&mut self, v: &[Self::E]);
     fn len(&self) -> usize;
@@ -113,6 +117,8 @@ pub struct MemoryNode<E: FloatElement, T: IdxType> {
 }
 
 impl<E: FloatElement, T: IdxType> Node for MemoryNode<E, T> {
+    type E = E;
+    type T = T;
     /// new without idx
     ///
     /// new a point without a idx
