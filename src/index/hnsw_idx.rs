@@ -21,7 +21,7 @@ use std::io::Write;
 use std::sync::RwLock;
 
 #[derive(Default, Debug, Serialize, Deserialize)]
-pub struct HNSWIndex<E: node::FloatElement, T: node::IdxType> {
+pub struct HNSWIndex<T: node::IdxType, N: node::Node<T = T>> {
     _dimension: usize, // dimension
     _n_items: usize,   // next item count
     _n_constructed_items: usize,
@@ -35,7 +35,7 @@ pub struct HNSWIndex<E: node::FloatElement, T: node::IdxType> {
     #[serde(skip_serializing, skip_deserializing)]
     _id2neighbor0: Vec<RwLock<Vec<usize>>>, //neigh_id at level 0
     #[serde(skip_serializing, skip_deserializing)]
-    _nodes: Vec<Box<node::Node<E, T>>>, // data saver
+    _nodes: Vec<Box<N>>, // data saver
     #[serde(skip_serializing, skip_deserializing)]
     _item2id: HashMap<T, usize>, //item_id to id in Hnsw
     _root_id: usize,     //root of hnsw
@@ -50,13 +50,13 @@ pub struct HNSWIndex<E: node::FloatElement, T: node::IdxType> {
     // use for serde
     _id2neighbor_tmp: Vec<Vec<Vec<usize>>>,
     _id2neighbor0_tmp: Vec<Vec<usize>>,
-    _nodes_tmp: Vec<node::Node<E, T>>,
+    _nodes_tmp: Vec<N>,
     _item2id_tmp: Vec<(T, usize)>,
     _delete_ids_tmp: Vec<usize>,
 }
 
-impl<E: node::FloatElement, T: node::IdxType> HNSWIndex<E, T> {
-    pub fn new(dimension: usize, params: &HNSWParams<E>) -> HNSWIndex<E, T> {
+impl<E: node::FloatElement, T: node::IdxType, N: node::Node<E = E, T = T>> HNSWIndex<T, N> {
+    pub fn new(dimension: usize, params: &HNSWParams<E>) -> HNSWIndex<T, N> {
         HNSWIndex {
             _dimension: dimension,
             _n_items: 0,
@@ -236,11 +236,11 @@ impl<E: node::FloatElement, T: node::IdxType> HNSWIndex<E, T> {
         self._has_removed && self._delete_ids.contains(&id)
     }
 
-    fn get_data(&self, id: usize) -> &node::Node<E, T> {
+    fn get_data(&self, id: usize) -> &N {
         &self._nodes[id]
     }
 
-    fn get_distance_from_vec(&self, x: &node::Node<E, T>, y: &node::Node<E, T>) -> E {
+    fn get_distance_from_vec(&self, x: &N, y: &N) -> E {
         return metrics::metric(x.vectors(), y.vectors(), self.mt).unwrap();
     }
 
@@ -255,7 +255,7 @@ impl<E: node::FloatElement, T: node::IdxType> HNSWIndex<E, T> {
 
     fn search_layer_with_candidate(
         &self,
-        search_data: &node::Node<E, T>,
+        search_data: &N,
         sorted_candidates: &[Neighbor<E, usize>],
         visited_id: &mut FixedBitSet,
         level: usize,
@@ -320,7 +320,7 @@ impl<E: node::FloatElement, T: node::IdxType> HNSWIndex<E, T> {
     fn search_layer(
         &self,
         root: usize,
-        search_data: &node::Node<E, T>,
+        search_data: &N,
         level: usize,
         ef: usize,
         has_deletion: bool,
@@ -380,7 +380,7 @@ impl<E: node::FloatElement, T: node::IdxType> HNSWIndex<E, T> {
     // fn search_layer_default(
     //     &self,
     //     root: usize,
-    //     search_data: &node::Node<E, T>,
+    //     search_data: &N,
     //     level: usize,
     // ) -> BinaryHeap<Neighbor<E, usize>> {
     //     return self.search_layer(root, search_data, level, self._ef_build, false);
@@ -388,7 +388,7 @@ impl<E: node::FloatElement, T: node::IdxType> HNSWIndex<E, T> {
 
     fn search_knn(
         &self,
-        search_data: &node::Node<E, T>,
+        search_data: &N,
         k: usize,
     ) -> Result<BinaryHeap<Neighbor<E, usize>>, &'static str> {
         let mut top_candidate: BinaryHeap<Neighbor<E, usize>> = BinaryHeap::new();
@@ -438,7 +438,7 @@ impl<E: node::FloatElement, T: node::IdxType> HNSWIndex<E, T> {
         Ok(top_candidate)
     }
 
-    fn init_item(&mut self, data: &node::Node<E, T>) -> usize {
+    fn init_item(&mut self, data: &N) -> usize {
         let cur_id = self._n_items;
         let mut cur_level = self.get_random_level();
         if cur_id == 0 {
@@ -475,7 +475,7 @@ impl<E: node::FloatElement, T: node::IdxType> HNSWIndex<E, T> {
         Ok(())
     }
 
-    fn add_item_not_constructed(&mut self, data: &node::Node<E, T>) -> Result<(), &'static str> {
+    fn add_item_not_constructed(&mut self, data: &N) -> Result<(), &'static str> {
         if data.len() != self._dimension {
             return Err("dimension is different");
         }
@@ -495,7 +495,7 @@ impl<E: node::FloatElement, T: node::IdxType> HNSWIndex<E, T> {
         Ok(())
     }
 
-    fn add_single_item(&mut self, data: &node::Node<E, T>) -> Result<(), &'static str> {
+    fn add_single_item(&mut self, data: &N) -> Result<(), &'static str> {
         //not support asysn
         if data.len() != self._dimension {
             return Err("dimension is different");
@@ -599,21 +599,23 @@ impl<E: node::FloatElement, T: node::IdxType> HNSWIndex<E, T> {
     }
 }
 
-impl<E: node::FloatElement, T: node::IdxType> ann_index::ANNIndex<E, T> for HNSWIndex<E, T> {
+impl<E: node::FloatElement, T: node::IdxType, N: node::Node<E = E, T = T>>
+    ann_index::ANNIndex<E, T, N> for HNSWIndex<T, N>
+{
     fn build(&mut self, mt: metrics::Metric) -> Result<(), &'static str> {
         self.mt = mt;
         self.batch_construct(mt)
     }
-    fn add_node(&mut self, item: &node::Node<E, T>) -> Result<(), &'static str> {
+    fn add_node(&mut self, item: &N) -> Result<(), &'static str> {
         self.add_item_not_constructed(item)
     }
     fn built(&self) -> bool {
         true
     }
 
-    fn node_search_k(&self, item: &node::Node<E, T>, k: usize) -> Vec<(node::Node<E, T>, E)> {
+    fn node_search_k(&self, item: &N, k: usize) -> Vec<(N, E)> {
         let mut ret: BinaryHeap<Neighbor<E, usize>> = self.search_knn(item, k).unwrap();
-        let mut result: Vec<(node::Node<E, T>, E)> = Vec::with_capacity(k);
+        let mut result: Vec<(N, E)> = Vec::with_capacity(k);
         let mut result_idx: Vec<(usize, E)> = Vec::with_capacity(k);
         while !ret.is_empty() {
             let top = ret.peek().unwrap();
@@ -641,12 +643,15 @@ impl<E: node::FloatElement, T: node::IdxType> ann_index::ANNIndex<E, T> for HNSW
     }
 }
 
-impl<E: node::FloatElement + DeserializeOwned, T: node::IdxType + DeserializeOwned>
-    ann_index::SerializableIndex<E, T> for HNSWIndex<E, T>
+impl<
+        E: node::FloatElement + DeserializeOwned,
+        T: node::IdxType + DeserializeOwned,
+        N: node::Node<E = E, T = T> + DeserializeOwned,
+    > ann_index::SerializableIndex<E, T, N> for HNSWIndex<T, N>
 {
     fn load(path: &str) -> Result<Self, &'static str> {
         let file = File::open(path).unwrap_or_else(|_| panic!("unable to open file {:?}", path));
-        let mut instance: HNSWIndex<E, T> = bincode::deserialize_from(&file).unwrap();
+        let mut instance: HNSWIndex<T, N> = bincode::deserialize_from(&file).unwrap();
         instance._nodes = instance
             ._nodes_tmp
             .iter()

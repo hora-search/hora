@@ -13,17 +13,17 @@ use std::fs::File;
 use std::io::Write;
 
 #[derive(Debug, Serialize, Deserialize)]
-pub struct BruteForceIndex<E: node::FloatElement, T: node::IdxType> {
+pub struct BruteForceIndex<N: node::Node> {
     #[serde(skip_serializing, skip_deserializing)]
-    nodes: Vec<Box<node::Node<E, T>>>,
-    tmp_nodes: Vec<node::Node<E, T>>, // only use for serialization scene
+    nodes: Vec<Box<N>>,
+    tmp_nodes: Vec<N>, // only use for serialization scene
     mt: metrics::Metric,
     dimension: usize,
 }
 
-impl<E: node::FloatElement, T: node::IdxType> BruteForceIndex<E, T> {
-    pub fn new(dimension: usize, _params: &BruteForceParams) -> BruteForceIndex<E, T> {
-        BruteForceIndex::<E, T> {
+impl<E: node::FloatElement, T: node::IdxType, N: node::Node<E = E, T = T>> BruteForceIndex<N> {
+    pub fn new(dimension: usize, _params: &BruteForceParams) -> BruteForceIndex<N> {
+        BruteForceIndex::<N> {
             nodes: Vec::new(),
             mt: metrics::Metric::Unknown,
             tmp_nodes: Vec::new(),
@@ -32,19 +32,21 @@ impl<E: node::FloatElement, T: node::IdxType> BruteForceIndex<E, T> {
     }
 }
 
-impl<E: node::FloatElement, T: node::IdxType> ann_index::ANNIndex<E, T> for BruteForceIndex<E, T> {
+impl<E: node::FloatElement, T: node::IdxType, N: node::Node<E = E, T = T>>
+    ann_index::ANNIndex<E, T, N> for BruteForceIndex<N>
+{
     fn build(&mut self, mt: metrics::Metric) -> Result<(), &'static str> {
         self.mt = mt;
         Result::Ok(())
     }
-    fn add_node(&mut self, item: &node::Node<E, T>) -> Result<(), &'static str> {
+    fn add_node(&mut self, item: &N) -> Result<(), &'static str> {
         self.nodes.push(Box::new(item.clone()));
         Result::Ok(())
     }
     fn built(&self) -> bool {
         true
     }
-    fn node_search_k(&self, item: &node::Node<E, T>, k: usize) -> Vec<(node::Node<E, T>, E)> {
+    fn node_search_k(&self, item: &N, k: usize) -> Vec<(N, E)> {
         let mut heap = BinaryHeap::with_capacity(k + 1);
         self.nodes
             .iter()
@@ -53,7 +55,7 @@ impl<E: node::FloatElement, T: node::IdxType> ann_index::ANNIndex<E, T> for Brut
                 heap.push(neighbor::Neighbor::new(
                     // use max heap, and every time pop out the greatest one in the heap
                     i,
-                    item.metric(node, self.mt).unwrap(),
+                    item.metric(&**node, self.mt).unwrap(),
                 ));
                 if heap.len() > k {
                     let _xp = heap.pop().unwrap();
@@ -81,12 +83,15 @@ impl<E: node::FloatElement, T: node::IdxType> ann_index::ANNIndex<E, T> for Brut
     }
 }
 
-impl<E: node::FloatElement + DeserializeOwned, T: node::IdxType + DeserializeOwned>
-    ann_index::SerializableIndex<E, T> for BruteForceIndex<E, T>
+impl<
+        E: node::FloatElement + DeserializeOwned,
+        T: node::IdxType + DeserializeOwned,
+        N: node::Node<E = E, T = T> + DeserializeOwned,
+    > ann_index::SerializableIndex<E, T, N> for BruteForceIndex<N>
 {
     fn load(path: &str) -> Result<Self, &'static str> {
         let file = File::open(path).unwrap_or_else(|_| panic!("unable to open file {:?}", path));
-        let mut instance: BruteForceIndex<E, T> = bincode::deserialize_from(file).unwrap();
+        let mut instance: BruteForceIndex<N> = bincode::deserialize_from(file).unwrap();
         instance.nodes = instance
             .tmp_nodes
             .iter()

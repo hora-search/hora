@@ -23,10 +23,10 @@ use std::io::Write;
 use std::sync::{Arc, Mutex};
 
 #[derive(Debug, Serialize, Deserialize)]
-pub struct SSGIndex<E: node::FloatElement, T: node::IdxType> {
+pub struct SSGIndex<E: node::FloatElement, N: node::Node<E = E>> {
     #[serde(skip_serializing, skip_deserializing)]
-    nodes: Vec<Box<node::Node<E, T>>>,
-    tmp_nodes: Vec<node::Node<E, T>>, // only use for serialization scene
+    nodes: Vec<Box<N>>,
+    tmp_nodes: Vec<N>, // only use for serialization scene
     mt: metrics::Metric,
     dimension: usize,
     neighbor_neighbor_size: usize,
@@ -44,9 +44,9 @@ pub struct SSGIndex<E: node::FloatElement, T: node::IdxType> {
     search_times: usize,
 }
 
-impl<E: node::FloatElement, T: node::IdxType> SSGIndex<E, T> {
-    pub fn new(dimension: usize, params: &SSGParams<E>) -> SSGIndex<E, T> {
-        SSGIndex::<E, T> {
+impl<E: node::FloatElement, T: node::IdxType, N: node::Node<E = E, T = T>> SSGIndex<E, N> {
+    pub fn new(dimension: usize, params: &SSGParams<E>) -> SSGIndex<E, N> {
+        SSGIndex::<E, N> {
             nodes: Vec::new(),
             tmp_nodes: Vec::new(),
             mt: metrics::Metric::Unknown,
@@ -80,7 +80,7 @@ impl<E: node::FloatElement, T: node::IdxType> SSGIndex<E, T> {
                     }
                     heap.push(neighbor::Neighbor::new(
                         i,
-                        item.metric(node, self.mt).unwrap(),
+                        item.metric(&**node, self.mt).unwrap(),
                     ));
                     if heap.len() > self.init_k {
                         heap.pop();
@@ -121,7 +121,7 @@ impl<E: node::FloatElement, T: node::IdxType> SSGIndex<E, T> {
                     continue;
                 }
                 flags.insert(*nn_id);
-                let dist = self.nodes[q].metric(&self.nodes[*nn_id], self.mt).unwrap();
+                let dist = self.nodes[q].metric(&*self.nodes[*nn_id], self.mt).unwrap();
                 expand_neighbors_tmp.push(neighbor::Neighbor::new(*nn_id, dist));
                 if expand_neighbors_tmp.len() >= self.neighbor_neighbor_size {
                     return;
@@ -217,7 +217,7 @@ impl<E: node::FloatElement, T: node::IdxType> SSGIndex<E, T> {
             expand_neighbors_tmp.push(neighbor::Neighbor::new(
                 *linked_id,
                 self.nodes[query_id]
-                    .metric(&self.nodes[*linked_id], self.mt)
+                    .metric(&*self.nodes[*linked_id], self.mt)
                     .unwrap(),
             ));
         });
@@ -241,7 +241,7 @@ impl<E: node::FloatElement, T: node::IdxType> SSGIndex<E, T> {
                     break;
                 }
                 let djk = self.nodes[iter.idx()]
-                    .metric(&self.nodes[p.idx()], self.mt)
+                    .metric(&*self.nodes[p.idx()], self.mt)
                     .unwrap();
                 let cos_ij = (p.distance().powi(2) + iter.distance().powi(2) - djk.powi(2))
                     / (E::from_usize(2).unwrap() * (p.distance() * iter.distance()));
@@ -321,7 +321,7 @@ impl<E: node::FloatElement, T: node::IdxType> SSGIndex<E, T> {
                             break;
                         }
                         let djk = self.nodes[rt.idx()]
-                            .metric(&self.nodes[p.idx()], self.mt)
+                            .metric(&*self.nodes[p.idx()], self.mt)
                             .unwrap();
                         let cos_ij = (p.distance().powi(2) + rt.distance().powi(2) - djk.powi(2))
                             / (E::from_usize(2).unwrap() * (p.distance() * rt.distance()));
@@ -399,7 +399,7 @@ impl<E: node::FloatElement, T: node::IdxType> SSGIndex<E, T> {
         // avg /= 1.0 * self.nodes.len() as f32;
     }
 
-    fn search(&self, query: &node::Node<E, T>, k: usize) -> Vec<(node::Node<E, T>, E)> {
+    fn search(&self, query: &N, k: usize) -> Vec<(N, E)> {
         // let mut search_flags = HashSet::with_capacity(self.nodes.len());
         let mut search_flags = FixedBitSet::with_capacity(self.nodes.len());
         let mut heap: BinaryHeap<neighbor::Neighbor<E, usize>> = BinaryHeap::new(); // max-heap
@@ -480,12 +480,15 @@ impl<E: node::FloatElement, T: node::IdxType> SSGIndex<E, T> {
     }
 }
 
-impl<E: node::FloatElement + DeserializeOwned, T: node::IdxType + DeserializeOwned>
-    ann_index::SerializableIndex<E, T> for SSGIndex<E, T>
+impl<
+        E: node::FloatElement + DeserializeOwned,
+        T: node::IdxType + DeserializeOwned,
+        N: node::Node<E = E, T = T> + DeserializeOwned,
+    > ann_index::SerializableIndex<E, T, N> for SSGIndex<E, N>
 {
     fn load(path: &str) -> Result<Self, &'static str> {
         let file = File::open(path).unwrap_or_else(|_| panic!("unable to open file {:?}", path));
-        let mut instance: SSGIndex<E, T> = bincode::deserialize_from(&file).unwrap();
+        let mut instance: SSGIndex<E, N> = bincode::deserialize_from(&file).unwrap();
         instance.nodes = instance
             .tmp_nodes
             .iter()
@@ -504,21 +507,23 @@ impl<E: node::FloatElement + DeserializeOwned, T: node::IdxType + DeserializeOwn
     }
 }
 
-impl<E: node::FloatElement, T: node::IdxType> ann_index::ANNIndex<E, T> for SSGIndex<E, T> {
+impl<E: node::FloatElement, T: node::IdxType, N: node::Node<E = E, T = T>>
+    ann_index::ANNIndex<E, T, N> for SSGIndex<E, N>
+{
     fn build(&mut self, mt: metrics::Metric) -> Result<(), &'static str> {
         self.mt = mt;
         self._build();
 
         Result::Ok(())
     }
-    fn add_node(&mut self, item: &node::Node<E, T>) -> Result<(), &'static str> {
+    fn add_node(&mut self, item: &N) -> Result<(), &'static str> {
         self.nodes.push(Box::new(item.clone()));
         Result::Ok(())
     }
     fn built(&self) -> bool {
         true
     }
-    fn node_search_k(&self, item: &node::Node<E, T>, k: usize) -> Vec<(node::Node<E, T>, E)> {
+    fn node_search_k(&self, item: &N, k: usize) -> Vec<(N, E)> {
         self.search(item, k)
     }
 

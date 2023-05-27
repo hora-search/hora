@@ -22,7 +22,9 @@ use serde::de::DeserializeOwned;
 /// ```
 ///
 
-pub trait ANNIndex<E: node::FloatElement, T: node::IdxType>: Send + Sync {
+pub trait ANNIndex<E: node::FloatElement, T: node::IdxType, N: node::Node<E = E, T = T>>:
+    Send + Sync
+{
     /// build up the ANN index
     ///
     /// build up index with all node which have add into before, it will cost some time, and the time it cost depends on the algorithm
@@ -33,13 +35,13 @@ pub trait ANNIndex<E: node::FloatElement, T: node::IdxType>: Send + Sync {
     ///
     /// it will allocate a space in the heap(Vector), and init a `Node`
     /// return `Err(&'static str)` if there is something wrong with the adding process, and the `static str` is the debug reason
-    fn add_node(&mut self, item: &node::Node<E, T>) -> Result<(), &'static str>;
+    fn add_node(&mut self, item: &N) -> Result<(), &'static str>;
 
     /// add node
     ///
     /// call `add_node()` internal
     fn add(&mut self, vs: &[E], idx: T) -> Result<(), &'static str> {
-        self.add_node(&node::Node::new_with_idx(vs, idx))
+        self.add_node(&N::new_with_idx(vs, idx))
     }
 
     /// add multiple node one time
@@ -50,7 +52,7 @@ pub trait ANNIndex<E: node::FloatElement, T: node::IdxType>: Send + Sync {
             return Err("vector's size is different with index");
         }
         for idx in 0..vss.len() {
-            let n = node::Node::new_with_idx(vss[idx], indices[idx].clone());
+            let n = N::new_with_idx(vss[idx], indices[idx].clone());
             if let Err(err) = self.add_node(&n) {
                 return Err(err);
             }
@@ -71,14 +73,14 @@ pub trait ANNIndex<E: node::FloatElement, T: node::IdxType>: Send + Sync {
     }
 
     /// search for k nearest neighbors node internal method
-    fn node_search_k(&self, item: &node::Node<E, T>, k: usize) -> Vec<(node::Node<E, T>, E)>;
+    fn node_search_k(&self, item: &N, k: usize) -> Vec<(N, E)>;
 
     /// search for k nearest neighbors and return full info
     ///
     /// it will return the all node's info including the original vectors, and the metric distance
     ///
     /// it require the item is the slice with the same dimension with index dimension, otherwise it will panic
-    fn search_nodes(&self, item: &[E], k: usize) -> Vec<(node::Node<E, T>, E)> {
+    fn search_nodes(&self, item: &[E], k: usize) -> Vec<(N, E)> {
         assert_eq!(item.len(), self.dimension());
         self.node_search_k(&node::Node::new(item), k)
     }
@@ -141,7 +143,8 @@ pub trait ANNIndex<E: node::FloatElement, T: node::IdxType>: Send + Sync {
 pub trait SerializableIndex<
     E: node::FloatElement + DeserializeOwned,
     T: node::IdxType + DeserializeOwned,
->: Send + Sync + ANNIndex<E, T>
+    N: node::Node<E = E, T = T>,
+>: Send + Sync + ANNIndex<E, T, N>
 {
     /// load file with path
     fn load(_path: &str) -> Result<Self, &'static str>

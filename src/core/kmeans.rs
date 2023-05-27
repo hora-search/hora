@@ -213,10 +213,10 @@ impl<E: node::FloatElement> Kmeans<E> {
     }
 }
 
-pub fn general_kmeans<E: node::FloatElement, T: node::IdxType>(
+pub fn general_kmeans<E: node::FloatElement, T: node::IdxType, N: node::Node<E = E, T = T>>(
     k: usize,
     epoch: usize,
-    nodes: &[Box<node::Node<E, T>>],
+    nodes: &[Box<N>],
     mt: metrics::Metric,
 ) -> Vec<usize> {
     if nodes.is_empty() {
@@ -239,7 +239,7 @@ pub fn general_kmeans<E: node::FloatElement, T: node::IdxType>(
             let mut idx = 0;
             let mut distance = E::max_value();
             for (i, _item) in means.iter().enumerate() {
-                let _distance = node.metric(&means[i], mt).unwrap();
+                let _distance = node.metric(&**means[i], mt).unwrap();
                 if _distance < distance {
                     idx = i;
                     distance = _distance;
@@ -277,7 +277,7 @@ pub fn general_kmeans<E: node::FloatElement, T: node::IdxType>(
             let mut mean_idx = 0;
             let mut mean_distance = E::max_value();
             nodes.iter().zip(0..nodes.len()).for_each(|(node, i)| {
-                let distance = node.metric(mean, mt).unwrap();
+                let distance = node.metric(&***mean, mt).unwrap();
                 if distance < mean_distance {
                     mean_idx = i;
                     mean_distance = distance;
@@ -347,7 +347,7 @@ mod tests {
             .map(|x| x.iter().map(|p| *p as f32).collect())
             .collect();
 
-        let nodes: Vec<Box<node::Node<f32, usize>>> = ns
+        let nodes: Vec<Box<node::MemoryNode<f32, usize>>> = ns
             .iter()
             .zip(0..ns.len())
             .map(|(vs, idx)| Box::new(node::Node::new_with_idx(vs, idx)))

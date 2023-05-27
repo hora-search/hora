@@ -1,4 +1,5 @@
 use hora::core::ann_index::ANNIndex;
+use hora::core::node::MemoryNode;
 use rand::{thread_rng, Rng};
 use rand_distr::{Distribution, Normal};
 
@@ -18,7 +19,7 @@ pub fn demo() {
     }
 
     // init index
-    let mut index = hora::index::hnsw_idx::HNSWIndex::<f32, usize>::new(
+    let mut index = hora::index::hnsw_idx::HNSWIndex::<usize, MemoryNode<f32, usize>>::new(
         dimension,
         &hora::index::hnsw_params::HNSWParams::<f32>::default(),
     );

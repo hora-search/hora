@@ -1,6 +1,7 @@
 #![deny(clippy::all)]
 use hora::core;
 use hora::core::ann_index::ANNIndex;
+use hora::core::node::MemoryNode;
 use std::collections::HashSet;
 use std::time::SystemTime;
 
@@ -79,9 +80,9 @@ fn bench_ssg<E: core::node::FloatElement>(
     let mut metrics_stats: Vec<StatMetrics> = Vec::new();
     for params in params_set.iter() {
         println!("start params {:?}", params);
-        let mut ssg_idx = Box::new(hora::index::ssg_idx::SSGIndex::<E, usize>::new(
-            dimension, params,
-        ));
+        let mut ssg_idx = Box::new(
+            hora::index::ssg_idx::SSGIndex::<E, MemoryNode<E, usize>>::new(dimension, params),
+        );
         make_idx_baseline(train, &mut ssg_idx);
         metrics_stats.push(bench_calc(ssg_idx, test, neighbors));
         println!("finish params {:?}", params);
@@ -130,9 +131,10 @@ fn bench_hnsw<E: core::node::FloatElement>(
 
     let mut metrics_stats: Vec<StatMetrics> = Vec::new();
     for params in params_set.iter() {
-        let mut hnsw_idx = Box::new(hora::index::hnsw_idx::HNSWIndex::<E, usize>::new(
-            dimension, params,
-        ));
+        let mut hnsw_idx = Box::new(hora::index::hnsw_idx::HNSWIndex::<
+            usize,
+            MemoryNode<E, usize>,
+        >::new(dimension, params));
         make_idx_baseline(train, &mut hnsw_idx);
         metrics_stats.push(bench_calc(hnsw_idx, test, neighbors));
         println!("finish params {:?}", params);
@@ -164,9 +166,11 @@ fn bench_ivfpq<E: core::node::FloatElement>(
 
     let mut metrics_stats: Vec<StatMetrics> = Vec::new();
     for params in params_set.iter() {
-        let mut ivfpq_idx = Box::new(hora::index::pq_idx::IVFPQIndex::<E, usize>::new(
-            dimension, params,
-        ));
+        let mut ivfpq_idx = Box::new(hora::index::pq_idx::IVFPQIndex::<
+            E,
+            usize,
+            MemoryNode<E, usize>,
+        >::new(dimension, params));
         make_idx_baseline(train, &mut ivfpq_idx);
         metrics_stats.push(bench_calc(ivfpq_idx, test, neighbors));
         println!("finish params {:?}", params);
@@ -184,7 +188,7 @@ fn bench_ivfpq<E: core::node::FloatElement>(
     }
 }
 
-fn bench_calc<E: core::node::FloatElement, T: ANNIndex<E, usize> + ?Sized>(
+fn bench_calc<E: core::node::FloatElement, T: ANNIndex<E, usize, MemoryNode<E, usize>> + ?Sized>(
     ann_idx: Box<T>,
     test: &Vec<Vec<E>>,
     neighbors: &Vec<HashSet<usize>>,
@@ -223,17 +227,17 @@ fn bench_calc<E: core::node::FloatElement, T: ANNIndex<E, usize> + ?Sized>(
     }
 }
 
-fn make_idx_baseline<E: core::node::FloatElement, T: ANNIndex<E, usize> + ?Sized>(
+fn make_idx_baseline<
+    E: core::node::FloatElement,
+    T: ANNIndex<E, usize, MemoryNode<E, usize>> + ?Sized,
+>(
     embs: &Vec<Vec<E>>,
     idx: &mut Box<T>,
 ) {
     let start = SystemTime::now();
     for i in 0..embs.len() {
-        idx.add_node(&core::node::Node::<E, usize>::new_with_idx(
-            embs[i].as_slice(),
-            i,
-        ))
-        .unwrap();
+        idx.add_node(&core::node::Node::new_with_idx(embs[i].as_slice(), i))
+            .unwrap();
     }
     idx.build(core::metrics::Metric::DotProduct).unwrap();
     let since_start = SystemTime::now()

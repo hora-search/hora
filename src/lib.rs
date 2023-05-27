@@ -6,10 +6,11 @@ mod tests {
     use super::*;
 
     use crate::core::ann_index::ANNIndex;
+    use crate::core::node::MemoryNode;
+    use crate::core::node::Node;
     use rand::distributions::Standard;
     use rand::Rng;
     use std::collections::HashSet;
-
     use std::sync::Arc;
     use std::sync::Mutex;
     fn make_normal_distribution_clustering(
@@ -58,29 +59,36 @@ mod tests {
 
         let (_, ns) =
             make_normal_distribution_clustering(node_n, nodes_every_cluster, dimension, 100.0);
-        let mut bf_idx = Box::new(index::bruteforce_idx::BruteForceIndex::<f64, usize>::new(
+        let mut bf_idx = Box::new(index::bruteforce_idx::BruteForceIndex::<
+            MemoryNode<f64, usize>,
+        >::new(
             dimension,
             &index::bruteforce_params::BruteForceParams::default(),
         ));
         // let bpt_idx = Box::new(
         //     index::bpt_idx::BPTIndex::<f64, usize>::new(dimension, &index::bpt_params::BPTParams::default()),
         // );
-        let hnsw_idx = Box::new(index::hnsw_idx::HNSWIndex::<f64, usize>::new(
-            dimension,
-            &index::hnsw_params::HNSWParams::<f64>::default(),
-        ));
+        let hnsw_idx = Box::new(
+            index::hnsw_idx::HNSWIndex::<usize, MemoryNode<f64, usize>>::new(
+                dimension,
+                &index::hnsw_params::HNSWParams::<f64>::default(),
+            ),
+        );
 
-        let pq_idx = Box::new(index::pq_idx::PQIndex::<f64, usize>::new(
+        let pq_idx = Box::new(index::pq_idx::PQIndex::<f64, MemoryNode<f64, usize>>::new(
             dimension,
             &index::pq_params::PQParams::<f64>::default(),
         ));
-        let ssg_idx = Box::new(index::ssg_idx::SSGIndex::<f64, usize>::new(
-            dimension,
-            &index::ssg_params::SSGParams::default(),
-        ));
+        let ssg_idx = Box::new(
+            index::ssg_idx::SSGIndex::<f64, MemoryNode<f64, usize>>::new(
+                dimension,
+                &index::ssg_params::SSGParams::default(),
+            ),
+        );
 
-        let mut indices: Vec<Box<dyn core::ann_index::ANNIndex<f64, usize>>> =
-            vec![pq_idx, ssg_idx, hnsw_idx];
+        let mut indices: Vec<
+            Box<dyn core::ann_index::ANNIndex<f64, usize, MemoryNode<f64, usize>>>,
+        > = vec![pq_idx, ssg_idx, hnsw_idx];
         let accuracy = Arc::new(Mutex::new(Vec::new()));
         for i in 0..indices.len() {
             make_idx_baseline(ns.clone(), &mut indices[i]);
@@ -112,16 +120,14 @@ mod tests {
         }
     }
 
-    fn make_idx_baseline<
+    fn make_idx_baseline<E, N, I>(embs: Vec<Vec<E>>, idx: &mut Box<I>)
+    where
         E: core::node::FloatElement,
-        T: core::ann_index::ANNIndex<E, usize> + ?Sized,
-    >(
-        embs: Vec<Vec<E>>,
-        idx: &mut Box<T>,
-    ) {
+        N: core::node::Node<E = E, T = usize>,
+        I: core::ann_index::ANNIndex<E, usize, N> + ?Sized,
+    {
         for i in 0..embs.len() {
-            idx.add_node(&core::node::Node::<E, usize>::new_with_idx(&embs[i], i))
-                .unwrap();
+            idx.add_node(&N::new_with_idx(&embs[i], i)).unwrap();
         }
         idx.build(core::metrics::Metric::Euclidean).unwrap();
     }
