@@ -86,23 +86,37 @@ to_idx_type!(u32);
 to_idx_type!(u64);
 to_idx_type!(u128);
 
+pub trait Node<E: FloatElement, T: IdxType>: Send + Sync {
+    fn new(vectors: &[E]) -> Self;
+    fn new_with_index(vectors: &[E], id: T) -> Self;
+    fn metric(&self, other: impl Node<E, T>, t: metrics::Metric) -> Result<E, &'static str>;
+    fn vectors(&self) -> Vec<E>;
+    fn mut_vectors(&mut self) -> &mut Vec<E>;
+    fn set_vectors(&mut self, v: &[E]);
+    fn len(&self) -> usize;
+    fn is_empty(&self) -> bool;
+    fn idx(&self) -> &Option<T>;
+    fn set_idx(&mut self, id: T);
+    fn valid_elements(vectors: &[E]) -> bool;
+}
+
 /// Node is the main container for the point in the space
 ///
 /// it contains a array of `FloatElement` and a index
 ///
 #[derive(Clone, Debug, Default, Serialize, Deserialize)]
-pub struct Node<E: FloatElement, T: IdxType> {
+pub struct MemoryNode<E: FloatElement, T: IdxType> {
     vectors: Vec<E>,
     idx: Option<T>, // data id, it can be any type;
 }
 
-impl<E: FloatElement, T: IdxType> Node<E, T> {
+impl<E: FloatElement, T: IdxType> Node<E, T> for MemoryNode<E, T> {
     /// new without idx
     ///
     /// new a point without a idx
-    pub fn new(vectors: &[E]) -> Node<E, T> {
-        Node::<E, T>::valid_elements(vectors);
-        Node {
+    fn new(vectors: &[E]) -> MemoryNode<E, T> {
+        MemoryNode::<E, T>::valid_elements(vectors);
+        MemoryNode {
             vectors: vectors.to_vec(),
             idx: Option::None,
         }
@@ -111,43 +125,43 @@ impl<E: FloatElement, T: IdxType> Node<E, T> {
     /// new with idx
     ///
     /// new a point with a idx
-    pub fn new_with_idx(vectors: &[E], id: T) -> Node<E, T> {
-        let mut n = Node::new(vectors);
+    fn new_with_idx(vectors: &[E], id: T) -> MemoryNode<E, T> {
+        let mut n = MemoryNode::new(vectors);
         n.set_idx(id);
         n
     }
 
     /// calculate the point distance
-    pub fn metric(&self, other: &Node<E, T>, t: metrics::Metric) -> Result<E, &'static str> {
-        metrics::metric(&self.vectors, &other.vectors, t)
+    fn metric(&self, other: &impl Node<E, T>, t: metrics::Metric) -> Result<E, &'static str> {
+        metrics::metric(&self.vectors, &other.vectors(), t)
     }
 
     // return internal embeddings
-    pub fn vectors(&self) -> &Vec<E> {
+    fn vectors(&self) -> &Vec<E> {
         &self.vectors
     }
 
     // return mut internal embeddings
-    pub fn mut_vectors(&mut self) -> &mut Vec<E> {
+    fn mut_vectors(&mut self) -> &mut Vec<E> {
         &mut self.vectors
     }
 
     // set internal embeddings
-    pub fn set_vectors(&mut self, v: &[E]) {
+    fn set_vectors(&mut self, v: &[E]) {
         self.vectors = v.to_vec();
     }
 
     // internal embeddings length
-    pub fn len(&self) -> usize {
+    fn len(&self) -> usize {
         self.vectors.len()
     }
 
-    pub fn is_empty(&self) -> bool {
+    fn is_empty(&self) -> bool {
         self.vectors.is_empty()
     }
 
     // return node's idx
-    pub fn idx(&self) -> &Option<T> {
+    fn idx(&self) -> &Option<T> {
         &self.idx
     }
 
@@ -166,7 +180,7 @@ impl<E: FloatElement, T: IdxType> Node<E, T> {
     }
 }
 
-impl<E: FloatElement, T: IdxType> core::fmt::Display for Node<E, T> {
+impl<E: FloatElement, T: IdxType> core::fmt::Display for MemoryNode<E, T> {
     fn fmt(&self, f: &mut core::fmt::Formatter) -> core::fmt::Result {
         write!(f, "(key: {:#?}, vectors: {:#?})", self.idx, self.vectors)
     }

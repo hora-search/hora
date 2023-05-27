@@ -6,6 +6,7 @@ mod tests {
     use super::*;
 
     use crate::core::ann_index::ANNIndex;
+    use crate::core::node::MemoryNode;
     use rand::distributions::Standard;
     use rand::Rng;
     use std::collections::HashSet;
@@ -112,13 +113,11 @@ mod tests {
         }
     }
 
-    fn make_idx_baseline<
+    fn make_idx_baseline<E, T>(embs: Vec<Vec<E>>, idx: &mut Box<T>)
+    where
         E: core::node::FloatElement,
-        T: core::ann_index::ANNIndex<E, usize> + ?Sized,
-    >(
-        embs: Vec<Vec<E>>,
-        idx: &mut Box<T>,
-    ) {
+        T: core::ann_index::ANNIndex<E, usize, MemoryNode<E, usize>> + ?Sized,
+    {
         for i in 0..embs.len() {
             idx.add_node(&core::node::Node::<E, usize>::new_with_idx(&embs[i], i))
                 .unwrap();

@@ -213,10 +213,10 @@ impl<E: node::FloatElement> Kmeans<E> {
     }
 }
 
-pub fn general_kmeans<E: node::FloatElement, T: node::IdxType>(
+pub fn general_kmeans<E: node::FloatElement, T: node::IdxType, N: node::Node<E, T>>(
     k: usize,
     epoch: usize,
-    nodes: &[Box<node::Node<E, T>>],
+    nodes: &[Box<N>],
     mt: metrics::Metric,
 ) -> Vec<usize> {
     if nodes.is_empty() {

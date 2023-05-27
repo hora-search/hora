@@ -19,7 +19,7 @@ use std::fs::File;
 use std::io::Write;
 
 #[derive(Default, Debug, Serialize, Deserialize)]
-pub struct PQIndex<E: node::FloatElement, T: node::IdxType> {
+pub struct PQIndex<E: node::FloatElement, T: node::IdxType, N: node::Node<E, T>> {
     _dimension: usize,                 //dimension of data
     _n_sub: usize,                     //num of subdata
     _sub_dimension: usize,             //dimension of subdata
@@ -37,15 +37,15 @@ pub struct PQIndex<E: node::FloatElement, T: node::IdxType> {
 
     _n_items: usize,
     _max_item: usize,
-    _nodes: Vec<Box<node::Node<E, T>>>,
+    _nodes: Vec<Box<N>>,
     _assigned_center: Vec<Vec<usize>>,
     mt: metrics::Metric, //compute metrics
     // _item2id: HashMap<i32, usize>,
-    _nodes_tmp: Vec<node::Node<E, T>>,
+    _nodes_tmp: Vec<N>,
 }
 
-impl<E: node::FloatElement, T: node::IdxType> PQIndex<E, T> {
-    pub fn new(dimension: usize, params: &PQParams<E>) -> PQIndex<E, T> {
+impl<E: node::FloatElement, T: node::IdxType, N: node::Node<E, T>> PQIndex<E, T, N> {
+    pub fn new(dimension: usize, params: &PQParams<E>) -> PQIndex<E, T, N> {
         let n_sub = params.n_sub;
         let sub_bits = params.sub_bits;
         let train_epoch = params.train_epoch;
@@ -89,7 +89,7 @@ impl<E: node::FloatElement, T: node::IdxType> PQIndex<E, T> {
         new_pq
     }
 
-    fn init_item(&mut self, data: &node::Node<E, T>) -> usize {
+    fn init_item(&mut self, data: &N) -> usize {
         let cur_id = self._n_items;
         // self._item2id.insert(item, cur_id);
         self._nodes.push(Box::new(data.clone()));
@@ -97,7 +97,7 @@ impl<E: node::FloatElement, T: node::IdxType> PQIndex<E, T> {
         cur_id
     }
 
-    fn add_item(&mut self, data: &node::Node<E, T>) -> Result<usize, &'static str> {
+    fn add_item(&mut self, data: &N) -> Result<usize, &'static str> {
         if data.len() != self._dimension {
             return Err("dimension is different");
         }
@@ -148,13 +148,7 @@ impl<E: node::FloatElement, T: node::IdxType> PQIndex<E, T> {
         self._is_trained = true;
     }
 
-    fn get_distance_from_vec_range(
-        &self,
-        x: &node::Node<E, T>,
-        y: &[E],
-        begin: usize,
-        end: usize,
-    ) -> E {
+    fn get_distance_from_vec_range(&self, x: &N, y: &[E], begin: usize, end: usize) -> E {
         let mut z = x.vectors()[begin..end].to_vec();
         if self._has_residual {
             (0..end - begin).for_each(|i| z[i] -= self._residual[i + begin]);
@@ -164,7 +158,7 @@ impl<E: node::FloatElement, T: node::IdxType> PQIndex<E, T> {
 
     fn search_knn_adc(
         &self,
-        search_data: &node::Node<E, T>,
+        search_data: &N,
         k: usize,
     ) -> Result<BinaryHeap<Neighbor<E, usize>>, &'static str> {
         let mut dis2centers: Vec<E> = Vec::new();
@@ -194,13 +188,15 @@ impl<E: node::FloatElement, T: node::IdxType> PQIndex<E, T> {
     }
 }
 
-impl<E: node::FloatElement, T: node::IdxType> ann_index::ANNIndex<E, T> for PQIndex<E, T> {
+impl<E: node::FloatElement, T: node::IdxType, N: node::Node<E, T>> ann_index::ANNIndex<E, T, N>
+    for PQIndex<E, T, N>
+{
     fn build(&mut self, _mt: metrics::Metric) -> Result<(), &'static str> {
         self.mt = _mt;
         self.train_center();
         Result::Ok(())
     }
-    fn add_node(&mut self, item: &node::Node<E, T>) -> Result<(), &'static str> {
+    fn add_node(&mut self, item: &N) -> Result<(), &'static str> {
         match self.add_item(item) {
             Err(err) => Err(err),
             _ => Ok(()),
@@ -210,7 +206,7 @@ impl<E: node::FloatElement, T: node::IdxType> ann_index::ANNIndex<E, T> for PQIn
         true
     }
 
-    fn node_search_k(&self, item: &node::Node<E, T>, k: usize) -> Vec<(node::Node<E, T>, E)> {
+    fn node_search_k(&self, item: &N, k: usize) -> Vec<(N, E)> {
         let mut ret: BinaryHeap<Neighbor<E, usize>> = self.search_knn_adc(item, k).unwrap();
         let mut result: Vec<(node::Node<E, T>, E)> = Vec::new();
         let mut result_idx: Vec<(usize, E)> = Vec::new();
@@ -240,8 +236,11 @@ impl<E: node::FloatElement, T: node::IdxType> ann_index::ANNIndex<E, T> for PQIn
     }
 }
 
-impl<E: node::FloatElement + DeserializeOwned, T: node::IdxType + DeserializeOwned>
-    ann_index::SerializableIndex<E, T> for PQIndex<E, T>
+impl<
+        E: node::FloatElement + DeserializeOwned,
+        T: node::IdxType + DeserializeOwned,
+        N: node::Node<E, T> + DeserializeOwned,
+    > ann_index::SerializableIndex<E, T, N> for PQIndex<E, T, N>
 {
     fn load(path: &str) -> Result<Self, &'static str> {
         let file = File::open(path).unwrap_or_else(|_| panic!("unable to open file {:?}", path));
@@ -265,7 +264,7 @@ impl<E: node::FloatElement + DeserializeOwned, T: node::IdxType + DeserializeOwn
 }
 
 #[derive(Default, Debug, Serialize, Deserialize)]
-pub struct IVFPQIndex<E: node::FloatElement, T: node::IdxType> {
+pub struct IVFPQIndex<E: node::FloatElement, T: node::IdxType, N: node::Node<E, T>> {
     _dimension: usize,     //dimension of data
     _n_sub: usize,         //num of subdata
     _sub_dimension: usize, //dimension of subdata
@@ -279,20 +278,20 @@ pub struct IVFPQIndex<E: node::FloatElement, T: node::IdxType> {
     _n_kmeans_center: usize,
     _centers: Vec<Vec<E>>,
     _ivflist: Vec<Vec<usize>>, //ivf center id
-    _pq_list: Vec<PQIndex<E, T>>,
+    _pq_list: Vec<PQIndex<E, T, N>>,
     _is_trained: bool,
 
     _n_items: usize,
     _max_item: usize,
-    _nodes: Vec<Box<node::Node<E, T>>>,
+    _nodes: Vec<Box<N>>,
     _assigned_center: Vec<Vec<usize>>,
     mt: metrics::Metric, //compute metrics
     // _item2id: HashMap<i32, usize>,
-    _nodes_tmp: Vec<node::Node<E, T>>,
+    _nodes_tmp: Vec<N>,
 }
 
-impl<E: node::FloatElement, T: node::IdxType> IVFPQIndex<E, T> {
-    pub fn new(dimension: usize, params: &IVFPQParams<E>) -> IVFPQIndex<E, T> {
+impl<E: node::FloatElement, T: node::IdxType, N: node::Node<E, T>> IVFPQIndex<E, T, N> {
+    pub fn new(dimension: usize, params: &IVFPQParams<E>) -> IVFPQIndex<E, T, N> {
         let n_sub = params.n_sub;
         let sub_bits = params.sub_bits;
         let n_kmeans_center = params.n_kmeans_center;
@@ -329,7 +328,7 @@ impl<E: node::FloatElement, T: node::IdxType> IVFPQIndex<E, T> {
         }
     }
 
-    fn init_item(&mut self, data: &node::Node<E, T>) -> usize {
+    fn init_item(&mut self, data: &N) -> usize {
         let cur_id = self._n_items;
         // self._item2id.insert(item, cur_id);
         self._nodes.push(Box::new(data.clone()));
@@ -337,7 +336,7 @@ impl<E: node::FloatElement, T: node::IdxType> IVFPQIndex<E, T> {
         cur_id
     }
 
-    fn add_item(&mut self, data: &node::Node<E, T>) -> Result<usize, &'static str> {
+    fn add_item(&mut self, data: &N) -> Result<usize, &'static str> {
         if data.len() != self._dimension {
             return Err("dimension is different");
         }
@@ -395,19 +394,13 @@ impl<E: node::FloatElement, T: node::IdxType> IVFPQIndex<E, T> {
         self._is_trained = true;
     }
 
-    fn get_distance_from_vec_range(
-        &self,
-        x: &node::Node<E, T>,
-        y: &[E],
-        begin: usize,
-        end: usize,
-    ) -> E {
+    fn get_distance_from_vec_range(&self, x: &N, y: &[E], begin: usize, end: usize) -> E {
         return metrics::metric(&x.vectors()[begin..end], y, self.mt).unwrap();
     }
 
     fn search_knn_adc(
         &self,
-        search_data: &node::Node<E, T>,
+        search_data: &N,
         k: usize,
     ) -> Result<BinaryHeap<Neighbor<E, usize>>, &'static str> {
         let mut top_centers: BinaryHeap<Neighbor<E, usize>> = BinaryHeap::new();
@@ -439,13 +432,15 @@ impl<E: node::FloatElement, T: node::IdxType> IVFPQIndex<E, T> {
     }
 }
 
-impl<E: node::FloatElement, T: node::IdxType> ann_index::ANNIndex<E, T> for IVFPQIndex<E, T> {
+impl<E: node::FloatElement, T: node::IdxType, N: node::Node<E, T>> ann_index::ANNIndex<E, T, N>
+    for IVFPQIndex<E, T, N>
+{
     fn build(&mut self, _mt: metrics::Metric) -> Result<(), &'static str> {
         self.mt = _mt;
         self.train();
         Result::Ok(())
     }
-    fn add_node(&mut self, item: &node::Node<E, T>) -> Result<(), &'static str> {
+    fn add_node(&mut self, item: &N) -> Result<(), &'static str> {
         match self.add_item(item) {
             Err(err) => Err(err),
             _ => Ok(()),
@@ -455,7 +450,7 @@ impl<E: node::FloatElement, T: node::IdxType> ann_index::ANNIndex<E, T> for IVFP
         true
     }
 
-    fn node_search_k(&self, item: &node::Node<E, T>, k: usize) -> Vec<(node::Node<E, T>, E)> {
+    fn node_search_k(&self, item: &N, k: usize) -> Vec<(N, E)> {
         let mut ret: BinaryHeap<Neighbor<E, usize>> = self.search_knn_adc(item, k).unwrap();
         let mut result: Vec<(node::Node<E, T>, E)> = Vec::new();
         let mut result_idx: Vec<(usize, E)> = Vec::new();
@@ -485,8 +480,11 @@ impl<E: node::FloatElement, T: node::IdxType> ann_index::ANNIndex<E, T> for IVFP
     }
 }
 
-impl<E: node::FloatElement + DeserializeOwned, T: node::IdxType + DeserializeOwned>
-    ann_index::SerializableIndex<E, T> for IVFPQIndex<E, T>
+impl<
+        E: node::FloatElement + DeserializeOwned,
+        T: node::IdxType + DeserializeOwned,
+        N: node::Node<E, T> + DeserializeOwned,
+    > ann_index::SerializableIndex<E, T, N> for IVFPQIndex<E, T, N>
 {
     fn load(path: &str) -> Result<Self, &'static str> {
         let file = File::open(path).unwrap_or_else(|_| panic!("unable to open file {:?}", path));
