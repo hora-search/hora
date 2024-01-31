@@ -1,3 +1,6 @@
+use std::fs::File;
+use std::io::Write;
+
 use crate::core::metrics;
 use crate::core::node;
 
@@ -144,7 +147,16 @@ pub trait SerializableIndex<
 >: Send + Sync + ANNIndex<E, T>
 {
     /// load file with path
-    fn load(_path: &str) -> Result<Self, &'static str>
+    fn load(path: &str) -> Result<Self, &'static str>
+    where
+        Self: Sized,
+    {
+        let bytes =
+            std::fs::read(path).unwrap_or_else(|_| panic!("unable to open file {:?}", path));
+        Self::load_bytes(&bytes)
+    }
+
+    fn load_bytes(_bytes: &[u8]) -> Result<Self, &'static str>
     where
         Self: Sized,
     {
@@ -152,7 +164,15 @@ pub trait SerializableIndex<
     }
 
     /// dump the file into the path
-    fn dump(&mut self, _path: &str) -> Result<(), &'static str> {
+    fn dump(&mut self, path: &str) -> Result<(), &'static str> {
+        let encoded_bytes = self.dump_bytes().unwrap();
+        let mut file = File::create(path).unwrap();
+        file.write_all(&encoded_bytes)
+            .unwrap_or_else(|_| panic!("unable to write file {:?}", path));
+        Result::Ok(())
+    }
+
+    fn dump_bytes(&mut self) -> Result<Vec<u8>, &'static str> {
         Err("empty implementation")
     }
 }
