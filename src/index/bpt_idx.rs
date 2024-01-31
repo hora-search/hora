@@ -6,6 +6,7 @@ use crate::core::neighbor;
 use crate::core::node;
 use crate::core::random;
 use crate::index::bpt_params::BPTParams;
+use bincode::{config, Decode, Encode};
 use serde::de::DeserializeOwned;
 use serde::{Deserialize, Serialize};
 use std::cmp::Ordering;
@@ -605,6 +606,18 @@ impl<E: node::FloatElement, T: node::IdxType> ann_index::ANNIndex<E, T> for BPTI
 impl<E: node::FloatElement + DeserializeOwned, T: node::IdxType + DeserializeOwned>
     ann_index::SerializableIndex<E, T> for BPTIndex<E, T>
 {
+    fn load_bytes(bytes: &[u8]) -> Result<Self, &'static str> {
+        let mut instance: BPTIndex<E, T> = bincode::deserialize_from(bytes).unwrap();
+
+        for i in 0..instance.leaves.len() {
+            instance.leaves[i].node =
+                Box::new(instance.leaves[i].tmp_node.as_ref().unwrap().clone());
+            instance.leaves[i].tmp_node = None;
+        }
+
+        Ok(instance)
+    }
+
     fn load(path: &str) -> Result<Self, &'static str> {
         let file = File::open(path).unwrap_or_else(|_| panic!("unable to open file {:?}", path));
         let mut instance: BPTIndex<E, T> = bincode::deserialize_from(&file).unwrap();
