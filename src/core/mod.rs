@@ -8,3 +8,4 @@ pub mod node;
 // pub mod random;
 pub mod macros;
 pub mod simd_metrics;
+pub mod parallel;
