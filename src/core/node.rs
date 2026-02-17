@@ -1,12 +1,14 @@
+//! Node and element types for vector representations in the index.
+
 #![allow(dead_code)]
+
 use crate::core::metrics;
 use crate::core::simd_metrics;
 use core::{hash::Hash, iter::Sum};
 use num::traits::{FromPrimitive, NumAssign};
 use serde::{Deserialize, Serialize};
 
-/// FloatElement trait, the generic of two primitive type `f32` and `f64`
-///
+/// Element type for vector components: either `f32` or `f64`.
 pub trait FloatElement:
     FromPrimitive
     + Sized
@@ -25,7 +27,7 @@ pub trait FloatElement:
     + Send
     + Sum
     + Serialize
-    + simd_metrics::SIMDOptmized
+    + simd_metrics::SIMDOptimized
 {
     fn float_one() -> Self;
 
@@ -34,10 +36,15 @@ pub trait FloatElement:
     fn float_zero() -> Self;
 
     fn zero_patch_num() -> Self;
+
+    /// Returns the maximum finite value for this float type.
+    fn max_value() -> Self;
+
+    /// Converts a usize to this float type.
+    fn from_usize(n: usize) -> Option<Self>;
 }
 
-/// IdxType trait indicate the primitive type used for the data index
-///
+/// Type used for node/data indices (e.g. `usize`, `i64`, `String`).
 pub trait IdxType:
     Sized + Clone + Default + core::fmt::Debug + Eq + Ord + Sync + Send + Serialize + Hash
 {
@@ -52,7 +59,7 @@ macro_rules! to_float_element {
             }
 
             fn float_two() -> Self {
-                1.0
+                2.0
             }
 
             fn float_zero() -> Self {
@@ -61,6 +68,14 @@ macro_rules! to_float_element {
 
             fn zero_patch_num() -> Self {
                 1.34e-6
+            }
+
+            fn max_value() -> Self {
+                <$x>::MAX
+            }
+
+            fn from_usize(n: usize) -> Option<Self> {
+                <$x as num::traits::FromPrimitive>::from_u64(n as u64)
             }
         }
     };
@@ -86,80 +101,78 @@ to_idx_type!(u32);
 to_idx_type!(u64);
 to_idx_type!(u128);
 
-/// Node is the main container for the point in the space
+/// A point in the metric space: embedding vector plus optional index.
 ///
-/// it contains a array of `FloatElement` and a index
-///
+/// Holds a slice of `FloatElement` (the vector) and an optional id of type `T`.
 #[derive(Clone, Debug, Default, Serialize, Deserialize)]
 pub struct Node<E: FloatElement, T: IdxType> {
+    /// Embedding vector.
     vectors: Vec<E>,
-    idx: Option<T>, // data id, it can be any type;
+    /// Optional user-defined index (e.g. database id).
+    idx: Option<T>,
 }
 
 impl<E: FloatElement, T: IdxType> Node<E, T> {
-    /// new without idx
-    ///
-    /// new a point without a idx
+    /// Creates a node from a vector without an index.
     pub fn new(vectors: &[E]) -> Node<E, T> {
         Node::<E, T>::valid_elements(vectors);
         Node {
             vectors: vectors.to_vec(),
-            idx: Option::None,
+            idx: None,
         }
     }
 
-    /// new with idx
-    ///
-    /// new a point with a idx
+    /// Creates a node from a vector with the given index.
     pub fn new_with_idx(vectors: &[E], id: T) -> Node<E, T> {
         let mut n = Node::new(vectors);
         n.set_idx(id);
         n
     }
 
-    /// calculate the point distance
+    /// Computes the distance to another node under the given metric.
     pub fn metric(&self, other: &Node<E, T>, t: metrics::Metric) -> Result<E, &'static str> {
         metrics::metric(&self.vectors, &other.vectors, t)
     }
 
-    // return internal embeddings
+    /// Returns the embedding vector.
     pub fn vectors(&self) -> &Vec<E> {
         &self.vectors
     }
 
-    // return mut internal embeddings
+    /// Returns mutable reference to the embedding vector.
     pub fn mut_vectors(&mut self) -> &mut Vec<E> {
         &mut self.vectors
     }
 
-    // set internal embeddings
+    /// Replaces the embedding vector.
     pub fn set_vectors(&mut self, v: &[E]) {
         self.vectors = v.to_vec();
     }
 
-    // internal embeddings length
+    /// Returns the dimension (length of the vector).
     pub fn len(&self) -> usize {
         self.vectors.len()
     }
 
+    /// Returns true if the vector is empty.
     pub fn is_empty(&self) -> bool {
         self.vectors.is_empty()
     }
 
-    // return node's idx
+    /// Returns the optional index of this node.
     pub fn idx(&self) -> &Option<T> {
         &self.idx
     }
 
     fn set_idx(&mut self, id: T) {
-        self.idx = Option::Some(id);
+        self.idx = Some(id);
     }
 
+    /// Panics if any element is NaN or infinite.
     fn valid_elements(vectors: &[E]) -> bool {
         for e in vectors.iter() {
             if e.is_nan() || e.is_infinite() {
-                //TODO: log
-                panic!("invalid float element");
+                panic!("invalid float element: expected finite number");
             }
         }
         true

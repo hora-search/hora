@@ -1,29 +1,34 @@
+//! ANN benchmark: load HDF5 train/test/neighbors and compare indexes (SSG, HNSW, IVFPQ).
+
 #![deny(clippy::all)]
+
 use hora::core;
 use hora::core::ann_index::ANNIndex;
 use std::collections::HashSet;
 use std::time::SystemTime;
 
+/// Aggregated benchmark stats (QPS, recall, time, build time, test set size).
 struct StatMetrics {
-    QPS: f64,
-    Accuracy: usize,
-    Cost: f64,
-    BuildCost: f64,
-    TestSize: usize,
+    qps: f64,
+    accuracy: usize,
+    cost: f64,
+    build_cost: f64,
+    test_size: usize,
 }
 
-const data_path: &str = "lastfm-64-dot.hdf5";
-const dimension: usize = 65;
+const DATA_PATH: &str = "lastfm-64-dot.hdf5";
+const BENCH_DIMENSION: usize = 65;
 const K: usize = 10;
 
+/// Runs benchmark: loads data from HDF5 and evaluates SSG (or other) index.
 pub fn ann_bench() {
-    let file = hdf5::File::open(&data_path).unwrap();
+    let file = hdf5::File::open(DATA_PATH).unwrap();
     let train: Vec<Vec<f32>> = file
         .dataset("train")
         .unwrap()
         .read_raw::<f32>()
         .unwrap()
-        .chunks(dimension)
+        .chunks(BENCH_DIMENSION)
         .map(|s| s.to_vec())
         .collect();
     let test: Vec<Vec<f32>> = file
@@ -31,7 +36,7 @@ pub fn ann_bench() {
         .unwrap()
         .read_raw::<f32>()
         .unwrap()
-        .chunks(dimension)
+        .chunks(BENCH_DIMENSION)
         .map(|s| s.to_vec())
         .collect();
     let neighbors: Vec<HashSet<usize>> = file
@@ -80,7 +85,8 @@ fn bench_ssg<E: core::node::FloatElement>(
     for params in params_set.iter() {
         println!("start params {:?}", params);
         let mut ssg_idx = Box::new(hora::index::ssg_idx::SSGIndex::<E, usize>::new(
-            dimension, params,
+            BENCH_DIMENSION,
+            params,
         ));
         make_idx_baseline(train, &mut ssg_idx);
         metrics_stats.push(bench_calc(ssg_idx, test, neighbors));
@@ -91,10 +97,10 @@ fn bench_ssg<E: core::node::FloatElement>(
         println!(
             "idx ssg params {:?} result {:?}/{:?} {:?}ms qps {:?}",
             params_set[i],
-            metrics_stats[i].Accuracy,
-            metrics_stats[i].TestSize,
-            metrics_stats[i].Cost,
-            metrics_stats[i].QPS,
+            metrics_stats[i].accuracy,
+            metrics_stats[i].test_size,
+            metrics_stats[i].cost,
+            metrics_stats[i].qps,
         );
     }
 }
@@ -131,7 +137,8 @@ fn bench_hnsw<E: core::node::FloatElement>(
     let mut metrics_stats: Vec<StatMetrics> = Vec::new();
     for params in params_set.iter() {
         let mut hnsw_idx = Box::new(hora::index::hnsw_idx::HNSWIndex::<E, usize>::new(
-            dimension, params,
+            BENCH_DIMENSION,
+            params,
         ));
         make_idx_baseline(train, &mut hnsw_idx);
         metrics_stats.push(bench_calc(hnsw_idx, test, neighbors));
@@ -142,10 +149,10 @@ fn bench_hnsw<E: core::node::FloatElement>(
         println!(
             "idx hnsw params {:?} result {:?}/{:?} {:?}ms qps {:?}",
             params_set[i],
-            metrics_stats[i].Accuracy,
-            metrics_stats[i].TestSize,
-            metrics_stats[i].Cost,
-            metrics_stats[i].QPS,
+            metrics_stats[i].accuracy,
+            metrics_stats[i].test_size,
+            metrics_stats[i].cost,
+            metrics_stats[i].qps,
         );
     }
 }
@@ -165,7 +172,8 @@ fn bench_ivfpq<E: core::node::FloatElement>(
     let mut metrics_stats: Vec<StatMetrics> = Vec::new();
     for params in params_set.iter() {
         let mut ivfpq_idx = Box::new(hora::index::pq_idx::IVFPQIndex::<E, usize>::new(
-            dimension, params,
+            BENCH_DIMENSION,
+            params,
         ));
         make_idx_baseline(train, &mut ivfpq_idx);
         metrics_stats.push(bench_calc(ivfpq_idx, test, neighbors));
@@ -176,10 +184,10 @@ fn bench_ivfpq<E: core::node::FloatElement>(
         println!(
             "idx ivfpq params {:?} result {:?}/{:?} {:?}ms qps {:?}",
             params_set[i],
-            metrics_stats[i].Accuracy,
-            metrics_stats[i].TestSize,
-            metrics_stats[i].Cost,
-            metrics_stats[i].QPS,
+            metrics_stats[i].accuracy,
+            metrics_stats[i].test_size,
+            metrics_stats[i].cost,
+            metrics_stats[i].qps,
         );
     }
 }
@@ -215,11 +223,11 @@ fn bench_calc<E: core::node::FloatElement, T: ANNIndex<E, usize> + ?Sized>(
         1.0 / (((cost as f32) / 1000.0) / test.len() as f32)
     );
     StatMetrics {
-        QPS: 1.0 / (((cost as f64) / 1000.0) / test.len() as f64),
-        Accuracy: accuracy,
-        TestSize: test.len() * K,
-        Cost: cost,
-        BuildCost: 0.0,
+        qps: 1.0 / (((cost as f64) / 1000.0) / test.len() as f64),
+        accuracy,
+        test_size: test.len() * K,
+        cost,
+        build_cost: 0.0,
     }
 }
 

@@ -1,63 +1,68 @@
+//! K-means clustering for PQ and other index training.
+
 #![allow(dead_code)]
+
 use crate::core::{metrics, node};
 use metrics::metric;
+use num::traits::FromPrimitive;
 use rand::prelude::*;
 use rayon::prelude::*;
 use std::sync::Mutex;
 
+/// K-means clusterer over a fixed dimension and metric; supports residual and range.
 #[derive(Default, Debug)]
 pub struct Kmeans<E: node::FloatElement> {
-    _dimension: usize,
-    _n_center: usize,
-    _centers: Vec<Vec<E>>,
-    _data_range_begin: usize,
-    _data_range_end: usize,
-    _has_residual: bool,
-    _residual: Vec<E>,
-    mt: metrics::Metric, //compute metrics
+    dimension: usize,
+    n_center: usize,
+    centers: Vec<Vec<E>>,
+    data_range_begin: usize,
+    data_range_end: usize,
+    has_residual: bool,
+    residual: Vec<E>,
+    mt: metrics::Metric,
 }
 
 impl<E: node::FloatElement> Kmeans<E> {
     pub fn new(dimension: usize, n_center: usize, mt: metrics::Metric) -> Kmeans<E> {
         Kmeans {
-            _dimension: dimension,
-            _n_center: n_center,
-            _data_range_begin: 0,
-            _data_range_end: dimension,
+            dimension,
+            n_center,
+            data_range_begin: 0,
+            data_range_end: dimension,
             mt,
             ..Default::default()
         }
     }
 
     pub fn centers(&self) -> &Vec<Vec<E>> {
-        &self._centers
+        &self.centers
     }
 
     pub fn get_distance_from_vec(&self, x: &[E], y: &[E]) -> E {
-        let mut z = x[self._data_range_begin..self._data_range_end].to_vec();
-        if self._has_residual {
-            (0..self._data_range_end - self._data_range_begin)
-                .for_each(|i| z[i] -= self._residual[i + self._data_range_begin]);
+        let mut z = x[self.data_range_begin..self.data_range_end].to_vec();
+        if self.has_residual {
+            (0..self.data_range_end - self.data_range_begin)
+                .for_each(|i| z[i] -= self.residual[i + self.data_range_begin]);
         }
-        return metric(&z, y, self.mt).unwrap();
+        metric(&z, &y[self.data_range_begin..self.data_range_end], self.mt).unwrap()
     }
 
     pub fn set_residual(&mut self, residual: Vec<E>) {
-        self._has_residual = true;
-        self._residual = residual;
+        self.has_residual = true;
+        self.residual = residual;
     }
 
     pub fn init_center(&mut self, batch_size: usize, batch_data: &[Vec<E>]) {
-        let dimension = self._dimension;
-        let n_center = self._n_center;
-        let begin = self._data_range_begin;
+        let dimension = self.dimension;
+        let n_center = self.n_center;
+        let begin = self.data_range_begin;
         let mut mean_center: Vec<E> = vec![E::from_f32(0.0).unwrap(); dimension];
 
         (0..batch_size).for_each(|i| {
             let cur_data = &batch_data[i];
             (0..dimension).for_each(|j| {
-                if self._has_residual {
-                    mean_center[j] += cur_data[begin + j] - self._residual[begin + j];
+                if self.has_residual {
+                    mean_center[j] += cur_data[begin + j] - self.residual[begin + j];
                 } else {
                     mean_center[j] += cur_data[begin + j];
                 }
@@ -65,7 +70,7 @@ impl<E: node::FloatElement> Kmeans<E> {
         });
 
         (0..dimension).for_each(|i| {
-            mean_center[i] /= E::from_usize(batch_size).unwrap();
+            mean_center[i] /= <E as node::FloatElement>::from_usize(batch_size).unwrap();
         });
 
         let mut new_centers: Vec<Vec<E>> = Vec::with_capacity(n_center);
@@ -82,7 +87,7 @@ impl<E: node::FloatElement> Kmeans<E> {
             });
             new_centers.push(cur_center);
         });
-        self._centers = new_centers;
+        self.centers = new_centers;
     }
 
     pub fn update_center(
@@ -91,9 +96,9 @@ impl<E: node::FloatElement> Kmeans<E> {
         batch_data: &[Vec<E>],
         assigned_center: &[usize],
     ) -> Vec<usize> {
-        let dimension = self._dimension;
-        let n_center = self._n_center;
-        let begin = self._data_range_begin;
+        let dimension = self.dimension;
+        let n_center = self.n_center;
+        let begin = self.data_range_begin;
         let mut new_centers: Vec<Vec<E>> = Vec::with_capacity(n_center);
         (0..n_center).for_each(|_| {
             new_centers.push(vec![E::from_f32(0.0).unwrap(); dimension]);
@@ -104,23 +109,24 @@ impl<E: node::FloatElement> Kmeans<E> {
             let cur_center = assigned_center[i];
             n_assigned_per_center[cur_center] += 1;
             (0..dimension).for_each(|j| {
-                if self._has_residual {
-                    new_centers[cur_center][j] += cur_data[begin + j] - self._residual[begin + j];
+                if self.has_residual {
+                    new_centers[cur_center][j] += cur_data[begin + j] - self.residual[begin + j];
                 } else {
                     new_centers[cur_center][j] += cur_data[begin + j];
                 }
             });
         });
 
-        (0..n_center).for_each(|i| {
+        for i in 0..n_center {
             if n_assigned_per_center[i] == 0 {
-                return;
+                continue;
             }
             (0..dimension).for_each(|j| {
-                new_centers[i][j] /= E::from_usize(n_assigned_per_center[i]).unwrap();
+                new_centers[i][j] /=
+                    <E as node::FloatElement>::from_usize(n_assigned_per_center[i]).unwrap();
             });
-        });
-        self._centers = new_centers;
+        }
+        self.centers = new_centers;
         n_assigned_per_center
     }
 
@@ -130,20 +136,19 @@ impl<E: node::FloatElement> Kmeans<E> {
         batch_data: &[Vec<E>],
         assigned_center: &mut Vec<usize>,
     ) {
-        let n_center = self._n_center;
-        let _dimension = self._dimension;
+        let n_center = self.n_center;
         (0..batch_size).for_each(|i| {
-            let mut nearist_center_id: usize = 0;
+            let mut nearest_center_id: usize = 0;
             (1..n_center).for_each(|j| {
-                let cur_center = &self._centers[j];
-                let nearist_center = &self._centers[nearist_center_id];
+                let cur_center = &self.centers[j];
+                let nearest_center = &self.centers[nearest_center_id];
                 if self.get_distance_from_vec(&batch_data[i], cur_center)
-                    < self.get_distance_from_vec(&batch_data[i], nearist_center)
+                    < self.get_distance_from_vec(&batch_data[i], nearest_center)
                 {
-                    nearist_center_id = j;
+                    nearest_center_id = j;
                 }
             });
-            assigned_center.push(nearist_center_id);
+            assigned_center.push(nearest_center_id);
         });
     }
 
@@ -152,8 +157,8 @@ impl<E: node::FloatElement> Kmeans<E> {
         batch_size: usize,
         n_assigned_per_center: &mut Vec<usize>,
     ) -> Result<(), &'static str> {
-        let dimension = self._dimension;
-        let n_center = self._n_center;
+        let dimension = self.dimension;
+        let n_center = self.n_center;
 
         if batch_size == 0 {
             return Err("None to assigned impossible split center");
@@ -176,13 +181,13 @@ impl<E: node::FloatElement> Kmeans<E> {
 
                 (0..dimension).for_each(|j| {
                     if j % 2 == 0 {
-                        self._centers[i][j] =
-                            self._centers[split_center_id][j] * E::from_f32(1.0 - EPS).unwrap();
-                        self._centers[split_center_id][j] *= E::from_f32(1.0 + EPS).unwrap();
+                        self.centers[i][j] =
+                            self.centers[split_center_id][j] * E::from_f32(1.0 - EPS).unwrap();
+                        self.centers[split_center_id][j] *= E::from_f32(1.0 + EPS).unwrap();
                     } else {
-                        self._centers[i][j] =
-                            self._centers[split_center_id][j] * E::from_f32(1.0 + EPS).unwrap();
-                        self._centers[split_center_id][j] *= E::from_f32(1.0 - EPS).unwrap();
+                        self.centers[i][j] =
+                            self.centers[split_center_id][j] * E::from_f32(1.0 + EPS).unwrap();
+                        self.centers[split_center_id][j] *= E::from_f32(1.0 - EPS).unwrap();
                     }
                 });
                 n_assigned_per_center[i] = n_assigned_per_center[split_center_id] / 2;
@@ -207,9 +212,9 @@ impl<E: node::FloatElement> Kmeans<E> {
     }
 
     pub fn set_range(&mut self, begin: usize, end: usize) {
-        assert!(end - begin == self._dimension);
-        self._data_range_begin = begin;
-        self._data_range_end = end;
+        assert!(end - begin == self.dimension);
+        self.data_range_begin = begin;
+        self.data_range_end = end;
     }
 }
 
@@ -233,11 +238,11 @@ pub fn general_kmeans<E: node::FloatElement, T: node::IdxType>(
     (0..epoch).for_each(|_| {
         let cluster_count: Vec<Mutex<usize>> = (0..k).map(|_| Mutex::new(0)).collect();
         let mut cluster_features: Vec<Mutex<Vec<E>>> = (0..k)
-            .map(|_| Mutex::new(vec![E::zero(); nodes[0].vectors().len()]))
+            .map(|_| Mutex::new(vec![num::Zero::zero(); nodes[0].vectors().len()]))
             .collect();
         nodes.par_iter().zip(0..nodes.len()).for_each(|(node, _j)| {
             let mut idx = 0;
-            let mut distance = E::max_value();
+            let mut distance = <E as node::FloatElement>::max_value();
             for (i, _item) in means.iter().enumerate() {
                 let _distance = node.metric(&means[i], mt).unwrap();
                 if _distance < distance {
@@ -249,7 +254,7 @@ pub fn general_kmeans<E: node::FloatElement, T: node::IdxType>(
                 .lock()
                 .unwrap()
                 .iter_mut()
-                .zip(node.vectors())
+                .zip(node.vectors().iter())
                 .for_each(|(i, j)| *i += *j);
             *cluster_count[idx].lock().unwrap() += 1;
         });
@@ -258,24 +263,22 @@ pub fn general_kmeans<E: node::FloatElement, T: node::IdxType>(
             .iter_mut()
             .zip(cluster_count)
             .for_each(|(features, cnt)| {
-                features
-                    .lock()
-                    .unwrap()
-                    .iter_mut()
-                    .for_each(|f| *f /= E::from_usize(*cnt.lock().unwrap()).unwrap())
+                features.lock().unwrap().iter_mut().for_each(|f| {
+                    *f /= <E as node::FloatElement>::from_usize(*cnt.lock().unwrap()).unwrap()
+                })
             });
 
         means
             .iter_mut()
             .zip(cluster_features)
-            .for_each(|(mean, features)| mean.set_vectors(&features.lock().unwrap()));
+            .for_each(|(mean, features)| mean.set_vectors(features.lock().unwrap().as_slice()));
     });
 
     means
         .iter()
         .map(|mean| {
             let mut mean_idx = 0;
-            let mut mean_distance = E::max_value();
+            let mut mean_distance = <E as node::FloatElement>::max_value();
             nodes.iter().zip(0..nodes.len()).for_each(|(node, i)| {
                 let distance = node.metric(mean, mt).unwrap();
                 if distance < mean_distance {

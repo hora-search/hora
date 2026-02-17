@@ -1,4 +1,7 @@
+//! BPT (Ball tree) index for approximate nearest neighbor search.
+
 #![allow(dead_code)]
+
 use crate::core::ann_index;
 use crate::core::calc;
 use crate::core::metrics;
@@ -11,10 +14,9 @@ use serde::{Deserialize, Serialize};
 use std::cmp::Ordering;
 use std::collections::BinaryHeap;
 use std::fs::File;
-
 use std::io::Write;
 
-// TODO: leaf as a trait with getter setter function
+/// Internal node/leaf for BPT tree (descendants, children, pivot node).
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 struct Leaf<E: node::FloatElement, T: node::IdxType> {
     n_descendants: i32, // tot n_descendants
@@ -171,27 +173,27 @@ fn two_means<E: node::FloatElement, T: node::IdxType>(
 
 #[derive(Default, Debug, Serialize, Deserialize)]
 pub struct BPTIndex<E: node::FloatElement, T: node::IdxType> {
-    _dimension: usize,    // dimension
-    _tot_items_cnt: i32, // add items count, means the physically the item count, _tot_items_cnt == leaves.size()
-    _tot_leaves_cnt: i32, // leaves count, whole tree leaves count
+    dimension: usize,    // dimension
+    tot_items_cnt: i32, // add items count, means the physically the item count, tot_items_cnt == leaves.size()
+    tot_leaves_cnt: i32, // leaves count, whole tree leaves count
     // _leaves_size: i32, // in source code, this means the memory which has been allocated, and we can use leaf's size to get data
-    _roots: Vec<i32>,     // dummy root's children
-    _leaf_max_items: i32, // max number of n_descendants to fit into leaf
-    _built: bool,
+    roots: Vec<i32>,     // dummy root's children
+    leaf_max_items: i32, // max number of n_descendants to fit into leaf
+    built: bool,
     leaves: Vec<Leaf<E, T>>,
     mt: metrics::Metric,
-    _tree_num: i32,
-    _candidate_size: i32,
+    tree_num: i32,
+    candidate_size: i32,
 }
 
 impl<E: node::FloatElement, T: node::IdxType> BPTIndex<E, T> {
     pub fn new(dimension: usize, params: &BPTParams) -> BPTIndex<E, T> {
         BPTIndex {
-            _built: false,
-            _dimension: dimension,
-            _leaf_max_items: ((dimension / 2) as i32) + 2,
-            _tree_num: params.tree_num,
-            _candidate_size: params.candidate_size,
+            built: false,
+            dimension: dimension,
+            leaf_max_items: ((dimension / 2) as i32) + 2,
+            tree_num: params.tree_num,
+            candidate_size: params.candidate_size,
             leaves: vec![Leaf::new()], // the id count should start from 1, use a node as placeholder
             ..Default::default()
         }
@@ -199,7 +201,7 @@ impl<E: node::FloatElement, T: node::IdxType> BPTIndex<E, T> {
 
     fn _add_item(&mut self, w: &node::Node<E, T>) -> Result<(), &'static str> {
         // TODO: remove
-        if w.len() != self._dimension {
+        if w.len() != self.dimension {
             return Err("dimension is different");
         }
 
@@ -210,7 +212,7 @@ impl<E: node::FloatElement, T: node::IdxType> BPTIndex<E, T> {
         nn.n_descendants = 1; // only the leaf itself, so the n_descendants include it self
 
         // no update method
-        self._tot_items_cnt += 1;
+        self.tot_items_cnt += 1;
 
         self.leaves.push(nn);
 
@@ -218,21 +220,21 @@ impl<E: node::FloatElement, T: node::IdxType> BPTIndex<E, T> {
     }
 
     fn build(&mut self, mt: metrics::Metric) -> Result<(), &'static str> {
-        if self._built {
+        if self.built {
             return Err("has built");
         }
 
         self.mt = mt;
-        self._tot_leaves_cnt = self._tot_items_cnt; // init with build.
-        self._build(self._tree_num, self.mt);
-        self._built = true;
+        self.tot_leaves_cnt = self.tot_items_cnt; // init with build.
+        self._build(self.tree_num, self.mt);
+        self.built = true;
         Ok(())
     }
 
     fn clear(&mut self) {
-        self._roots.clear();
-        self._tot_leaves_cnt = self._tot_items_cnt;
-        self._built = false;
+        self.roots.clear();
+        self.tot_leaves_cnt = self.tot_items_cnt;
+        self.built = false;
     }
     fn get_distance(&self, i: i32, j: i32) -> E {
         let ni = self.get_leaf(i).unwrap();
@@ -240,19 +242,19 @@ impl<E: node::FloatElement, T: node::IdxType> BPTIndex<E, T> {
         return metrics::metric(ni.node.vectors(), nj.node.vectors(), self.mt).unwrap();
     }
 
-    fn get_tot_items_cnt(&self) -> i32 {
-        self._tot_items_cnt
+    fn gettot_items_cnt(&self) -> i32 {
+        self.tot_items_cnt
     }
     fn get_n_tree(&self) -> i32 {
-        self._roots.len() as i32
+        self.roots.len() as i32
     }
 
-    fn get_dimension(&self) -> usize {
-        self._dimension
+    fn getdimension(&self) -> usize {
+        self.dimension
     }
 
     fn get_k(&self) -> i32 {
-        self._leaf_max_items
+        self.leaf_max_items
     }
 
     fn get_leaf_mut(&mut self, i: i32) -> &mut Leaf<E, T> {
@@ -297,7 +299,7 @@ impl<E: node::FloatElement, T: node::IdxType> BPTIndex<E, T> {
 
         loop {
             if tree_num == -1 {
-                if self._tot_leaves_cnt >= 2 * self._tot_items_cnt {
+                if self.tot_leaves_cnt >= 2 * self.tot_items_cnt {
                     break;
                 }
             } else if this_root.len() >= (tree_num as usize) {
@@ -305,7 +307,7 @@ impl<E: node::FloatElement, T: node::IdxType> BPTIndex<E, T> {
             }
 
             let mut indices: Vec<i32> = Vec::new();
-            for i in 1..self._tot_items_cnt {
+            for i in 1..self.tot_items_cnt {
                 let leaf = self.get_leaf(i).unwrap();
                 if leaf.n_descendants >= 1 {
                     indices.push(i as i32);
@@ -317,7 +319,7 @@ impl<E: node::FloatElement, T: node::IdxType> BPTIndex<E, T> {
         }
 
         // thread lock
-        self._roots.extend_from_slice(&this_root);
+        self.roots.extend_from_slice(&this_root);
     }
 
     fn make_tree(
@@ -334,11 +336,11 @@ impl<E: node::FloatElement, T: node::IdxType> BPTIndex<E, T> {
         }
 
         // the batch is a leaf cluster, make a parent node
-        if (indices.len() as i32) <= self._leaf_max_items
-            && (!is_root || self._tot_items_cnt <= self._leaf_max_items || indices.len() == 1)
+        if (indices.len() as i32) <= self.leaf_max_items
+            && (!is_root || self.tot_items_cnt <= self.leaf_max_items || indices.len() == 1)
         {
-            self._tot_leaves_cnt += 1;
-            let item_cnt = self._tot_items_cnt;
+            self.tot_leaves_cnt += 1;
+            let item_cnt = self.tot_items_cnt;
             let mut n = self.extent_leaf();
 
             n.n_descendants = if is_root {
@@ -348,7 +350,7 @@ impl<E: node::FloatElement, T: node::IdxType> BPTIndex<E, T> {
             };
             n.children = indices.to_vec();
 
-            return Ok(self._tot_leaves_cnt);
+            return Ok(self.tot_leaves_cnt);
         }
 
         let mut children: Vec<Leaf<E, T>> = Vec::new();
@@ -390,7 +392,7 @@ impl<E: node::FloatElement, T: node::IdxType> BPTIndex<E, T> {
             children_indices[1].clear();
 
             let is_initial = new_parent_leaf.node.len() == 0;
-            for z in 0..self._dimension {
+            for z in 0..self.dimension {
                 if is_initial {
                     new_parent_leaf.node.push(&E::float_zero()); // TODO: make it const value
                 } else {
@@ -406,7 +408,7 @@ impl<E: node::FloatElement, T: node::IdxType> BPTIndex<E, T> {
         let flip = (children_indices[0].len() > children_indices[1].len()) as bool;
 
         new_parent_leaf.n_descendants = if is_root {
-            self._tot_items_cnt
+            self.tot_items_cnt
         } else {
             indices.len() as i32
         };
@@ -422,10 +424,10 @@ impl<E: node::FloatElement, T: node::IdxType> BPTIndex<E, T> {
                 }
             }
         }
-        self._tot_leaves_cnt += 1;
+        self.tot_leaves_cnt += 1;
         self.leaves.push(new_parent_leaf);
 
-        Ok((self._tot_leaves_cnt) as i32)
+        Ok((self.tot_leaves_cnt) as i32)
     }
 
     fn _search_k(
@@ -437,48 +439,45 @@ impl<E: node::FloatElement, T: node::IdxType> BPTIndex<E, T> {
 
         v_leaf.node.set_vectors(&vectors.to_vec());
 
-        if self._roots.is_empty() || !self._built {
+        if self.roots.is_empty() || !self.built {
             return Err("empty tree");
         }
 
-        let mut candidate_size = self._candidate_size;
+        let mut candidate_size = self.candidate_size;
         if candidate_size <= 0 {
-            candidate_size = (n * self._roots.len() * 2) as i32;
+            candidate_size = (n * self.roots.len() * 2) as i32;
         }
 
         let mut heap: BinaryHeap<neighbor::Neighbor<E, i32>> = BinaryHeap::new(); // max-heap
-        self._roots.iter().for_each(|root| {
-            heap.push(neighbor::Neighbor {
-                _distance: self.pq_initial_value(), // float MAX
-                _idx: *root,
-            });
+        self.roots.iter().for_each(|root| {
+            heap.push(neighbor::Neighbor::new(*root, self.pq_initial_value()));
         });
 
         // it use a heap to ensure the minest distance node will pop up
         let mut nns: Vec<i32> = Vec::new();
         while nns.len() < (candidate_size as usize) && !(heap.is_empty()) {
             let top = heap.peek().unwrap();
-            let top_idx = top._idx;
-            let top_distance = top._distance;
+            let top_idx = top.idx();
+            let top_distance = top.distance();
 
             let nd = self.get_leaf(top_idx).unwrap();
             heap.pop();
 
-            if nd.n_descendants == 1 && (top_idx) < self._tot_items_cnt {
+            if nd.n_descendants == 1 && (top_idx) < self.tot_items_cnt {
                 nns.push(top_idx);
-            } else if nd.n_descendants <= self._leaf_max_items {
+            } else if nd.n_descendants <= self.leaf_max_items {
                 nns.extend_from_slice(&nd.children); // push all of its children
             } else {
                 let margin = self.margin(nd, vectors)?;
                 // put two children into heap, and use distance to sort the order for poping up.
-                heap.push(neighbor::Neighbor {
-                    _distance: self.pq_distance(top_distance, margin, 1),
-                    _idx: nd.children[1],
-                });
-                heap.push(neighbor::Neighbor {
-                    _distance: self.pq_distance(top_distance, margin, 0),
-                    _idx: nd.children[0],
-                });
+                heap.push(neighbor::Neighbor::new(
+                    nd.children[1],
+                    self.pq_distance(top_distance, margin, 1),
+                ));
+                heap.push(neighbor::Neighbor::new(
+                    nd.children[0],
+                    self.pq_distance(top_distance, margin, 0),
+                ));
             }
         }
 
@@ -505,7 +504,7 @@ impl<E: node::FloatElement, T: node::IdxType> BPTIndex<E, T> {
 
         for item in nns_vec.iter().take(return_size) {
             result.push((
-                self.get_leaf(item._idx as i32).unwrap().clone_node(),
+                self.get_leaf(item.idx() as i32).unwrap().clone_node(),
                 item._distance,
             ));
         }
@@ -514,7 +513,7 @@ impl<E: node::FloatElement, T: node::IdxType> BPTIndex<E, T> {
     }
 
     fn show_trees(&self) {
-        let mut v = self._roots.clone();
+        let mut v = self.roots.clone();
         while !v.is_empty() {
             let i = v.pop().unwrap();
             let item = self.get_leaf(i).unwrap();
@@ -586,7 +585,7 @@ impl<E: node::FloatElement, T: node::IdxType> ann_index::ANNIndex<E, T> for BPTI
         self._add_item(item)
     }
     fn built(&self) -> bool {
-        self._built
+        self.built
     }
 
     fn node_search_k(&self, item: &node::Node<E, T>, k: usize) -> Vec<(node::Node<E, T>, E)> {
@@ -598,7 +597,7 @@ impl<E: node::FloatElement, T: node::IdxType> ann_index::ANNIndex<E, T> for BPTI
     }
 
     fn dimension(&self) -> usize {
-        self._dimension
+        self.dimension
     }
 }
 

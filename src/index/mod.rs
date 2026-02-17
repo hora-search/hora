@@ -1,3 +1,5 @@
+//! Index implementations: BruteForce, HNSW, PQ, SSG.
+
 // pub mod bpt_idx;
 // pub mod bpt_params;
 pub mod bruteforce_idx;

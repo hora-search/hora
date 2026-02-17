@@ -1,4 +1,7 @@
+//! Exhaustive (brute-force) k-NN search; exact results, O(n) per query.
+
 #![allow(dead_code)]
+
 use crate::core::ann_index;
 use crate::core::metrics;
 use crate::core::neighbor;
@@ -7,22 +10,22 @@ use crate::index::bruteforce_params::BruteForceParams;
 use serde::de::DeserializeOwned;
 use serde::{Deserialize, Serialize};
 use std::collections::BinaryHeap;
-
 use std::fs::File;
-
 use std::io::Write;
 
+/// Brute-force index: stores all nodes and scans them for each query. Exact k-NN.
 #[derive(Debug, Serialize, Deserialize)]
 pub struct BruteForceIndex<E: node::FloatElement, T: node::IdxType> {
     #[serde(skip_serializing, skip_deserializing)]
     nodes: Vec<Box<node::Node<E, T>>>,
-    tmp_nodes: Vec<node::Node<E, T>>, // only use for serialization scene
+    /// Used only for serialization (bincode does not handle Box in place).
+    tmp_nodes: Vec<node::Node<E, T>>,
     mt: metrics::Metric,
     dimension: usize,
 }
 
 impl<E: node::FloatElement, T: node::IdxType> BruteForceIndex<E, T> {
-    pub fn new(dimension: usize, _params: &BruteForceParams) -> BruteForceIndex<E, T> {
+    pub fn new(dimension: usize, params: &BruteForceParams) -> BruteForceIndex<E, T> {
         BruteForceIndex::<E, T> {
             nodes: Vec::new(),
             mt: metrics::Metric::Unknown,
@@ -35,11 +38,11 @@ impl<E: node::FloatElement, T: node::IdxType> BruteForceIndex<E, T> {
 impl<E: node::FloatElement, T: node::IdxType> ann_index::ANNIndex<E, T> for BruteForceIndex<E, T> {
     fn build(&mut self, mt: metrics::Metric) -> Result<(), &'static str> {
         self.mt = mt;
-        Result::Ok(())
+        Ok(())
     }
     fn add_node(&mut self, item: &node::Node<E, T>) -> Result<(), &'static str> {
         self.nodes.push(Box::new(item.clone()));
-        Result::Ok(())
+        Ok(())
     }
     fn built(&self) -> bool {
         true
@@ -101,6 +104,6 @@ impl<E: node::FloatElement + DeserializeOwned, T: node::IdxType + DeserializeOwn
         let mut file = File::create(path).unwrap();
         file.write_all(&encoded_bytes)
             .unwrap_or_else(|_| panic!("unable to write file {:?}", path));
-        Result::Ok(())
+        Ok(())
     }
 }

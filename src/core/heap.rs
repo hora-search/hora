@@ -1,8 +1,9 @@
-// this lib migrate from official lib, but without std dependency;
+//! `no_std`-compatible binary heap (migrated from std, without std dependency).
 
 use core::mem::{swap, ManuallyDrop};
 use core::ptr;
 
+/// Min-heap for generic `Ord` types; used in ANN search for candidate ordering.
 pub struct BinaryHeap<T> {
     data: Vec<T>,
 }

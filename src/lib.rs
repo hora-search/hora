@@ -1,3 +1,10 @@
+//! # Hora
+//!
+//! Hora Search Everywhere - Approximate Nearest Neighbor (ANN) search library.
+//!
+//! Provides multiple index implementations: BruteForce, HNSW, PQ, SSG, etc.,
+//! with support for Euclidean, Manhattan, Cosine and other metrics.
+
 pub mod core;
 pub mod index;
 
@@ -12,15 +19,13 @@ mod tests {
 
     use std::sync::Arc;
     use std::sync::Mutex;
+    /// Generates test data: cluster centers and points with normal noise.
     fn make_normal_distribution_clustering(
         clustering_n: usize,
         node_n: usize,
         dimension: usize,
         range: f64,
-    ) -> (
-        Vec<Vec<f64>>, // center of cluster
-        Vec<Vec<f64>>, // cluster data
-    ) {
+    ) -> (Vec<Vec<f64>>, Vec<Vec<f64>>) {
         let mut bases: Vec<Vec<f64>> = Vec::new();
         let mut ns: Vec<Vec<f64>> = Vec::new();
         for _i in 0..clustering_n {
@@ -97,14 +102,14 @@ mod tests {
             let base_set: HashSet<usize> = bf_idx
                 .search_nodes(w, 100)
                 .iter()
-                .map(|(n, _dist)| n.idx().unwrap())
+                .map(|(n, _dist)| *n.idx().as_ref().unwrap())
                 .collect();
 
             for j in 0..indices.len() {
                 accuracy.lock().unwrap()[j] = 0.0;
                 let result = indices[j].search_nodes(w, 100);
                 for (n, _dist) in result.iter() {
-                    if base_set.contains(&n.idx().unwrap()) {
+                    if base_set.contains(n.idx().as_ref().unwrap()) {
                         accuracy.lock().unwrap()[j] += 1.0;
                     }
                 }
@@ -112,6 +117,7 @@ mod tests {
         }
     }
 
+    /// Fills an index with embeddings and builds it with Euclidean metric.
     fn make_idx_baseline<
         E: core::node::FloatElement,
         T: core::ann_index::ANNIndex<E, usize> + ?Sized,

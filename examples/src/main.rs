@@ -1,3 +1,5 @@
+//! Hora examples: demo and optional ANN benchmark.
+
 mod ann_bench;
 mod demo;
 

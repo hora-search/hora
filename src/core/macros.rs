@@ -1,3 +1,5 @@
+//! Conditionally parallel or sequential iteration macros (respects `no_thread` feature).
+
 #[macro_export]
 macro_rules! vec_iter {
     (  $v:expr, $d: ident) => {

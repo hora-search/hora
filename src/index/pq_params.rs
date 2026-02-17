@@ -1,9 +1,11 @@
+//! Parameters for PQ (Product Quantization) and IVF-PQ indexes.
+
 #![allow(dead_code)]
 
 use crate::core::node;
-
 use serde::{Deserialize, Serialize};
 
+/// PQ index parameters: number of subspaces, bits per subquantizer, training epochs.
 #[derive(Debug, Serialize, Deserialize)]
 pub struct PQParams<E: node::FloatElement> {
     pub n_sub: usize,

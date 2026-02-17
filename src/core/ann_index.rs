@@ -1,56 +1,43 @@
+//! ANN index trait and serialization interface.
+
 use crate::core::metrics;
 use crate::core::node;
-
 use serde::de::DeserializeOwned;
 
-/// ANNIndex trait provide the all `Approximate Nearest Neighbor Search` problem required method
+/// Trait for Approximate Nearest Neighbor (ANN) indexes.
 ///
-/// ANNIndex is the main trait that all `Approximate Nearest Neighbor Search` algorithm index have to implement
+/// Implementors support adding nodes, building the index, and querying for k nearest neighbors.
+/// After construction, call [`build`](ANNIndex::build) to finalize the index for search.
 ///
-/// Initial a ANNIndex and call `.build` method, it will build up the index internal to speed up the ANN search.
+/// # Example
 ///
-///
-/// Example:
-///
-/// ```
-/// let mut bf_idx = Box::new(bf::bf::BruteForceIndex::<f32, usize>::new()); // use BruteForceIndex
-/// for i in 0..embs.len() {
-///    bf_idx.add_node(&core::node::Node::<E, usize>::new_with_idx(&embs[i], i)); // add index
+/// ```ignore
+/// let mut idx = Box::new(BruteForceIndex::<f32, usize>::new(dim, &params));
+/// for (i, emb) in embs.iter().enumerate() {
+///     idx.add_node(&Node::new_with_idx(emb, i)).unwrap();
 /// }
-/// bf_idx.build(core::metrics::Metric::Euclidean).unwrap(); // build up index
-/// println!("{embedding {}'s nearest neighbor is {}}", 0, bf_idx.search(embs[0]);
+/// idx.build(Metric::Euclidean).unwrap();
+/// let nearest = idx.search(&embs[0], 10);
 /// ```
-///
-
 pub trait ANNIndex<E: node::FloatElement, T: node::IdxType>: Send + Sync {
-    /// build up the ANN index
-    ///
-    /// build up index with all node which have add into before, it will cost some time, and the time it cost depends on the algorithm
-    /// return `Err(&'static str)` if there is something wrong with the building process, and the `static str` is the debug reason
+    /// Builds the index from all previously added nodes. May be expensive depending on the algorithm.
     fn build(&mut self, mt: metrics::Metric) -> Result<(), &'static str>;
 
-    /// add node internal method
-    ///
-    /// it will allocate a space in the heap(Vector), and init a `Node`
-    /// return `Err(&'static str)` if there is something wrong with the adding process, and the `static str` is the debug reason
+    /// Adds a single node (vector + index) to the index.
     fn add_node(&mut self, item: &node::Node<E, T>) -> Result<(), &'static str>;
 
-    /// add node
-    ///
-    /// call `add_node()` internal
+    /// Adds a node from a slice and index; delegates to `add_node`.
     fn add(&mut self, vs: &[E], idx: T) -> Result<(), &'static str> {
         self.add_node(&node::Node::new_with_idx(vs, idx))
     }
 
-    /// add multiple node one time
-    ///
-    /// return `Err(&'static str)` if there is something wrong with the adding process, and the `static str` is the debug reason
+    /// Adds multiple nodes at once. Returns an error if `vss.len() != indices.len()`.
     fn madd(&mut self, vss: &[&[E]], indices: &[T]) -> Result<(), &'static str> {
         if vss.len() != indices.len() {
-            return Err("vector's size is different with index");
+            return Err("vector count does not match index count");
         }
-        for idx in 0..vss.len() {
-            let n = node::Node::new_with_idx(vss[idx], indices[idx].clone());
+        for (vs, id) in vss.iter().zip(indices) {
+            let n = node::Node::new_with_idx(vs, id.clone());
             if let Err(err) = self.add_node(&n) {
                 return Err(err);
             }
@@ -58,92 +45,63 @@ pub trait ANNIndex<E: node::FloatElement, T: node::IdxType>: Send + Sync {
         Ok(())
     }
 
-    /// return the index has already been built or not
-    ///
-    /// return `True` if the index has been built
+    /// Returns whether the index has been built (ready for search).
     fn built(&self) -> bool;
 
-    /// to rebuild the index with all nodes inside
-    ///
-    /// return `Err(&'static str)` if there is something wrong with the rebuilding process, and the `static str` is the debug reason
+    /// Rebuilds the index with current nodes. Default implementation returns an error.
     fn rebuild(&mut self, _mt: metrics::Metric) -> Result<(), &'static str> {
-        Err("not implement")
+        Err("not implemented")
     }
 
-    /// search for k nearest neighbors node internal method
+    /// Internal: search for k nearest neighbors given a node. Implementors override this.
     fn node_search_k(&self, item: &node::Node<E, T>, k: usize) -> Vec<(node::Node<E, T>, E)>;
 
-    /// search for k nearest neighbors and return full info
-    ///
-    /// it will return the all node's info including the original vectors, and the metric distance
-    ///
-    /// it require the item is the slice with the same dimension with index dimension, otherwise it will panic
+    /// Returns k nearest neighbors as (node, distance). Panics if `item.len() != dimension()`.
     fn search_nodes(&self, item: &[E], k: usize) -> Vec<(node::Node<E, T>, E)> {
         assert_eq!(item.len(), self.dimension());
         self.node_search_k(&node::Node::new(item), k)
     }
 
-    /// search for k nearest neighbors
-    ///
-    /// it only return the idx of the nearest node
-    ///
-    /// it require the item is the slice with the same dimension with index dimension, otherwise it will panic
+    /// Returns indices of k nearest neighbors. Panics if `item.len() != dimension()`.
     fn search(&self, item: &[E], k: usize) -> Vec<T> {
         assert_eq!(item.len(), self.dimension());
         self.node_search_k(&node::Node::new(item), k)
-            .iter()
-            .map(|x| x.0.idx().as_ref().unwrap().clone())
+            .into_iter()
+            .map(|(n, _)| n.idx().as_ref().unwrap().clone())
             .collect::<Vec<T>>()
     }
 
-    /// return the name of the Index
-    /// format like this
-    /// `HNSWIndex(Hierarchical Navigable Small World Index)`
+    /// Human-readable index name (e.g. `"HNSWIndex"`).
     fn name(&self) -> &'static str;
 
-    /// internal nodes' size
+    /// Number of nodes in the index. Default is 0.
     fn nodes_size(&self) -> usize {
         0
     }
 
-    /// clear all nodes and index built before
+    /// Clears all nodes and built index state.
     fn clear(&mut self) {}
 
-    /// return String of Index statistics informations
+    /// Optional statistics string for the index. Default: `"not implemented"`.
     fn idx_info(&self) -> String {
-        "not implement".to_string()
+        "not implemented".to_string()
     }
 
-    /// return the dimension it require
+    /// Vector dimension required by this index.
     fn dimension(&self) -> usize {
         0
     }
 }
 
-/// SerializableIndex provide the `Serialization` and `Deserialization` method for the index
-/// SerializableIndex is the main trait that all index have to implement
+/// Index that can be serialized to and loaded from disk (e.g. bincode).
 ///
-/// call `.dump` method to dump a binary format file in the disk, and the binary file include all nodes which have added into
-/// call `.load' method to load a binary format file to load back the Index built before, and the Index loaded have all Nodes' info the binary file have
-///
-///
-/// Example:
-///
-/// ```
-/// let mut bf_idx = Box::new(bf::bf::BruteForceIndex::<f32, usize>::new()); // use BruteForceIndex
-/// for i in 0..embs.len() {
-///    bf_idx.add_node(&core::node::Node::<E, usize>::new_with_idx(&embs[i], i)); // add index
-/// }
-/// bf_idx.dump("bf_idx.idx", &arguments::Args::new());
-/// let bf_idx2 = Box::new(bf::bf::BruteForceIndex::<f32, usize>::load("bf_idx.idx", &argument).unwrap());
-/// ```
-///
+/// Use [`dump`](SerializableIndex::dump) to save and [`load`](SerializableIndex::load) to restore.
 pub trait SerializableIndex<
     E: node::FloatElement + DeserializeOwned,
     T: node::IdxType + DeserializeOwned,
 >: Send + Sync + ANNIndex<E, T>
 {
-    /// load file with path
+    /// Loads the index from a file at `path`. Default returns an error.
     fn load(_path: &str) -> Result<Self, &'static str>
     where
         Self: Sized,
@@ -151,7 +109,7 @@ pub trait SerializableIndex<
         Err("empty implementation")
     }
 
-    /// dump the file into the path
+    /// Saves the index to a file at `path`. Default returns an error.
     fn dump(&mut self, _path: &str) -> Result<(), &'static str> {
         Err("empty implementation")
     }
