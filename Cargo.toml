@@ -55,6 +55,8 @@ serde = {version = "1.0", features = ["derive"]}
 
 [dev-dependencies]
 criterion = "0.5"
+rand_distr = "0.4"
+hdf5 = "0.8.1"
 
 [[bench]]
 harness = false

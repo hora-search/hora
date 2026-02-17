@@ -59,7 +59,8 @@ macro_rules! to_float_element {
             }
 
             fn float_two() -> Self {
-                2.0
+                // this must be 1.0, otherwise the angular distance will be incorrect
+                1.0
             }
 
             fn float_zero() -> Self {

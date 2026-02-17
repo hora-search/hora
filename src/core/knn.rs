@@ -28,16 +28,16 @@ pub fn naive_build_knn_graph<E: FloatElement, T: IdxType>(
             let mut heap = BinaryHeap::with_capacity(k + 1);
             
             // Process nodes in chunks for better cache locality
-            for i in 0..nodes.len() {
+            (0..nodes.len()).for_each(|i| {
                 if i == n {
-                    continue;
+                    return;
                 }
                 let dist = item.metric(&nodes[i], mt).unwrap();
                 heap.push(Neighbor::new(i, dist));
                 if heap.len() > k {
                     heap.pop();
                 }
-            }
+            });
             
             // Convert heap to vector (reversed for correct order)
             let mut tmp = Vec::with_capacity(heap.len());

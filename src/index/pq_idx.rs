@@ -124,7 +124,6 @@ impl<E: node::FloatElement, T: node::IdxType> PQIndex<E, T> {
         let n_item = self.n_items;
         let n_sub = self.n_sub;
         (0..n_sub).for_each(|i| {
-            let dimension = self.subdimension;
             let n_center = self.n_sub_center;
             let n_epoch = self.train_epoch;
             let begin = self.dimension_range[i][0];

@@ -4,7 +4,6 @@
 
 use crate::core::{metrics, node};
 use metrics::metric;
-use num::traits::FromPrimitive;
 use rand::prelude::*;
 use rayon::prelude::*;
 use std::sync::Mutex;
@@ -117,15 +116,15 @@ impl<E: node::FloatElement> Kmeans<E> {
             });
         });
 
-        for i in 0..n_center {
+        (0..n_center).for_each(|i| {
             if n_assigned_per_center[i] == 0 {
-                continue;
+                return;
             }
             (0..dimension).for_each(|j| {
                 new_centers[i][j] /=
                     <E as node::FloatElement>::from_usize(n_assigned_per_center[i]).unwrap();
             });
-        }
+        });
         self.centers = new_centers;
         n_assigned_per_center
     }

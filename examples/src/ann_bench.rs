@@ -29,7 +29,7 @@ pub fn ann_bench() {
         .read_raw::<f32>()
         .unwrap()
         .chunks(BENCH_DIMENSION)
-        .map(|s| s.to_vec())
+        .map(|s: &[f32]| s.to_vec())
         .collect();
     let test: Vec<Vec<f32>> = file
         .dataset("test")
@@ -37,7 +37,7 @@ pub fn ann_bench() {
         .read_raw::<f32>()
         .unwrap()
         .chunks(BENCH_DIMENSION)
-        .map(|s| s.to_vec())
+        .map(|s: &[f32]| s.to_vec())
         .collect();
     let neighbors: Vec<HashSet<usize>> = file
         .dataset("neighbors")
