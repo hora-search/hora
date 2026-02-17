@@ -1,9 +1,11 @@
+//! Parameters for HNSW (Hierarchical Navigable Small World) index.
+
 #![allow(dead_code)]
 
 use crate::core::node;
-
 use serde::{Deserialize, Serialize};
 
+/// HNSW construction and search parameters (M, M0, max_level, ef_build, ef_search, etc.).
 #[derive(Debug, Serialize, Deserialize)]
 pub struct HNSWParams<E: node::FloatElement> {
     pub max_item: usize,

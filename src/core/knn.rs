@@ -17,27 +17,42 @@ pub fn naive_build_knn_graph<E: FloatElement, T: IdxType>(
     k: usize,
     graph: &mut Vec<Vec<Neighbor<E, usize>>>, // TODO: not use this one
 ) {
-    let tmp_graph = Arc::new(Mutex::new(graph));
-    (0..nodes.len()).into_par_iter().for_each(|n| {
-        let item = &nodes[n];
-        let mut heap = BinaryHeap::with_capacity(k);
-        (0..nodes.len()).for_each(|i| {
-            if i == n {
-                return;
+    // Pre-allocate graph to avoid reallocations
+    graph.resize_with(nodes.len(), || Vec::with_capacity(k));
+    
+    // Use collect to avoid lock contention - compute all results first, then assign
+    let results: Vec<Vec<Neighbor<E, usize>>> = (0..nodes.len())
+        .into_par_iter()
+        .map(|n| {
+            let item = &nodes[n];
+            let mut heap = BinaryHeap::with_capacity(k + 1);
+            
+            // Process nodes in chunks for better cache locality
+            (0..nodes.len()).for_each(|i| {
+                if i == n {
+                    return;
+                }
+                let dist = item.metric(&nodes[i], mt).unwrap();
+                heap.push(Neighbor::new(i, dist));
+                if heap.len() > k {
+                    heap.pop();
+                }
+            });
+            
+            // Convert heap to vector (reversed for correct order)
+            let mut tmp = Vec::with_capacity(heap.len());
+            while let Some(neighbor) = heap.pop() {
+                tmp.push(neighbor);
             }
-            heap.push(Neighbor::new(i, item.metric(&nodes[i], mt).unwrap()));
-            if heap.len() > k {
-                heap.pop();
-            }
-        });
-        let mut tmp = Vec::with_capacity(heap.len());
-        while !heap.is_empty() {
-            tmp.push(heap.pop().unwrap());
-        }
-
-        tmp_graph.lock().unwrap()[n].clear();
-        tmp_graph.lock().unwrap()[n] = tmp;
-    });
+            tmp.reverse();
+            tmp
+        })
+        .collect();
+    
+    // Single-threaded assignment to avoid any contention
+    for (i, result) in results.into_iter().enumerate() {
+        graph[i] = result;
+    }
 }
 
 pub struct NNDescentHandler<'a, E: FloatElement, T: IdxType> {
@@ -93,18 +108,20 @@ impl<'a, E: FloatElement, T: IdxType> NNDescentHandler<'a, E, T> {
         let dist = self.nodes[me]
             .metric(&self.nodes[candidate], self.mt)
             .unwrap();
-        if dist > my_graph[me].lock().unwrap().peek().unwrap().distance() {
-            false
-        } else {
-            my_graph[me]
-                .lock()
-                .unwrap()
-                .push(Neighbor::new(candidate, dist));
-            if my_graph[me].lock().unwrap().len() > self.k {
-                my_graph[me].lock().unwrap().pop();
+        
+        // Single lock acquisition for the entire operation
+        let mut graph = my_graph[me].lock().unwrap();
+        if let Some(peek) = graph.peek() {
+            if dist > peek.distance() {
+                return false;
             }
-            true
         }
+        
+        graph.push(Neighbor::new(candidate, dist));
+        if graph.len() > self.k {
+            graph.pop();
+        }
+        true
     }
 
     fn init(&mut self) {

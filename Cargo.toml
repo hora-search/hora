@@ -1,6 +1,6 @@
 [package]
 authors = ["aljun <gagasalamer@outlook.com>", "moonlight"]
-edition = "2018"
+edition = "2021"
 license = "Apache-2.0"
 name = "hora"
 version = "0.1.1"
@@ -41,21 +41,22 @@ rpath = false
 [features]
 no_std = ["hashbrown"]
 no_thread = []
-simd = ["packed_simd"]
+simd = []
 
 [dependencies]
-bincode = "^1.3"
-fixedbitset = "0.4.0"
-hashbrown = {version = "0.11.2", optional = true}
-log = "^0.4"
-num = "0.4.0"
-packed_simd = {version = "0.3.6", package = "packed_simd_2", optional = true}
-rand = "0.8.4"
-rayon = "^1.5"
-serde = {version = "^1.0", features = ["derive"]}
+bincode = "1.3"
+fixedbitset = "0.5"
+hashbrown = {version = "0.15", optional = true}
+log = "0.4"
+num = "0.4"
+rand = "0.8"
+rayon = "1.11"
+serde = {version = "1.0", features = ["derive"]}
 
 [dev-dependencies]
-criterion = "0.3.4"
+criterion = "0.5"
+rand_distr = "0.4"
+hdf5 = "0.8.1"
 
 [[bench]]
 harness = false

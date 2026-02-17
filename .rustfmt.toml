@@ -1,0 +1,7 @@
+# Project-wide Rust style: 4 spaces, max width 100
+edition = "2021"
+max_width = 100
+use_small_heuristics = "Default"
+reorder_imports = true
+reorder_modules = true
+newline_style = "Unix"

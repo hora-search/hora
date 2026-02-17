@@ -1,9 +1,11 @@
+//! Parameters for SSG (Saturating Spanning Graph) index.
+
 #![allow(dead_code)]
 
 use crate::core::node;
-
 use serde::{Deserialize, Serialize};
 
+/// SSG index parameters: angle, init_k, index_size, neighbor size, root_size.
 #[derive(Debug, Serialize, Deserialize)]
 pub struct SSGParams<E: node::FloatElement> {
     pub angle: E,

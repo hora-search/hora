@@ -1,4 +1,7 @@
+//! SSG (Saturating Spanning Graph) approximate nearest neighbor index.
+
 #![allow(dead_code)]
+
 use crate::core::ann_index;
 use crate::core::kmeans;
 use crate::core::metrics;
@@ -17,11 +20,11 @@ use std::collections::BinaryHeap;
 use std::collections::HashSet;
 use std::collections::LinkedList;
 use std::collections::VecDeque;
-
 use std::fs::File;
 use std::io::Write;
 use std::sync::{Arc, Mutex};
 
+/// SSG index: sparse graph built from k-NN graph with angle constraint; BFS-style search.
 #[derive(Debug, Serialize, Deserialize)]
 pub struct SSGIndex<E: node::FloatElement, T: node::IdxType> {
     #[serde(skip_serializing, skip_deserializing)]
@@ -244,7 +247,8 @@ impl<E: node::FloatElement, T: node::IdxType> SSGIndex<E, T> {
                     .metric(&self.nodes[p.idx()], self.mt)
                     .unwrap();
                 let cos_ij = (p.distance().powi(2) + iter.distance().powi(2) - djk.powi(2))
-                    / (E::from_usize(2).unwrap() * (p.distance() * iter.distance()));
+                    / (<E as node::FloatElement>::from_usize(2).unwrap()
+                        * (p.distance() * iter.distance()));
 
                 if cos_ij > threshold {
                     occlude = true;
@@ -258,13 +262,15 @@ impl<E: node::FloatElement, T: node::IdxType> SSGIndex<E, T> {
         }
 
         (0..result.len()).for_each(|t| {
-            pruned_graph_tmp[t + query_id * self.index_size]._idx = result[t].idx();
-            pruned_graph_tmp[t + query_id * self.index_size]._distance = result[t].distance();
+            pruned_graph_tmp[t + query_id * self.index_size] =
+                neighbor::Neighbor::new(result[t].idx(), result[t].distance());
         });
         if result.len() < self.index_size {
             (result.len()..self.index_size).for_each(|i| {
-                pruned_graph_tmp[query_id * self.index_size + i]._distance = E::max_value();
-                pruned_graph_tmp[query_id * self.index_size + i]._idx = self.nodes.len();
+                pruned_graph_tmp[query_id * self.index_size + i] = neighbor::Neighbor::new(
+                    self.nodes.len(),
+                    <E as node::FloatElement>::max_value(),
+                );
                 // means not exist
             });
         }
@@ -278,7 +284,7 @@ impl<E: node::FloatElement, T: node::IdxType> SSGIndex<E, T> {
         pruned_graph_tmp: &mut Vec<neighbor::Neighbor<E, usize>>,
     ) {
         (0..range).for_each(|i| {
-            if pruned_graph_tmp[i + n].distance() == E::max_value() {
+            if pruned_graph_tmp[i + n].distance() == <E as node::FloatElement>::max_value() {
                 return;
             }
 
@@ -288,7 +294,9 @@ impl<E: node::FloatElement, T: node::IdxType> SSGIndex<E, T> {
             let mut dup = false;
 
             for j in 0..range {
-                if pruned_graph_tmp[j + des * self.index_size].distance() == E::max_value() {
+                if pruned_graph_tmp[j + des * self.index_size].distance()
+                    == <E as node::FloatElement>::max_value()
+                {
                     break;
                 }
                 // each other has neighbor relationship
@@ -324,7 +332,8 @@ impl<E: node::FloatElement, T: node::IdxType> SSGIndex<E, T> {
                             .metric(&self.nodes[p.idx()], self.mt)
                             .unwrap();
                         let cos_ij = (p.distance().powi(2) + rt.distance().powi(2) - djk.powi(2))
-                            / (E::from_usize(2).unwrap() * (p.distance() * rt.distance()));
+                            / (<E as node::FloatElement>::from_usize(2).unwrap()
+                                * (p.distance() * rt.distance()));
 
                         if cos_ij > self.threshold {
                             occlude = true;
@@ -341,15 +350,24 @@ impl<E: node::FloatElement, T: node::IdxType> SSGIndex<E, T> {
                 });
 
                 if result.len() < range {
-                    pruned_graph_tmp[result.len() + des * self.index_size]._distance =
-                        E::max_value();
+                    pruned_graph_tmp[result.len() + des * self.index_size] =
+                        neighbor::Neighbor::new(
+                            self.nodes.len(),
+                            <E as node::FloatElement>::max_value(),
+                        );
                 }
             } else {
                 for t in 0..range {
-                    if pruned_graph_tmp[t + des * self.index_size].distance() == E::max_value() {
+                    if pruned_graph_tmp[t + des * self.index_size].distance()
+                        == <E as node::FloatElement>::max_value()
+                    {
                         pruned_graph_tmp[t + des * self.index_size] = sn.clone();
                         if (t + 1) < range {
-                            pruned_graph_tmp[t + des * self.index_size]._distance = E::max_value();
+                            pruned_graph_tmp[t + 1 + des * self.index_size] =
+                                neighbor::Neighbor::new(
+                                    self.nodes.len(),
+                                    <E as node::FloatElement>::max_value(),
+                                );
                             break;
                         }
                     }
@@ -371,7 +389,9 @@ impl<E: node::FloatElement, T: node::IdxType> SSGIndex<E, T> {
         for i in 0..self.nodes.len() {
             let mut pool_size = 0;
             for j in 0..self.index_size {
-                if pruned_graph_tmp[i * self.index_size + j].distance() == E::max_value() {
+                if pruned_graph_tmp[i * self.index_size + j].distance()
+                    == <E as node::FloatElement>::max_value()
+                {
                     break;
                 }
                 pool_size = j;

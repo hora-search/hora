@@ -1,12 +1,15 @@
+//! Simple HNSW demo: build index on random vectors and query k-NN.
+
 use hora::core::ann_index::ANNIndex;
 use rand::{thread_rng, Rng};
 use rand_distr::{Distribution, Normal};
 
+/// Builds an HNSW index on random Gaussian vectors and runs a sample k-NN query.
 pub fn demo() {
-    let n = 1000000;
+    let n = 1_000_000;
     let dimension = 64;
 
-    // make sample points
+    // Sample points from normal distribution
     let mut samples = Vec::with_capacity(n);
     let normal = Normal::new(0.0, 10.0).unwrap();
     for _i in 0..n {
@@ -17,23 +20,22 @@ pub fn demo() {
         samples.push(sample);
     }
 
-    // init index
+    // Build HNSW index
     let mut index = hora::index::hnsw_idx::HNSWIndex::<f32, usize>::new(
         dimension,
         &hora::index::hnsw_params::HNSWParams::<f32>::default(),
     );
     for (i, sample) in samples.iter().enumerate().take(n) {
-        // add point
         index.add(sample, i).unwrap();
     }
     index.build(hora::core::metrics::Metric::Euclidean).unwrap();
 
+    // Query k nearest neighbors for a random point
     let mut rng = thread_rng();
     let target: usize = rng.gen_range(0..n);
-    // 523 has neighbors: [523, 762, 364, 268, 561, 231, 380, 817, 331, 246]
     println!(
         "{:?} has neighbors: {:?}",
         target,
-        index.search(&samples[target], 10) // search for k nearest neighbors
+        index.search(&samples[target], 10)
     );
 }

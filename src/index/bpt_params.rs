@@ -1,8 +1,10 @@
-#![allow(dead_code)]
+//! Parameters for BPT (Ball tree) index.
 
+#![allow(dead_code)]
 
 use serde::{Deserialize, Serialize};
 
+/// BPT index parameters: number of trees and candidate size.
 #[derive(Debug, Serialize, Deserialize)]
 pub struct BPTParams {
     pub tree_num: i32,
